@@ -7,11 +7,16 @@ namespace YesodScript.Engine.Commands
 		[CommandParameter]
 		private string id;
 
+		[CommandParameter]
+		private string labelWhenEmpty;
+
 		private List<Instruction> _fired;
 
 		public override void OnEnter()
 		{
 			_fired = VM.FireTrigger(id);
+			if (_fired.Count == 0 && !string.IsNullOrEmpty(labelWhenEmpty))
+				Instruction.Jump(labelWhenEmpty);
 		}
 
 		public override bool OnTick(float deltaTime)
