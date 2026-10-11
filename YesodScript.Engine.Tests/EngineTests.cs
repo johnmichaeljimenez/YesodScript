@@ -23,9 +23,16 @@ public partial class EngineTests
     public void Test_Directory()
     {
         var vm = new VirtualMachine();
-        vm.CompileDirectory("scripts", "ysl");
-        vm.FindInstruction("DefaultArg").Should().NotBeNull();
+        vm.CompileDirectory("scripts/special", "ysl");
         vm.FindInstruction("special/Minsky").Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Test_Compiler()
+    {
+        FluentActions.Invoking(() => Utils.Test(out var output, "FAULTY.ysl"))
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("Compiler error at 'FAULTY' line 1: Unknown command: 'INVALID'");
     }
 
     [Fact]

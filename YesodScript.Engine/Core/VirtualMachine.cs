@@ -373,78 +373,88 @@ public class VirtualMachine : IDisposable
 		var ins = new Instruction() { ID = id };
 		var n = 0;
 
+		var lineNumber = 0;
+
 		foreach (var i in code.Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None))
 		{
-			if (string.IsNullOrEmpty(i)) continue;
-
-			var line = i.Trim();
-			if (line.Length == 0) continue;
-			if (line.StartsWith("#")) continue;
-
-			if (line.StartsWith("@"))
+			lineNumber++;
+			try
 			{
-				var triggerLine = line.Substring(1).Trim();
-				var lineParts = triggerLine.SplitArguments();
-				var triggerKey = lineParts[0];
+				if (string.IsNullOrEmpty(i)) continue;
 
-				var triggerParams = new Dictionary<string, string>();
-				for (int j = 1; j < lineParts.Count; j++)
+				var line = i.Trim();
+				if (line.Length == 0) continue;
+				if (line.StartsWith("#")) continue;
+
+				if (line.StartsWith("@"))
 				{
-					var varName = lineParts[j].Replace("<", "").Replace(">", "");
-					triggerParams.Add(varName, "");
+					var triggerLine = line.Substring(1).Trim();
+					var lineParts = triggerLine.SplitArguments();
+					var triggerKey = lineParts[0];
+
+					var triggerParams = new Dictionary<string, string>();
+					for (int j = 1; j < lineParts.Count; j++)
+					{
+						var varName = lineParts[j].Replace("<", "").Replace(">", "");
+						triggerParams.Add(varName, "");
+					}
+
+					var cmd = new _Trigger
+					{
+						TriggerKey = triggerKey,
+						Parameters = triggerParams
+					};
+					cmd.Initialize(this, ins, commandTypes[nameof(_Trigger).ToUpper()], Array.Empty<ArgumentToken>());
+					cmd.OnInit();
+
+					ins.Triggers.Add(new TriggerDefinition
+					{
+						Key = triggerKey,
+						Parameters = triggerParams,
+						StartIndex = n + 1
+					});
+
+					ins.Labels[triggerKey] = n + 1;
+					if (ins.Triggers.Count == 1)
+					{
+						ins.TriggerKey = triggerKey;
+						ins.TriggerParameters.Clear();
+						foreach (var kvp in triggerParams)
+							ins.TriggerParameters[kvp.Key] = kvp.Value;
+					}
+
+					ins.Commands.Add(cmd);
+					n++;
+					continue;
 				}
 
-				var cmd = new _Trigger
+				if (line.StartsWith(">"))
 				{
-					TriggerKey = triggerKey,
-					Parameters = triggerParams
-				};
-				cmd.Initialize(this, ins, commandTypes[nameof(_Trigger).ToUpper()], Array.Empty<ArgumentToken>());
-				cmd.OnInit();
+					var labelName = line.Substring(1).Trim();
+					if (ins.Labels.ContainsKey(labelName))
+						throw new InvalidOperationException($"Label '{labelName}' already exists");
 
-				ins.Triggers.Add(new TriggerDefinition
-				{
-					Key = triggerKey,
-					Parameters = triggerParams,
-					StartIndex = n + 1
-				});
-
-				ins.Labels[triggerKey] = n + 1;
-				if (ins.Triggers.Count == 1)
-				{
-					ins.TriggerKey = triggerKey;
-					ins.TriggerParameters.Clear();
-					foreach (var kvp in triggerParams)
-						ins.TriggerParameters[kvp.Key] = kvp.Value;
+					ins.Labels.Add(labelName, n);
+					continue;
 				}
 
-				ins.Commands.Add(cmd);
+				var parts = line.SplitArgumentTokens();
+				var typeName = parts[0].Value.ToUpper();
+
+				if (!commandTypes.TryGetValue(typeName, out var type))
+					throw new Exception($"Unknown command: '{typeName}'");
+
+				var command = Activator.CreateInstance(type.Type) as Command;
+				command.Initialize(this, ins, type, parts.Skip(1).ToArray());
+				command.OnInit();
+
+				ins.Commands.Add(command);
 				n++;
-				continue;
 			}
-
-			if (line.StartsWith(">"))
+			catch (Exception ex)
 			{
-				var labelName = line.Substring(1).Trim();
-				if (ins.Labels.ContainsKey(labelName))
-					throw new InvalidOperationException($"Label '{labelName}' already exists");
-
-				ins.Labels.Add(labelName, n);
-				continue;
+				throw new InvalidOperationException($"Compiler error at '{id}' line {lineNumber}: {ex.Message}");
 			}
-
-			var parts = line.SplitArgumentTokens();
-			var typeName = parts[0].Value.ToUpper();
-
-			if (!commandTypes.TryGetValue(typeName, out var type))
-				throw new Exception($"Unknown command: '{typeName}'");
-
-			var command = Activator.CreateInstance(type.Type) as Command;
-			command.Initialize(this, ins, type, parts.Skip(1).ToArray());
-			command.OnInit();
-
-			ins.Commands.Add(command);
-			n++;
 		}
 
 		allCommands.Add(ins);
