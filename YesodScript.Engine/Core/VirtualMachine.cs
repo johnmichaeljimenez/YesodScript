@@ -231,12 +231,29 @@ public class VirtualMachine : IDisposable
 
 
 				var currentIndex = i.CurrentIndex;
-				var updateDone = line.OnTick(deltaTime);
+				var updateDone = false;
+
+				try
+				{
+					updateDone = line.OnTick(deltaTime);
+				}
+				catch (Exception ex)
+				{
+					throw Instruction.LineError(i, line, ex.Message);
+				}
 
 				if (!updateDone)
 					break; //waiting
 
-				line.OnExit();
+				try
+				{
+					line.OnExit();
+				}
+				catch (Exception ex)
+				{
+					throw Instruction.LineError(i, line, ex.Message);
+				}
+
 				OnPostExecuteCommand(line);
 
 				if (!i.IsRunning)
@@ -424,6 +441,7 @@ public class VirtualMachine : IDisposable
 					}
 
 					ins.Commands.Add(cmd);
+					ins.LineReference.Add(cmd, lineNumber);
 					n++;
 					continue;
 				}
@@ -449,6 +467,7 @@ public class VirtualMachine : IDisposable
 				command.OnInit();
 
 				ins.Commands.Add(command);
+				ins.LineReference.Add(command, lineNumber);
 				n++;
 			}
 			catch (Exception ex)

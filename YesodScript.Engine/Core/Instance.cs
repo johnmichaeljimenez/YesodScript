@@ -25,6 +25,7 @@ namespace YesodScript.Engine.Core
 
 		public readonly List<Command> Commands = new();
 		public readonly Dictionary<string, int> Labels = new();
+		public readonly Dictionary<Command, int> LineReference = new();
 
 		public readonly List<Var> Vars = new();
 
@@ -35,9 +36,16 @@ namespace YesodScript.Engine.Core
 			if (index >= Commands.Count)
 				return;
 
-			var cmd = Commands[CurrentIndex];
-			cmd.ResolveDynamicParameters();
-			cmd.OnEnter();
+			try
+			{
+				var cmd = Commands[CurrentIndex];
+				cmd.ResolveDynamicParameters();
+				cmd.OnEnter();
+			}
+			catch (Exception ex)
+			{
+				throw LineError(this, Commands[CurrentIndex], ex.Message);
+			}
 		}
 
 		public void Jump(string name)
@@ -53,6 +61,11 @@ namespace YesodScript.Engine.Core
 		internal void ClearLocalVars()
 		{
 			Vars.Clear();
+		}
+
+		public static Exception LineError(Instruction ins, Command cmd, string msg)
+		{
+			throw new InvalidOperationException($"Runtime error at '{ins.ID}' line {ins.LineReference[cmd]}: {msg}");
 		}
 	}
 }

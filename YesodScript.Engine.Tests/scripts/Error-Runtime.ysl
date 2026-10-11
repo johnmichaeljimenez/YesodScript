@@ -1,0 +1,4 @@
+@_INIT
+
+DEFVAR test 0 int
+SETVAR test "hello"

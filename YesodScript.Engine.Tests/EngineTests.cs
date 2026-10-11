@@ -28,11 +28,19 @@ public partial class EngineTests
     }
 
     [Fact]
-    public void Test_Compiler()
+    public void Test_ErrorCompiler()
     {
-        FluentActions.Invoking(() => Utils.Test(out var output, "FAULTY.ysl"))
+        FluentActions.Invoking(() => Utils.Test(out var output, "Error-Compile.ysl"))
             .Should().Throw<InvalidOperationException>()
-            .WithMessage("Compiler error at 'FAULTY' line 1: Unknown command: 'INVALID'");
+            .WithMessage("Compiler error at 'Error-Compile' line 1: Unknown command: 'INVALID'");
+    }
+
+    [Fact]
+    public void Test_ErrorRuntime()
+    {
+        FluentActions.Invoking(() => Utils.Test(out var output, "Error-Runtime.ysl"))
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("Runtime error at 'Error-Runtime' line 4: The input string 'hello' was not in a correct format.");
     }
 
     [Fact]
