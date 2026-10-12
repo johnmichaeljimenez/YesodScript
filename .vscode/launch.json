@@ -1,0 +1,16 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch VN Example (External Terminal)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/YesodScript.Examples.VN/bin/Debug/net8.0/YesodScript.Examples.VN.dll",
+			"args": [],
+			"cwd": "${workspaceFolder}/YesodScript.Examples.VN",
+			"console": "externalTerminal",
+			"stopAtEntry": false
+		}
+	]
+}
