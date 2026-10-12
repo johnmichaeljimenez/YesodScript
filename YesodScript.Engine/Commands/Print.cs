@@ -9,7 +9,7 @@ namespace YesodScript.Engine.Commands
 
 		public override void OnEnter()
 		{
-			VM.OnOutput?.Invoke($"{msg}\n");
+			VM.OnOutput?.Invoke($"{msg}");
 		}
 	}
 }
