@@ -5,14 +5,21 @@ namespace YesodScript.Examples;
 
 public class RaylibHost
 {
-	const int screenWidth = 800;
-	const int screenHeight = 450;
-	private VirtualMachine vm;
+	public static RaylibHost Instance { get; private set; }
+	const float hz = 1.0f / 60.0f;
+	const int screenWidth = 1280;
+	const int screenHeight = 720;
+	private GameVM vm;
+	private Renderer renderer;
 
-	public RaylibHost(VirtualMachine vm)
+	public RaylibHost(GameVM vm)
 	{
-		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint | ConfigFlags.MaximizedWindow);
+		Instance = this;
+
+		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
+
+		renderer = new();
 
 		this.vm = vm;
 		vm.Initialize();
@@ -20,21 +27,45 @@ public class RaylibHost
 
 	public void Tick()
 	{
+		var accumulator = 0.0f;
+		var latchedClick = false;
+
 		while (!Raylib.WindowShouldClose())
 		{
-			var dt = Raylib.GetFrameTime();
-			vm.Tick(dt);    //TODO: use fixed 60hz
+			var frameTime = Raylib.GetFrameTime();
+			if (frameTime > 0.25f) frameTime = 0.25f;
 
-			Raylib.BeginDrawing();
-			Raylib.ClearBackground(Color.Black);
+			if (Raylib.IsMouseButtonPressed(0))
+			{
+				latchedClick = true;
+			}
 
-			Raylib.EndDrawing();
+			var mousePos = renderer.GetVirtualMousePosition();
+
+			accumulator += frameTime;
+			while (accumulator >= hz)
+			{
+				vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
+				vm.Tick(hz);
+				accumulator -= hz;
+
+				if (!vm.IsRunning)
+					break;
+			}
+
+			latchedClick = false;
+			
+			if (!vm.IsRunning)
+				break;
+
+			renderer.Draw();
 		}
 	}
 
 	public void Cleanup()
 	{
 		vm.Dispose();
+		renderer.Dispose();
 		Raylib.CloseWindow();
 	}
 }
