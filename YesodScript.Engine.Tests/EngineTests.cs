@@ -24,7 +24,7 @@ public partial class EngineTests
     {
         var vm = new VirtualMachine();
         vm.CompileDirectory("scripts/special", "ysl");
-        vm.FindInstruction("special/Minsky").Should().NotBeNull();
+        vm.FindInstruction("Minsky").Should().NotBeNull();
     }
 
     [Fact]

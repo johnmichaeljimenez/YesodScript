@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace YesodScript.Tools;
+namespace YesodScript.Engine.Tools;
 
 public sealed class PathMember
 {

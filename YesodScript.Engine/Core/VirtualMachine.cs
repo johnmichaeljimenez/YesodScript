@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using YesodScript.Engine.Commands;
+using YesodScript.Engine.Tools;
 
 namespace YesodScript.Engine.Core;
 
@@ -355,9 +356,9 @@ public class VirtualMachine : IDisposable
 
 	public void CompileDirectory(string path, string ext = "ysl")
 	{
-		foreach (var file in Directory.GetFiles(path, $"*.{ext}", SearchOption.AllDirectories))
+		foreach (var file in DirectoryExtractor.GetPaths(path, ext))
 		{
-			CompileFile(file);
+			CompileFile(file.Value, file.Key);
 		}
 	}
 
@@ -365,17 +366,7 @@ public class VirtualMachine : IDisposable
 	{
 		if (string.IsNullOrEmpty(id))
 		{
-			var segments = path.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-
-			if (segments.Length > 1)
-			{
-				segments[^1] = Path.GetFileNameWithoutExtension(segments[^1]);
-				id = string.Join("/", segments.Skip(1));
-			}
-			else
-			{
-				id = Path.GetFileNameWithoutExtension(path);
-			}
+			id = Path.GetFileNameWithoutExtension(path);
 		}
 
 		var content = File.ReadAllText(path);
