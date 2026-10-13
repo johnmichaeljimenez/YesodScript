@@ -1,13 +1,15 @@
 using System.Numerics;
 using Raylib_cs;
+using YesodScript.Engine.Tools;
 
 namespace YesodScript.Examples;
 
 public class Renderer : IDisposable
 {
+	public static readonly IReadOnlyDictionary<string, PathMember> RenderDataMembers = PathMemberCache.Build<RenderData>();
 	public static Renderer Instance { get; private set; }
 
-	private int renderID;
+	private int renderID = 1;	//0 means stale default data
 	private readonly Dictionary<int, RenderData> renderList = new();
 
 	const int scale = 2;
@@ -39,16 +41,22 @@ public class Renderer : IDisposable
 		renderList.Remove(id);
 	}
 
-	public RenderData CreateRenderData(Vector2 position, Vector2 size, bool disabled)
+	public RenderData CreateRenderData(int x, int y)
 	{
 		var r = new RenderData();
 		r.ID = renderID + 1;
-		r.Position = position;
-		r.Size = size;
-		r.Disabled = disabled;
+		r.X = x;
+		r.Y = y;
+		r.W = 1;
+		r.H = 1;
 
 		renderList[r.ID] = r;
 		return r;
+	}
+
+	public RenderData GetRenderData(int id)
+	{
+		return renderList[id];
 	}
 
 	public Vector2 GetVirtualMousePosition()
@@ -92,7 +100,12 @@ public class Renderer : IDisposable
 				if (i.Value.Disabled)
 					continue;
 
-				Raylib.DrawRectangleV(i.Value.Position, i.Value.Size, Color.Red);
+				Raylib.DrawRectangle(i.Value.X, i.Value.Y, i.Value.W, i.Value.H, Color.Red);
+				
+				if (string.IsNullOrWhiteSpace(i.Value.Text))
+					continue;
+					
+				Raylib.DrawText(i.Value.Text, i.Value.X, i.Value.Y, 14, Color.Red);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -102,17 +115,23 @@ public class Renderer : IDisposable
 			Raylib.ClearBackground(Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 
-			Raylib.DrawFPS(4, 4);
+			// Raylib.DrawFPS(4, 4);
 		}
 		Raylib.EndDrawing();
 	}
 }
 
-public struct RenderData
+public class RenderData
 {
 	public int ID;
 	public bool Disabled;
-	public Vector2 Position;
-	public Vector2 Size;
+	public int X, Y;
+	public int W, H;
 	public float Rotation; //degrees
+	public string Text;
+
+	public void Sync()
+	{
+		
+	}
 }

@@ -87,21 +87,40 @@ public class JumpClick : GameCommands
 	}
 }
 
-public class Draw : GameCommands
+public class Render : GameCommands
 {
 	[CommandParameter]
 	private int x;
 	[CommandParameter]
 	private int y;
 	[CommandParameter]
-	private int w;
-	[CommandParameter]
-	private int h;
-	[CommandParameter]
-	private bool disabled;
+	private string storeID;
 
 	public override void OnEnter()
 	{
-		Renderer.Instance.CreateRenderData(new Vector2(x, y), new Vector2(w, h), disabled);
+		var data = Renderer.Instance.CreateRenderData(x, y);
+		if (string.IsNullOrEmpty(storeID))
+			return;
+
+		var storeVar = GameVM.GetVar(storeID, Instruction);
+		storeVar.Value = data.ID;
+	}
+}
+
+public class Edit : GameCommands
+{
+	[CommandParameter]
+	private int id;
+
+	[CommandParameter]
+	private string path;
+
+	[CommandParameter]
+	private string value;
+
+	public override void OnEnter()
+	{
+		var data = Renderer.Instance.GetRenderData(id);
+		Renderer.RenderDataMembers[path].SetParsed(data, value);
 	}
 }
