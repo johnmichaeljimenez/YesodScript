@@ -546,4 +546,30 @@ public class VirtualMachine : IDisposable
 		return Vars.FirstOrDefault(v =>
 			string.Equals(v.Name, name, StringComparison.OrdinalIgnoreCase));
 	}
+
+	public Var AddGlobalVar(string name, Type type, object value)
+	{
+		var newVar = new Var()
+		{
+			Name = name,
+			Type = type,
+			Value = value
+		};
+
+		Vars.Add(newVar);
+		return newVar;
+	}
+
+	public Var AddGlobalList(string name, Type type)
+	{
+		var newVar = new Var()
+		{
+			Name = name,
+			Type = typeof(OpList),
+			Value = new OpList(type)
+		};
+
+		Vars.Add(newVar);
+		return newVar;
+	}
 }
