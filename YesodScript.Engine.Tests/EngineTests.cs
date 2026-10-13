@@ -125,7 +125,7 @@ public partial class EngineTests
         vm.Initialize();
 
         var output = "";
-        vm.OnOutput += str => output += $"{str}";
+        vm.OnOutput += str => output += $"{str}\n";
 
         var seq = new TriggerSequence(vm);
         seq.Enqueue("SECOND");
@@ -152,7 +152,7 @@ public partial class EngineTests
         vm.Initialize();
 
         var output = "";
-        vm.OnOutput += str => output += $"{str}";
+        vm.OnOutput += str => output += $"{str}\n";
 
         var seq = new TriggerSequence(vm);
         seq.Tick().Should().BeTrue();//empty queue -> done immediately

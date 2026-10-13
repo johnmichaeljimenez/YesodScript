@@ -14,7 +14,7 @@ public static class Utils
 			vm.CompileFile($"scripts/{path}");
 		}
 
-		vm.OnOutput += (str) => { vmOutput += $"{str}"; };
+		vm.OnOutput += (str) => { vmOutput += $"{str}\n"; };
 		vm.Initialize();
 
 		while (vm.IsRunning)
