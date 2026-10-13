@@ -7,7 +7,7 @@
 			"command": "dotnet",
 			"args": [
 				"build",
-				"${workspaceFolder}/YesodScript.Examples.VN/YesodScript.Examples.VN.csproj",
+				"${workspaceFolder}/YesodScript.Examples.Raylib/YesodScript.Examples.Raylib.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],

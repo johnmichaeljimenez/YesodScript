@@ -2,13 +2,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Launch VN Example (External Terminal)",
+			"name": "Launch Raylib Example (External Terminal)",
 			"type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "build",
-			"program": "${workspaceFolder}/YesodScript.Examples.VN/bin/Debug/net8.0/YesodScript.Examples.VN.dll",
+			"program": "${workspaceFolder}/YesodScript.Examples.Raylib/bin/Debug/net8.0/YesodScript.Examples.Raylib.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/YesodScript.Examples.VN",
+			"cwd": "${workspaceFolder}/YesodScript.Examples.Raylib",
 			"console": "externalTerminal",
 			"stopAtEntry": false
 		}
