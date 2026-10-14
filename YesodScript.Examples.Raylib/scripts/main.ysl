@@ -26,6 +26,8 @@ DEFVAR "P2_X" 600 int
 DEFVAR "P2_Y" 150 int
 DEFVAR "P2_T" 0 int
 DEFVAR "P2_B" 0 int
+DEFVAR "P2_DZT" 0 int
+DEFVAR "P2_DZB" 0 int
 
 CLEAR
 
@@ -62,6 +64,8 @@ EDIT [[P2]] "SpriteID" "paddleRed"
 		JUMP AFTER
 	
 >AFTER
+	CALL AI_PADDLE
+
 	SETVAR P1_T [[P1_Y]]
 	SETVAR P1_B [[P1_Y]]
 	SUB P1_T PADDLE_LENGTH_HALF
