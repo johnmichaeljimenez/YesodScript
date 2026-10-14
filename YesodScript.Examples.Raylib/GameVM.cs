@@ -2,6 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using YesodScript.Engine.Commands;
 using YesodScript.Engine.Core;
+using YesodScript.Engine.Tools;
 
 namespace YesodScript.Examples;
 
@@ -122,21 +123,18 @@ public class Render : GameCommand
 	}
 }
 
-public class Edit : GameCommand
+public class Edit : EditPropertyCommand<RenderData>
 {
-	[CommandParameter]
-	private int id;
-
-	[CommandParameter]
-	private string path;
-
-	[CommandParameter]
-	private string value;
-
 	public override void OnEnter()
 	{
-		var data = Renderer.Instance.GetRenderData(id);
-		Renderer.RenderDataMembers[path].SetParsed(data, value);
-		data.Sync();
+		base.OnEnter();
+		instance.Sync();
 	}
+
+	protected override RenderData GetInstance(int id)
+	{
+		return Renderer.Instance.GetRenderData(id);
+	}
+
+	protected override IReadOnlyDictionary<string, PathMember> dataMembers => Renderer.RenderDataMembers;
 }
