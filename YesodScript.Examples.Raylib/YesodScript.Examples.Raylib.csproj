@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="assets/**/*" CopyToOutputDirectory="PreserveNewest" />
     <None Include="scripts/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

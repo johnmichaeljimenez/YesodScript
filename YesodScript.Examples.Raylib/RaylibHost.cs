@@ -11,6 +11,7 @@ public class RaylibHost
 	const int screenHeight = 720;
 	private GameVM vm;
 	private Renderer renderer;
+	private Assets assets;
 
 	public RaylibHost(GameVM vm)
 	{
@@ -20,6 +21,7 @@ public class RaylibHost
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
 
 		renderer = new();
+		assets = new();
 
 		this.vm = vm;
 		vm.Initialize();
@@ -65,6 +67,7 @@ public class RaylibHost
 	public void Cleanup()
 	{
 		vm.Dispose();
+		assets.Dispose();
 		renderer.Dispose();
 		Raylib.CloseWindow();
 	}

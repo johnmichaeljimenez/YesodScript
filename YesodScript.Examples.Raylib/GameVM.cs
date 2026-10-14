@@ -42,7 +42,7 @@ public class GameVM : VirtualMachine
 	}
 }
 
-public class GameCommands : Command
+public class GameCommand : Command
 {
 	protected GameVM GameVM => (GameVM)VM;
 }
@@ -67,7 +67,7 @@ public class WaitFrame : Command
 	}
 }
 
-public class Clear : GameCommands
+public class Clear : GameCommand
 {
 	public override void OnEnter()
 	{
@@ -75,7 +75,7 @@ public class Clear : GameCommands
 	}
 }
 
-public class JumpClick : GameCommands
+public class JumpClick : GameCommand
 {
 	[CommandParameter]
 	private string labelName;
@@ -87,7 +87,7 @@ public class JumpClick : GameCommands
 	}
 }
 
-public class Render : GameCommands
+public class Render : GameCommand
 {
 	[CommandParameter]
 	private int x;
@@ -107,7 +107,7 @@ public class Render : GameCommands
 	}
 }
 
-public class Edit : GameCommands
+public class Edit : GameCommand
 {
 	[CommandParameter]
 	private int id;
@@ -122,5 +122,6 @@ public class Edit : GameCommands
 	{
 		var data = Renderer.Instance.GetRenderData(id);
 		Renderer.RenderDataMembers[path].SetParsed(data, value);
+		data.Sync();
 	}
 }

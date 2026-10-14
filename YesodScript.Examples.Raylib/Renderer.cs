@@ -9,7 +9,7 @@ public class Renderer : IDisposable
 	public static readonly IReadOnlyDictionary<string, PathMember> RenderDataMembers = PathMemberCache.Build<RenderData>();
 	public static Renderer Instance { get; private set; }
 
-	private int renderID = 1;	//0 means stale default data
+	private int renderID = 1;   //0 means stale default data
 	private readonly Dictionary<int, RenderData> renderList = new();
 
 	const int scale = 2;
@@ -47,8 +47,6 @@ public class Renderer : IDisposable
 		r.ID = renderID + 1;
 		r.X = x;
 		r.Y = y;
-		r.W = 1;
-		r.H = 1;
 
 		renderList[r.ID] = r;
 		return r;
@@ -100,12 +98,15 @@ public class Renderer : IDisposable
 				if (i.Value.Disabled)
 					continue;
 
-				Raylib.DrawRectangle(i.Value.X, i.Value.Y, i.Value.W, i.Value.H, Color.Red);
-				
+				if (i.Value.Sprite.Id != 0)
+				{
+					Raylib.DrawTexture(i.Value.Sprite, (int)i.Value.X, (int)i.Value.Y, Color.White);
+				}
+
 				if (string.IsNullOrWhiteSpace(i.Value.Text))
 					continue;
 					
-				Raylib.DrawText(i.Value.Text, i.Value.X, i.Value.Y, 14, Color.Red);
+				Raylib.DrawText(i.Value.Text, (int)i.Value.X, (int)i.Value.Y, 14, Color.Red);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -125,13 +126,20 @@ public class RenderData
 {
 	public int ID;
 	public bool Disabled;
-	public int X, Y;
-	public int W, H;
-	public float Rotation; //degrees
+	public float X, Y;
 	public string Text;
+
+	public string SpriteID;
+	public Texture2D Sprite { get; private set; }
 
 	public void Sync()
 	{
-		
+		if (string.IsNullOrEmpty(SpriteID))
+		{
+			Sprite = default;
+			return;
+		}
+
+		Sprite = Assets.Instance.GetSprite(SpriteID);
 	}
 }
