@@ -44,7 +44,7 @@ public class Renderer : IDisposable
 	public RenderData CreateRenderData(int x, int y)
 	{
 		var r = new RenderData();
-		r.ID = renderID + 1;
+		r.ID = renderID++;
 		r.X = x;
 		r.Y = y;
 
