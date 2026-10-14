@@ -13,6 +13,9 @@ public class RaylibHost
 	private Renderer renderer;
 	private Assets assets;
 
+	private readonly HashSet<KeyboardKey> pressedKeys = new();
+	private static readonly KeyboardKey[] allKeys = Enum.GetValues<KeyboardKey>();
+
 	public RaylibHost(GameVM vm)
 	{
 		Instance = this;
@@ -42,6 +45,14 @@ public class RaylibHost
 				latchedClick = true;
 			}
 
+			foreach (var key in allKeys)
+			{
+				if (Raylib.IsKeyDown(key))
+				{
+					pressedKeys.Add(key);
+				}
+			}
+
 			var mousePos = renderer.GetVirtualMousePosition();
 
 			accumulator += frameTime;
@@ -56,7 +67,8 @@ public class RaylibHost
 			}
 
 			latchedClick = false;
-			
+			pressedKeys.Clear();
+
 			if (!vm.IsRunning)
 				break;
 
@@ -70,5 +82,10 @@ public class RaylibHost
 		assets.Dispose();
 		renderer.Dispose();
 		Raylib.CloseWindow();
+	}
+
+	public bool IsKeyPressed(KeyboardKey key)
+	{
+		return pressedKeys.Contains(key);
 	}
 }
