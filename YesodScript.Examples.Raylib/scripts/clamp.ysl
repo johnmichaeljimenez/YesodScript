@@ -1,0 +1,16 @@
+@CLAMP <varname> <val> <min> <max>
+
+JUMPLE <val> <min> LOWBOUND
+JUMPGE <val> <max> UPBOUND
+JUMP AFTER
+
+>LOWBOUND
+	SETVAR <varname> <min>
+	JUMP AFTER
+
+>UPBOUND
+	SETVAR <varname> <max>
+	JUMP AFTER
+
+>AFTER
+	BREAK
