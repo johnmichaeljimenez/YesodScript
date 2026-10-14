@@ -100,12 +100,18 @@ public class Renderer : IDisposable
 
 				if (i.Value.Sprite.Id != 0)
 				{
-					Raylib.DrawTexture(i.Value.Sprite, (int)i.Value.X, (int)i.Value.Y, Color.White);
+					var to = new Vector2(i.Value.X, i.Value.Y);
+					if ((i.Value.visPos - to).LengthSquared() >= 1000)
+						i.Value.visPos = to;
+					else
+						i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 10);
+
+					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos, Color.White);
 				}
 
 				if (string.IsNullOrWhiteSpace(i.Value.Text))
 					continue;
-					
+
 				Raylib.DrawText(i.Value.Text, (int)i.Value.X, (int)i.Value.Y, 14, Color.Red);
 			}
 		}
@@ -116,7 +122,7 @@ public class Renderer : IDisposable
 			Raylib.ClearBackground(Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 
-			// Raylib.DrawFPS(4, 4);
+			Raylib.DrawFPS(4, 4);
 		}
 		Raylib.EndDrawing();
 	}
@@ -128,6 +134,8 @@ public class RenderData
 	public bool Disabled;
 	public float X, Y;
 	public string Text;
+
+	public Vector2 visPos;
 
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
