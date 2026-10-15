@@ -37,11 +37,6 @@ DEFVAR "WINNER" 0 int
 
 CLEAR
 
-RENDER 100 20 "TXTSCORE1"
-EDIT [[TXTSCORE1]] "Text" 0
-RENDER 300 20 "TXTSCORE2"
-EDIT [[TXTSCORE2]] "Text" 0
-
 RENDER [[BALL_X]] [[BALL_Y]] "BALL"
 EDIT [[BALL]] "SpriteID" "ballBlue"
 
@@ -50,6 +45,11 @@ EDIT [[P1]] "SpriteID" "paddleBlu"
 
 RENDER [[P2_X]] [[P2_Y]] "P2"
 EDIT [[P2]] "SpriteID" "paddleRed"
+
+RENDER 160 20 "TXTSCORE1"
+EDIT [[TXTSCORE1]] "Text" 0
+RENDER 480 20 "TXTSCORE2"
+EDIT [[TXTSCORE2]] "Text" 0
 
 JUMP RESET
 
