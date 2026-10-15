@@ -14,6 +14,69 @@ namespace YesodScript.Engine.Commands
 		}
 	}
 
+	public class JumpBetween : Command
+	{
+		[CommandParameter]
+		private string x1 = "";
+		[CommandParameter]
+		private string y1 = "";
+		[CommandParameter]
+		private string x2 = "";
+		[CommandParameter]
+		private string y2 = "";
+		[CommandParameter]
+		private string labelName = "";
+
+		public override void OnEnter()
+		{
+			var valX1 = ResolveOperand(x1);
+			var valY1 = ResolveOperand(y1);
+			var valX2 = ResolveOperand(x2);
+			var valY2 = ResolveOperand(y2);
+
+			if (TryGetNumber(valX1, out var fx1) &&
+				TryGetNumber(valY1, out var fy1) &&
+				TryGetNumber(valX2, out var fx2) &&
+				TryGetNumber(valY2, out var fy2))
+			{
+				//normalize range
+				float min1 = Math.Min(fx1, fy1);
+				float max1 = Math.Max(fx1, fy1);
+				float min2 = Math.Min(fx2, fy2);
+				float max2 = Math.Max(fx2, fy2);
+
+				if (min1 <= max2 && min2 <= max1)
+				{
+					Instruction.Jump(labelName);
+				}
+			}
+		}
+
+		private object ResolveOperand(string operand)
+		{
+			var var = VM.GetVar(operand, Instruction);
+			return var != null ? var.Value : operand;
+		}
+
+		private static bool TryGetNumber(object value, out float number)
+		{
+			if (value is int i)
+			{
+				number = i;
+				return true;
+			}
+
+			if (value is float f)
+			{
+				number = f;
+				return true;
+			}
+
+			return float.TryParse(Convert.ToString(value, CultureInfo.InvariantCulture),
+				NumberStyles.Float, CultureInfo.InvariantCulture, out number);
+		}
+	}
+
 	public class JumpIf : Command
 	{
 		[CommandParameter]
