@@ -1,5 +1,4 @@
 ﻿using Raylib_cs;
-using YesodScript.Engine.Core;
 
 namespace YesodScript.Examples;
 
@@ -20,7 +19,7 @@ public class RaylibHost
 	{
 		Instance = this;
 
-		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
+		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
 
 		renderer = new();
@@ -40,37 +39,34 @@ public class RaylibHost
 			var frameTime = Raylib.GetFrameTime();
 			if (frameTime > 0.25f) frameTime = 0.25f;
 
-			if (Raylib.IsMouseButtonPressed(0))
-			{
-				latchedClick = true;
-			}
+			if (Raylib.IsMouseButtonPressed(0)) latchedClick = true;
 
 			foreach (var key in allKeys)
 			{
-				if (Raylib.IsKeyDown(key))
-				{
-					pressedKeys.Add(key);
-				}
+				if (Raylib.IsKeyDown(key)) pressedKeys.Add(key);
 			}
 
 			var mousePos = renderer.GetVirtualMousePosition();
-
 			accumulator += frameTime;
+
+			bool vmTickedThisFrame = false;
 			while (accumulator >= hz)
 			{
 				vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
 				vm.Tick(hz);
 				accumulator -= hz;
+				vmTickedThisFrame = true;
 
-				if (!vm.IsRunning)
-					break;
+				if (!vm.IsRunning) break;
 			}
 
-			latchedClick = false;
-			pressedKeys.Clear();
+			if (vmTickedThisFrame)
+			{
+				latchedClick = false;
+				pressedKeys.Clear();
+			}
 
-			if (!vm.IsRunning)
-				break;
+			if (!vm.IsRunning) break;
 
 			renderer.Draw();
 		}
