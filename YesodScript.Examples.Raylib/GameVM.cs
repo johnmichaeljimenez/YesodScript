@@ -11,10 +11,17 @@ public class GameVM : VirtualMachine
 	public bool mouseClicked;
 	private Var mouseX, mouseY;
 
+	public GameVM(int randomSeed = 0) : base(randomSeed)
+	{
+	}
+
 	public static GameVM Instance { get; private set; }
+
+	
+
 	public static GameVM Create()
 	{
-		var vm = new GameVM();
+		var vm = new GameVM(Environment.TickCount);
 		vm.OnOutput += (msg) =>
 		{
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
