@@ -1,0 +1,10 @@
+@WAITPRESS <key>
+
+>LOOP
+	JUMPKEY <key> END
+
+	WAITFRAME
+	JUMP LOOP
+
+>END
+	BREAK

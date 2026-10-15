@@ -102,7 +102,7 @@ public class Renderer : IDisposable
 				{
 					var size = i.Value.Sprite.Dimensions;
 					var to = new Vector2(i.Value.X, i.Value.Y);
-					i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 10);
+					i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 30);
 
 					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos - (size * 0.5f), Color.White);
 				}
