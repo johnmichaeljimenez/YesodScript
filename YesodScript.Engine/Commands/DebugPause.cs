@@ -6,7 +6,8 @@ namespace YesodScript.Engine.Commands
 	{
 		public override void OnEnter()
 		{
-			Debugger.Break();
+			if (Debugger.IsAttached)
+				Debugger.Break();
 		}
 	}
 }
