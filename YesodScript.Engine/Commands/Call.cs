@@ -25,8 +25,13 @@ namespace YesodScript.Engine.Commands
 				return true;
 
 			foreach (var ins in _fired)
+			{
+				if (!ins.IsRunning) continue;
+
+				VM.RunInline(ins, deltaTime); //run immediately
 				if (ins.IsRunning)
-					return false; // blocked if anyone from _fired is still running
+					return false;
+			}
 
 			return true;
 		}

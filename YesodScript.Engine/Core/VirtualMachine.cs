@@ -201,6 +201,37 @@ public class VirtualMachine : IDisposable
 		}
 	}
 
+	public void RunInline(Instruction i, float deltaTime)
+	{
+		while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
+		{
+			var line = i.Commands[i.CurrentIndex];
+			if (line is _Trigger) { i.IsRunning = false; break; }
+
+			var currentIndex = i.CurrentIndex;
+			bool updateDone;
+			try { updateDone = line.OnTick(deltaTime); }
+			catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
+
+			if (!updateDone) break; //real wait
+
+			try { line.OnExit(); }
+			catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
+
+			OnPostExecuteCommand(line);
+
+			if (!i.IsRunning) break;
+			if (currentIndex != i.CurrentIndex) continue; // jumped
+			i.SetIndex(i.CurrentIndex + 1);
+		}
+
+		if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
+		{
+			i.IsRunning = false;
+			runningCommands.Remove(i);
+		}
+	}
+
 	public void Tick(float deltaTime)
 	{
 		CurrentTick++;
