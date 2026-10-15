@@ -19,7 +19,7 @@ public class RaylibHost
 	{
 		Instance = this;
 
-		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
+		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
 
 		renderer = new();
