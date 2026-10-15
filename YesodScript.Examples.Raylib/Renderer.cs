@@ -100,13 +100,11 @@ public class Renderer : IDisposable
 
 				if (i.Value.Sprite.Id != 0)
 				{
+					var size = i.Value.Sprite.Dimensions;
 					var to = new Vector2(i.Value.X, i.Value.Y);
-					if ((i.Value.visPos - to).LengthSquared() >= 1000)
-						i.Value.visPos = to;
-					else
-						i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 10);
+					i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 10);
 
-					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos, Color.White);
+					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos - (size * 0.5f), Color.White);
 				}
 
 				if (string.IsNullOrWhiteSpace(i.Value.Text))
