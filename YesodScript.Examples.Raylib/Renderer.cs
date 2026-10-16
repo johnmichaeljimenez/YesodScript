@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Tween;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
 
@@ -146,7 +147,7 @@ public class Renderer : IDisposable
 	}
 }
 
-public class RenderData
+public class RenderData : IDisposable
 {
 	public int ID;
 	public bool Disabled;
@@ -159,6 +160,8 @@ public class RenderData
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
 
+	public List<TweenBase> activeTweens = new();
+
 	public void Sync()
 	{
 		if (string.IsNullOrEmpty(SpriteID))
@@ -168,5 +171,13 @@ public class RenderData
 		}
 
 		Sprite = Assets.Instance.GetSprite(SpriteID);
+	}
+
+	public void Dispose()
+	{
+		foreach (var i in activeTweens)
+		{
+			TweenManager.Remove(i);
+		}
 	}
 }

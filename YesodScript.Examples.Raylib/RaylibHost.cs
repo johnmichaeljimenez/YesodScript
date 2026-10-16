@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using Tween;
 
 namespace YesodScript.Examples;
 
@@ -24,6 +25,8 @@ public class RaylibHost
 
 		renderer = new();
 		assets = new();
+
+		Tween<int>.RegisterLerper((a,b,n) => (int)Raymath.Lerp(a, b, n));
 
 		this.vm = vm;
 		vm.Initialize();
@@ -68,6 +71,7 @@ public class RaylibHost
 
 			if (!vm.IsRunning) break;
 
+			TweenManager.Update(frameTime, frameTime);
 			renderer.Draw();
 		}
 	}

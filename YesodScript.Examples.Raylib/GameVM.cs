@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Tween;
 using YesodScript.Engine.Commands;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
@@ -17,7 +18,7 @@ public class GameVM : VirtualMachine
 
 	public static GameVM Instance { get; private set; }
 
-	
+
 
 	public static GameVM Create()
 	{
@@ -116,7 +117,7 @@ public class JumpKey : GameCommand
 {
 	[CommandParameter]
 	private KeyboardKey key;
-	
+
 	[CommandParameter]
 	private string labelName;
 
@@ -161,4 +162,43 @@ public class Edit : EditPropertyCommand<RenderData>
 	}
 
 	protected override IReadOnlyDictionary<string, PathMember> dataMembers => Renderer.RenderDataMembers;
+}
+
+public class Tween : GameCommand
+{
+	[CommandParameter] private int id;
+	[CommandParameter] private string path;
+	[CommandParameter] private int from;
+	[CommandParameter] private int to;
+	[CommandParameter] private bool relative;
+	[CommandParameter] private float duration = 0.5f;
+	[CommandParameter] private string easing = "Linear";
+	[CommandParameter] private string tweenId = "";
+
+	public override void OnEnter()
+	{
+		var data = Renderer.Instance.GetRenderData(id);
+		if (!Renderer.RenderDataMembers.TryGetValue(path, out var member))
+			throw new Exception($"Unknown path '{path}'");
+
+		Func<int> getter = () => (int)member.Get(data)!;
+		Action<int> setter = v => member.Set(data, v);
+
+		var _from = relative ? getter() + from : from;
+		var _to = relative ? getter() + to : to;
+
+		var tween = new Tween<int>(getter, setter, to, duration, from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
+		tween.SetEasing(ResolveEasing(easing));
+
+		data.activeTweens.Add(tween);
+		TweenManager.Add(tween);
+	}
+
+	private static EasingFunction ResolveEasing(string name) => name.ToUpperInvariant() switch
+	{
+		"LINEAR" => Easing.Linear,
+		"QUAD" => Easing.QuadInOut,
+		"SHAKE" => Easing.QuadInOutLoop,
+		_ => Easing.Linear
+	};
 }
