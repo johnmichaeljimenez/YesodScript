@@ -13,6 +13,7 @@ public sealed class PathMember
 		typeof(int),
 		typeof(float),  //no double
         typeof(bool),
+        typeof(byte),
 	};
 
 	private readonly MemberInfo[] _chain;
@@ -113,7 +114,7 @@ public sealed class PathMember
 
 		if (!AllowedLeafTypes.Contains(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte).");
 
 		if (destination == typeof(string)) return value;
 		if (destination == typeof(bool))
@@ -127,8 +128,30 @@ public sealed class PathMember
 			return int.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture);
 		if (destination == typeof(float))
 			return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
+		if (destination == typeof(byte))
+			return ParseByte(value);
 
 		return ConvertTo(value, targetType);
+	}
+
+	private static byte ParseByte(string value)
+	{
+		string s = value.Trim();
+		if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ||
+			s.StartsWith("&h", StringComparison.OrdinalIgnoreCase))
+		{
+			s = s[2..];
+			return byte.Parse(s, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
+		}
+
+		if (byte.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out byte dec))
+			return dec;
+
+		if (s.Length is 1 or 2 &&
+			byte.TryParse(s, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out byte hex))
+			return hex;
+
+		throw new FormatException($"Cannot parse '{value}' as byte (expected 0-255 or hex).");
 	}
 
 	private string SegmentPath(int memberCount) =>
@@ -216,7 +239,7 @@ public sealed class PathMember
 
 		if (!AllowedLeafTypes.Contains(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte).");
 
 		Type source = value.GetType();
 		if (destination.IsAssignableFrom(source))
@@ -224,10 +247,23 @@ public sealed class PathMember
 
 		if (value is string text)
 		{
-			if (destination == typeof(bool)) return bool.Parse(text);
-			if (destination == typeof(int)) return int.Parse(text, CultureInfo.InvariantCulture);
-			if (destination == typeof(float)) return float.Parse(text, CultureInfo.InvariantCulture);
-			return text;
+			if (destination == typeof(string)) return text;
+			if (destination == typeof(bool))
+			{
+				if (bool.TryParse(text, out bool b)) return b;
+				if (text == "1") return true;
+				if (text == "0") return false;
+				throw new FormatException($"Cannot parse '{text}' as bool (expected true/false or 1/0).");
+			}
+			if (destination == typeof(int))
+				return int.Parse(text, NumberStyles.Integer, CultureInfo.InvariantCulture);
+			if (destination == typeof(float))
+				return float.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture);
+			if (destination == typeof(byte))
+				return ParseByte(text);
+
+			throw new InvalidOperationException(
+				$"Cannot convert string to allowed leaf type '{destination.Name}'.");
 		}
 
 		return Convert.ChangeType(value, destination, CultureInfo.InvariantCulture);

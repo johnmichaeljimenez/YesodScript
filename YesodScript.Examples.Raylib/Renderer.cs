@@ -125,13 +125,15 @@ public class Renderer : IDisposable
 					var to = new Vector2(i.Value.X, i.Value.Y);
 					i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 30);
 
-					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos - (size * 0.5f), Color.White);
+					var c1 = new Color(i.Value.Tint.R, i.Value.Tint.G, i.Value.Tint.B, i.Value.Tint.A * i.Value.Opacity);
+					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos - (size * 0.5f), c1);
 				}
 
 				if (string.IsNullOrWhiteSpace(i.Value.Text))
 					continue;
 
-				Raylib.DrawText(i.Value.Text, (int)i.Value.X, (int)i.Value.Y, 14, Color.Red);
+				var c2 = new Color(i.Value.Tint.R, i.Value.Tint.G, i.Value.Tint.B, i.Value.Tint.A * i.Value.Opacity);
+				Raylib.DrawText(i.Value.Text, (int)i.Value.X, (int)i.Value.Y, 14, c2);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -154,6 +156,8 @@ public class RenderData : IDisposable
 	public float X, Y;
 	public string Text;
 	public string Group = "";
+	public float Opacity = 1;
+	public Color Tint = Color.White;
 
 	public Vector2 visPos;
 
