@@ -1,0 +1,15 @@
+@SIGN <amt> <varto>
+
+JUMPGE <amt> 0 SIGN_P
+JUMP SIGN_N
+
+>SIGN_P
+    SETVAR <varto> 1
+    JUMP END
+
+>SIGN_N
+    SETVAR <varto> -1
+    JUMP END
+
+>END
+    BREAK
