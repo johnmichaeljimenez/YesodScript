@@ -1,0 +1,16 @@
+@PADDLE_HIT <player>
+    PLAYSOUND "hit"
+    JUMPEQ <player> 1 P1
+    JUMPEQ <player> 2 P2
+    JUMP END
+    
+>P1
+    TWEEN [[P1]] "X" 0 -8 true 0.3 "SHAKE"
+    JUMP END
+
+>P2
+    TWEEN [[P2]] "X" 0 8 true 0.3 "SHAKE"
+    JUMP END
+
+>END
+    BREAK
