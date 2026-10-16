@@ -8,7 +8,7 @@ public class SetVar : Command
 	private string key;
 
 	[CommandParameter]
-	private string value;
+	private string value = "";
 
 	[CommandParameter]
 	private bool relative;
@@ -28,7 +28,7 @@ public class DefVar : Command
 	private string key;
 
 	[CommandParameter]
-	private string value;
+	private string value = "";
 
 	[CommandParameter]
 	private string typeName;
