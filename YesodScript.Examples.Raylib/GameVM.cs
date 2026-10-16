@@ -168,8 +168,8 @@ public class Tween : GameCommand
 {
 	[CommandParameter] private int id;
 	[CommandParameter] private string path;
-	[CommandParameter] private int from;
-	[CommandParameter] private int to;
+	[CommandParameter] private float from;
+	[CommandParameter] private float to;
 	[CommandParameter] private bool relative;
 	[CommandParameter] private float duration = 0.5f;
 	[CommandParameter] private string easing = "Linear";
@@ -181,13 +181,13 @@ public class Tween : GameCommand
 		if (!Renderer.RenderDataMembers.TryGetValue(path, out var member))
 			throw new Exception($"Unknown path '{path}'");
 
-		Func<int> getter = () => (int)member.Get(data)!;
-		Action<int> setter = v => member.Set(data, v);
+		Func<float> getter = () => (float)member.Get(data);
+		Action<float> setter = (v) => member.Set(data, v);
 
-		var _from = relative ? getter() + from : from;
+		var _from = relative ? getter.Invoke() + from : from;
 		var _to = relative ? getter() + to : to;
 
-		var tween = new Tween<int>(getter, setter, to, duration, from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
+		var tween = new Tween<float>(getter, setter, _to, duration, _from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
 		tween.SetEasing(ResolveEasing(easing));
 
 		data.activeTweens.Add(tween);

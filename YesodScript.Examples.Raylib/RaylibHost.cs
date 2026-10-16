@@ -26,8 +26,6 @@ public class RaylibHost
 		renderer = new();
 		assets = new();
 
-		Tween<int>.RegisterLerper((a,b,n) => (int)Raymath.Lerp(a, b, n));
-
 		this.vm = vm;
 		vm.Initialize();
 	}

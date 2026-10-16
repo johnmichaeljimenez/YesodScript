@@ -314,8 +314,9 @@ public class VirtualMachine : IDisposable
 	private void InitRegistry()
 	{
 		var validTypes = new List<Type>();
-		foreach (var t in AppDomain.CurrentDomain.GetAssemblies()
-			.SelectMany(GetLoadableTypes)
+		var a = AppDomain.CurrentDomain.GetAssemblies();
+		var l = a.SelectMany(GetLoadableTypes).ToList();
+		foreach (var t in l
 			.Where(t => t.IsClass && !t.IsAbstract && typeof(Command).IsAssignableFrom(t) && t != typeof(Command)))
 		{
 			validTypes.Add(t);
