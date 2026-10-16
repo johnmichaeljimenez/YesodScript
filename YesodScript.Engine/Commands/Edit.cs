@@ -12,7 +12,7 @@ public abstract class EditPropertyCommand<T> : Command
 	protected string path;
 
 	[CommandParameter]
-	protected string value;
+	protected string value = "";
 
 	protected T instance { get; private set; }
 
