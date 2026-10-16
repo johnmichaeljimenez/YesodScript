@@ -33,6 +33,7 @@ public class VirtualMachine : IDisposable
 	private readonly List<Instruction> allCommands = new();
 	private readonly List<Instruction> runningCommands = new();
 	private readonly List<Instruction> _toRemove = new();
+	private int _cloneCounter;
 
 	public Random RNG { get; private set; }
 	private int _randomSeed = -1;
@@ -132,7 +133,7 @@ public class VirtualMachine : IDisposable
 			parts.RemoveAt(0);
 		}
 
-		foreach (var i in allCommands)
+		foreach (var i in allCommands.ToArray())
 		{
 			foreach (var trigger in i.Triggers)
 			{
@@ -365,7 +366,74 @@ public class VirtualMachine : IDisposable
 		return allCommands.FirstOrDefault(p => p.ID.Equals(id, StringComparison.InvariantCultureIgnoreCase));
 	}
 
-	public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
+	
+	public Instruction CloneInstruction(string sourceId, bool runInit = true)
+	{
+		var source = FindInstruction(sourceId);
+		if (source == null)
+			throw new InvalidOperationException($"Instruction '{sourceId}' not found.");
+
+		string newId;
+		do
+		{
+			newId = $"{source.ID}#{++_cloneCounter}";
+		} while (FindInstruction(newId) != null);
+
+		var clone = new Instruction { ID = newId };
+
+		foreach (var t in source.Triggers)
+		{
+			clone.Triggers.Add(new TriggerDefinition
+			{
+				Key = t.Key,
+				Parameters = new Dictionary<string, string>(t.Parameters),
+				StartIndex = t.StartIndex
+			});
+		}
+
+		foreach (var kv in source.Labels)
+			clone.Labels[kv.Key] = kv.Value;
+
+		for (int i = 0; i < source.Commands.Count; i++)
+		{
+			var orig = source.Commands[i];
+			var cmdClone = orig.CreateClone(this, clone);
+			clone.Commands.Add(cmdClone);
+			if (source.LineReference.TryGetValue(orig, out var line))
+				clone.LineReference[cmdClone] = line;
+		}
+
+		int trigIdx = 0;
+		foreach (var cmd in clone.Commands)
+		{
+			if (cmd is _Trigger trig && trigIdx < clone.Triggers.Count)
+			{
+				var def = clone.Triggers[trigIdx++];
+				trig.TriggerKey = def.Key;
+				trig.Parameters = def.Parameters;
+			}
+		}
+
+		allCommands.Add(clone);
+
+		if (runInit)
+		{
+			var initTrig = clone.Triggers.FirstOrDefault(t =>
+				string.Equals(t.Key, "_INIT", StringComparison.OrdinalIgnoreCase));
+			if (initTrig != null)
+			{
+				clone.TriggerKey = initTrig.Key;
+				clone.TriggerParameters.Clear();
+				foreach (var kv in initTrig.Parameters)
+					clone.TriggerParameters[kv.Key] = kv.Value;
+				Run(clone, initTrig.StartIndex);
+			}
+		}
+
+		return clone;
+	}
+
+public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
 	{
 		if (selector == null)
 			throw new ArgumentNullException(nameof(selector));

@@ -10,7 +10,16 @@ public class _Trigger : Command
 	public override void OnInit() { }
 	public override void OnEnter() { }
 
-	public override bool OnTick(float deltaTime)
+	
+	internal override Command CreateClone(VirtualMachine vm, Instruction newInstruction)
+	{
+		var clone = (_Trigger)base.CreateClone(vm, newInstruction);
+		clone.TriggerKey = TriggerKey;
+		clone.Parameters = Parameters != null ? new Dictionary<string, string>(Parameters) : new();
+		return clone;
+	}
+
+public override bool OnTick(float deltaTime)
 	{
 		return true;
 	}

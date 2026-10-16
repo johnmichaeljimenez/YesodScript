@@ -142,5 +142,13 @@ namespace YesodScript.Engine.Commands
 		}
 
 		public virtual bool OnTick(float deltaTime) => true;
+
+		internal virtual Command CreateClone(VirtualMachine vm, Instruction newInstruction)
+		{
+			var clone = (Command)Activator.CreateInstance(GetType());
+			clone.Initialize(vm, newInstruction, _commandType, _rawArgs ?? Array.Empty<ArgumentToken>());
+			return clone;
+		}
+
 	}
 }

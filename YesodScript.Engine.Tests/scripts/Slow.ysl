@@ -1,0 +1,4 @@
+@SLOW
+
+WAIT 0.2
+PRINT "SLOW DONE"

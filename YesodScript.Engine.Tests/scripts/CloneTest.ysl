@@ -1,0 +1,5 @@
+@_INIT
+
+DEFVAR ID "-" string
+CLONE "CloneMe" ID
+PRINT "GOT [[ID]]"

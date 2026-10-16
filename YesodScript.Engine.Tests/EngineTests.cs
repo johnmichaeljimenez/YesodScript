@@ -166,4 +166,22 @@ public partial class EngineTests
         output.Should().Contain("A1\nA2");
         seq.Tick().Should().BeTrue();//drained
     }
+
+    [Fact]
+    public void Test_FireAndForget()
+    {
+        var vm = Utils.Test(out var output, "FireAndForget.ysl", "Slow.ysl");
+        output.Should().Be("START\nAFTER CALL\nSLOW DONE\nMAIN DONE");
+    }
+
+    [Fact]
+    public void Test_Clone()
+    {
+        var vm = Utils.Test(out var output, "CloneTest.ysl", "CloneMe.ysl");
+        output.Should().Contain("SPAWNED");
+        output.Should().Contain("SECRET 99");
+        output.Should().Contain("GOT CloneMe#1");
+        
+        output.Split("SPAWNED").Length.Should().Be(3);
+    }
 }

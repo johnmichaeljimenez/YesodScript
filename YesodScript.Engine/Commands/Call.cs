@@ -10,6 +10,9 @@ namespace YesodScript.Engine.Commands
 		[CommandParameter]
 		private string labelWhenEmpty;
 
+		[CommandParameter]
+		private bool fireAndForget = false;
+
 		private List<Instruction> _fired;
 
 		public override void OnEnter()
@@ -21,7 +24,7 @@ namespace YesodScript.Engine.Commands
 
 		public override bool OnTick(float deltaTime)
 		{
-			if (_fired == null || _fired.Count == 0)
+			if (fireAndForget || _fired == null || _fired.Count == 0)
 				return true;
 
 			foreach (var ins in _fired)
