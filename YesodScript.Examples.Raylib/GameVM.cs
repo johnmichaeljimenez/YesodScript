@@ -77,9 +77,26 @@ public class WaitFrame : Command
 
 public class Clear : GameCommand
 {
+	[CommandParameter]
+	private string filter = "*";
+
 	public override void OnEnter()
 	{
-		Renderer.Instance.ClearRenderData();
+		Renderer.Instance.ClearRenderData(filter);
+	}
+}
+
+public class Show : GameCommand
+{
+	[CommandParameter]
+	private bool enabled = false;
+
+	[CommandParameter]
+	private string filter = "*";
+
+	public override void OnEnter()
+	{
+		Renderer.Instance.SetRenderDataState(enabled, filter);
 	}
 }
 

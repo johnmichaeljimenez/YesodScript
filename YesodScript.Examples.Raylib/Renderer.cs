@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
 
 namespace YesodScript.Examples;
@@ -31,9 +32,28 @@ public class Renderer : IDisposable
 		Raylib.UnloadRenderTexture(rt);
 	}
 
-	public void ClearRenderData()
+	public void ClearRenderData(string filter = "*")
 	{
-		renderList.Clear();
+		if (filter.Equals("*"))
+		{
+			renderList.Clear();
+			return;
+		}
+
+		foreach (var i in renderList.Values.ToArray())
+		{
+			if (Utils.IsMatchWildcard(i.Group, filter))
+				renderList.Remove(i.ID);
+		}
+	}
+
+	public void SetRenderDataState(bool state, string filter = "*")
+	{
+		foreach (var i in renderList)
+		{
+			if (Utils.IsMatchWildcard(i.Value.Group, filter))
+				i.Value.Disabled = !state;
+		}
 	}
 
 	public void RemoveRenderData(int id)
@@ -132,6 +152,7 @@ public class RenderData
 	public bool Disabled;
 	public float X, Y;
 	public string Text;
+	public string Group = "";
 
 	public Vector2 visPos;
 
