@@ -202,3 +202,16 @@ public class Tween : GameCommand
 		_ => Easing.Linear
 	};
 }
+
+public class PlaySound : GameCommand
+{
+	[CommandParameter]
+	private string sfxID;
+
+    public override void OnEnter()
+    {
+		var snd = Assets.Instance.GetSound(sfxID);
+		Raylib.SetSoundPitch(snd, Raymath.Remap(Raylib.GetRandomValue(0, 100), 0, 100, 0.9f, 1.0f));
+		Raylib.PlaySound(snd);
+    }
+}

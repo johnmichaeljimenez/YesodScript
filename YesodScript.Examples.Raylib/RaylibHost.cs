@@ -22,6 +22,7 @@ public class RaylibHost
 
 		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
+		Raylib.InitAudioDevice();
 
 		renderer = new();
 		assets = new();
@@ -79,6 +80,7 @@ public class RaylibHost
 		vm.Dispose();
 		assets.Dispose();
 		renderer.Dispose();
+		Raylib.CloseAudioDevice();
 		Raylib.CloseWindow();
 	}
 
