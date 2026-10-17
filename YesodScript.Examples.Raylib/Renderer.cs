@@ -101,6 +101,15 @@ public class Renderer : IDisposable
 		return r;
 	}
 
+	public void SnapshotPosition()
+	{
+		foreach (var i in sortedRenderList)
+		{
+			i.prevX = i.X;
+			i.prevY = i.Y;
+		}
+	}
+
 	public RenderData GetRenderData(int id)
 	{
 		return renderList[id];
@@ -149,10 +158,14 @@ public class Renderer : IDisposable
 				if (i.Disabled)
 					continue;
 
+				var maxDist = 100f;
+				var drawX = Math.Abs(i.X - i.prevX) > maxDist ? i.X : i.prevX + (i.X - i.prevX) * alpha;
+				var drawY = Math.Abs(i.Y - i.prevY) > maxDist ? i.Y : i.prevY + (i.Y - i.prevY) * alpha;
+
 				if (i.Sprite.Id != 0)
 				{
 					var size = i.Sprite.Dimensions;
-					var pos = new Vector2(i.X, i.Y);
+					var pos = new Vector2(drawX, drawY);
 
 					var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
 					Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
@@ -164,8 +177,8 @@ public class Renderer : IDisposable
 				var fontSize = i.FontSize;
 				var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
 				var textWidth = Raylib.MeasureText(i.Text, fontSize);
-				var textX = (int)i.X - (textWidth / 2);
-				var textY = (int)i.Y - (fontSize / 2);
+				var textX = (int)drawX - (textWidth / 2);
+				var textY = (int)drawY - (fontSize / 2);
 				Raylib.DrawText(i.Text, textX, textY, fontSize, c2);
 			}
 		}
@@ -187,28 +200,8 @@ public class RenderData : IDisposable
 	public int ID;
 	public bool Disabled;
 
-	private float _x, _y;
-	public float X
-	{
-		get => _x;
-		set
-		{
-			prevX = _x;
-			_x = value;
-			if (Math.Abs(_x - prevX) > 100f) { prevX = _x; }
-		}
-	}
-	public float Y
-	{
-		get => _y;
-		set
-		{
-			prevY = _y;
-			_y = value;
-			if (Math.Abs(_y - prevY) > 100f) { prevY = _y; }
-		}
-	}
-
+	public float X;
+	public float Y;
 	public float prevX, prevY;
 	public string Text;
 	public string Group = "";

@@ -7,6 +7,8 @@ public class RaylibHost
 {
 	public static RaylibHost Instance { get; private set; }
 	const float hz = 1.0f / 60.0f;
+	private float accumulator = 0.0f;
+	public float HzAlpha => accumulator / hz;
 	const int screenWidth = 1280;
 	const int screenHeight = 720;
 	private GameVM vm;
@@ -33,7 +35,7 @@ public class RaylibHost
 
 	public void Tick()
 	{
-		var accumulator = 0.0f;
+		accumulator = 0;
 		var latchedClick = false;
 
 		while (!Raylib.WindowShouldClose())
@@ -54,6 +56,7 @@ public class RaylibHost
 			bool vmTickedThisFrame = false;
 			while (accumulator >= hz)
 			{
+				renderer.SnapshotPosition();
 				vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
 				vm.Tick(hz);
 				accumulator -= hz;
