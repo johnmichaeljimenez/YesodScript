@@ -64,7 +64,6 @@ CALL "MENU_SHOW"
 JUMP RESET
 
 >RESET
-	SHOW false "Popup"
 	EDIT [[BALL]] "Disabled" false
 	SETVAR "P1_Y" [[GAME_HEIGHT]]
 	SETVAR "P2_Y" [[GAME_HEIGHT]]
@@ -135,7 +134,6 @@ JUMP RESET
 	JUMP RESET
 
 >LOSE
-	SHOW true "Popup"
 	ADD SCORE2 1
 	CALL "ON_SCORE"
 	EDIT [[BALL]] "Disabled" true

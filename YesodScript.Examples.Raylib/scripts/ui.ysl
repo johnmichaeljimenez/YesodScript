@@ -19,20 +19,22 @@
     EDIT [[TXTSCORE2]] "Tint.B" 0
 
     DEFVAR "TXTWINNER" 0 int
-    RENDER 320 180 "TXTWINNER" 10
+    RENDER 320 180 "TXTWINNER" 10 "POPUP_SCORE"
     EDIT [[TXTWINNER]] "FontSize" 40
     EDIT [[TXTWINNER]] "Text" "P1 Wins!"
 
     DEFVAR "TXTHELP" 0 int
-    RENDER 320 300 "TXTHELP" 10
+    RENDER 320 300 "TXTHELP" 10 "POPUP_SCORE"
     EDIT [[TXTHELP]] "FontSize" 12
     EDIT [[TXTHELP]] "Text" "[Space] Continue"
-    EDIT [[TXTHELP]] "Tint.R" 80
-    EDIT [[TXTHELP]] "Tint.G" 80
-    EDIT [[TXTHELP]] "Tint.B" 80
+    EDIT [[TXTHELP]] "Tint.R" 150
+    EDIT [[TXTHELP]] "Tint.G" 150
+    EDIT [[TXTHELP]] "Tint.B" 150
+    
+    SHOW false "POPUP_SCORE"
 
 @MENU_SHOW
-    SHOW true "UI*"
+    SHOW true "POPUP"
     PRINT "PLAY"
     WAIT 1
     CALL "WAITPRESS Space"
@@ -43,12 +45,18 @@
 	EDIT [[TXTSCORE2]] "Text" [[SCORE2]]
 
 @ON_END <winner>
-    SHOW true "UI*"
-    PRINT "P[[WINNER]] WINS!"
+    SHOW true "POPUP_SCORE"
+    TWEEN [[TXTWINNER]] "Y" -20 0 true 0.3 "QUAD"
+    TWEEN [[TXTWINNER]] "Opacity" 0 1 false 0.2 "QUAD"
+    
+    TWEEN [[TXTHELP]] "Y" 20 0 true 0.8 "QUAD"
+    TWEEN [[TXTHELP]] "Opacity" 0 1 false 0.8 "QUAD"
+
+    EDIT [[TXTWINNER]] "Text" "P[[WINNER]] WINS!"
     WAIT 1
     CALL "WAITPRESS Space"
     JUMP END
 
 >END
-    SHOW false "UI*"
+    SHOW false "POPUP_SCORE"
     BREAK

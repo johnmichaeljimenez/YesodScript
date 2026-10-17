@@ -138,11 +138,14 @@ public class Render : GameCommand
 	private string storeID;
 	[CommandParameter]
 	private int depth;
+	[CommandParameter]
+	private string group = "";
 
 	public override void OnEnter()
 	{
 		var data = Renderer.Instance.CreateRenderData(x, y);
 		data.Depth = depth;
+		data.Group = group;
 		if (string.IsNullOrEmpty(storeID))
 			return;
 
