@@ -99,6 +99,13 @@ public class RaylibHost
 
 	public bool IsKeyPressed(KeyboardKey key)
 	{
-		return pressedKeys.Contains(key);
+		var pressed = pressedKeys.Contains(key);
+
+		if (pressed)
+		{
+			pressedKeys.Remove(key);    //consume immediately if true
+		}
+		
+		return pressed;
 	}
 }
