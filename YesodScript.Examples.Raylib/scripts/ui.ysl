@@ -3,24 +3,33 @@
     DEFVAR "UI_BG_BAR" 0 int
     
     DEFVAR "TXTSCORE1" 0 int
-    RENDER 160 30 "TXTSCORE1"
+    RENDER 160 30 "TXTSCORE1" 1
     EDIT [[TXTSCORE1]] "Text" 0
+    EDIT [[TXTSCORE1]] "FontSize" 20
     EDIT [[TXTSCORE1]] "Tint.R" 0
     EDIT [[TXTSCORE1]] "Tint.G" 255
     EDIT [[TXTSCORE1]] "Tint.B" 255
 
     DEFVAR "TXTSCORE2" 0 int
-    RENDER 480 30 "TXTSCORE2"
+    RENDER 480 30 "TXTSCORE2" 1
     EDIT [[TXTSCORE2]] "Text" 0
+    EDIT [[TXTSCORE2]] "FontSize" 20
     EDIT [[TXTSCORE2]] "Tint.R" 255
     EDIT [[TXTSCORE2]] "Tint.G" 0
     EDIT [[TXTSCORE2]] "Tint.B" 0
 
     DEFVAR "TXTWINNER" 0 int
-    RENDER 320 180 "TXTWINNER"
-    PAUSE
-    EDIT [[TXTWINNER]] "FontSize" 25
+    RENDER 320 180 "TXTWINNER" 10
+    EDIT [[TXTWINNER]] "FontSize" 40
     EDIT [[TXTWINNER]] "Text" "P1 Wins!"
+
+    DEFVAR "TXTHELP" 0 int
+    RENDER 320 300 "TXTHELP" 10
+    EDIT [[TXTHELP]] "FontSize" 12
+    EDIT [[TXTHELP]] "Text" "[Space] Continue"
+    EDIT [[TXTHELP]] "Tint.R" 80
+    EDIT [[TXTHELP]] "Tint.G" 80
+    EDIT [[TXTHELP]] "Tint.B" 80
 
 @MENU_SHOW
     SHOW true "UI*"
@@ -29,10 +38,11 @@
     CALL "WAITPRESS Space"
     JUMP END
 
-
-@ON_END <winner>
+@ON_SCORE
 	EDIT [[TXTSCORE1]] "Text" [[SCORE1]]
 	EDIT [[TXTSCORE2]] "Text" [[SCORE2]]
+
+@ON_END <winner>
     SHOW true "UI*"
     PRINT "P[[WINNER]] WINS!"
     WAIT 1

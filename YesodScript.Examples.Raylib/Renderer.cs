@@ -13,6 +13,8 @@ public class Renderer : IDisposable
 
 	private int renderID = 1;   //0 means stale default data
 	private readonly Dictionary<int, RenderData> renderList = new();
+	private readonly List<RenderData> sortedRenderList = new();
+	private bool sortDirty;
 
 	const int scale = 2;
 	const int VirtualWidth = 1280 / scale;
@@ -38,13 +40,18 @@ public class Renderer : IDisposable
 		if (filter.Equals("*"))
 		{
 			renderList.Clear();
+			sortedRenderList.Clear();
+			sortDirty = false;
 			return;
 		}
 
 		foreach (var i in renderList.Values.ToArray())
 		{
 			if (Utils.IsMatchWildcard(i.Group, filter))
+			{
 				renderList.Remove(i.ID);
+				sortedRenderList.Remove(i);
+			}
 		}
 	}
 
@@ -59,7 +66,24 @@ public class Renderer : IDisposable
 
 	public void RemoveRenderData(int id)
 	{
-		renderList.Remove(id);
+		if (!renderList.Remove(id, out var data))
+			return;
+
+		sortedRenderList.Remove(data);
+	}
+
+	public void SortRenderers()
+	{
+		sortDirty = true;
+	}
+
+	private void EnsureSorted()
+	{
+		if (!sortDirty)
+			return;
+
+		sortedRenderList.Sort((a, b) => a.Depth.CompareTo(b.Depth));
+		sortDirty = false;
 	}
 
 	public RenderData CreateRenderData(int x, int y)
@@ -68,8 +92,12 @@ public class Renderer : IDisposable
 		r.ID = renderID++;
 		r.X = x;
 		r.Y = y;
+		r.prevX = x;
+		r.prevY = y;
 
 		renderList[r.ID] = r;
+		sortedRenderList.Add(r);
+		SortRenderers();
 		return r;
 	}
 
@@ -114,30 +142,31 @@ public class Renderer : IDisposable
 		{
 			Raylib.ClearBackground(Color.RayWhite);
 
-			foreach (var i in renderList)
+			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
+			EnsureSorted();
+			foreach (var i in sortedRenderList)
 			{
-				if (i.Value.Disabled)
+				if (i.Disabled)
 					continue;
 
-				if (i.Value.Sprite.Id != 0)
+				if (i.Sprite.Id != 0)
 				{
-					var size = i.Value.Sprite.Dimensions;
-					var to = new Vector2(i.Value.X, i.Value.Y);
-					i.Value.visPos = Raymath.Vector2Lerp(i.Value.visPos, to, Raylib.GetFrameTime() * 30);
+					var size = i.Sprite.Dimensions;
+					var pos = new Vector2(i.X, i.Y);
 
-					var c1 = new Color(i.Value.Tint.R, i.Value.Tint.G, i.Value.Tint.B, i.Value.Tint.A * i.Value.Opacity);
-					Raylib.DrawTextureV(i.Value.Sprite, i.Value.visPos - (size * 0.5f), c1);
+					var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
+					Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
 				}
 
-				if (string.IsNullOrWhiteSpace(i.Value.Text))
+				if (string.IsNullOrWhiteSpace(i.Text))
 					continue;
 
-				var fontSize = i.Value.FontSize;
-				var c2 = new Color(i.Value.Tint.R, i.Value.Tint.G, i.Value.Tint.B, i.Value.Tint.A * i.Value.Opacity);
-				var textWidth = Raylib.MeasureText(i.Value.Text, fontSize);
-				var textX = (int)i.Value.X - (textWidth / 2);
-				var textY = (int)i.Value.Y - (fontSize / 2);
-				Raylib.DrawText(i.Value.Text, textX, textY, fontSize, c2);
+				var fontSize = i.FontSize;
+				var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
+				var textWidth = Raylib.MeasureText(i.Text, fontSize);
+				var textX = (int)i.X - (textWidth / 2);
+				var textY = (int)i.Y - (fontSize / 2);
+				Raylib.DrawText(i.Text, textX, textY, fontSize, c2);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -157,19 +186,54 @@ public class RenderData : IDisposable
 {
 	public int ID;
 	public bool Disabled;
-	public float X, Y;
+
+	private float _x, _y;
+	public float X
+	{
+		get => _x;
+		set
+		{
+			prevX = _x;
+			_x = value;
+			if (Math.Abs(_x - prevX) > 100f) { prevX = _x; }
+		}
+	}
+	public float Y
+	{
+		get => _y;
+		set
+		{
+			prevY = _y;
+			_y = value;
+			if (Math.Abs(_y - prevY) > 100f) { prevY = _y; }
+		}
+	}
+
+	public float prevX, prevY;
 	public string Text;
 	public string Group = "";
 	public float Opacity = 1;
 	public Color Tint = Color.White;
 
-	public Vector2 visPos;
-
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
-    public int FontSize = 14;
+	public int FontSize = 14;
 
-    public List<TweenBase> activeTweens = new();
+	private int _depth;
+	public int Depth
+	{
+		get => _depth;
+		set
+		{
+			if (_depth == value)
+				return;
+
+			_depth = value;
+			Renderer.Instance?.SortRenderers();
+		}
+	}
+
+	public List<TweenBase> activeTweens = new();
 
 	public void Sync()
 	{
