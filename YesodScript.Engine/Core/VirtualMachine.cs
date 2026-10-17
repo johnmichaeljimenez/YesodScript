@@ -105,6 +105,11 @@ public class VirtualMachine : IDisposable
 
 	public void Initialize()
 	{
+		//prioritize "main.ysl" if it exists
+		allCommands.Sort((x, y) =>
+			(x.ID.Equals("main", StringComparison.InvariantCultureIgnoreCase) ? 0 : 1).CompareTo(y.ID == "main" ? 0 : 1)
+		);
+
 		OnInitialize();
 		FireTrigger("_INIT");
 		Tick(0);
@@ -367,7 +372,7 @@ public class VirtualMachine : IDisposable
 		return allCommands.FirstOrDefault(p => p.ID.Equals(id, StringComparison.InvariantCultureIgnoreCase));
 	}
 
-	
+
 	public Instruction CloneInstruction(string sourceId, bool runInit = true)
 	{
 		var source = FindInstruction(sourceId);
@@ -434,7 +439,7 @@ public class VirtualMachine : IDisposable
 		return clone;
 	}
 
-public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
+	public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
 	{
 		if (selector == null)
 			throw new ArgumentNullException(nameof(selector));
