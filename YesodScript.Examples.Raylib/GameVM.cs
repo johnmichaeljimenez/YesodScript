@@ -209,19 +209,11 @@ public class Tween : GameCommand
 		var _to = relative ? getter() + to : to;
 
 		var tween = new Tween<float>(getter, setter, _to, duration, _from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
-		tween.SetEasing(ResolveEasing(easing));
+		tween.SetEasing(TweenUtil.ResolveEasing(easing));
 
 		data.activeTweens.Add(tween);
 		TweenManager.Add(tween);
 	}
-
-	private static EasingFunction ResolveEasing(string name) => name.ToUpperInvariant() switch
-	{
-		"LINEAR" => Easing.Linear,
-		"QUAD" => Easing.QuadInOut,
-		"SHAKE" => Easing.QuadInOutLoop,
-		_ => Easing.Linear
-	};
 }
 
 public class PlaySound : GameCommand
@@ -229,10 +221,75 @@ public class PlaySound : GameCommand
 	[CommandParameter]
 	private string sfxID;
 
-    public override void OnEnter()
-    {
+	public override void OnEnter()
+	{
 		var snd = Assets.Instance.GetSound(sfxID);
 		Raylib.SetSoundPitch(snd, Raymath.Remap(Raylib.GetRandomValue(0, 100), 0, 100, 0.9f, 1.0f));
 		Raylib.PlaySound(snd);
-    }
+	}
+}
+
+public class Cam : GameCommand
+{
+	[CommandParameter]
+	private float x;
+	[CommandParameter]
+	private float y;
+	[CommandParameter]
+	private float zoom;
+
+	public override void OnEnter()
+	{
+		var cam = Renderer.Instance.Camera;
+		cam.Target.X = x;
+		cam.Target.Y = y;
+
+		cam.Zoom = zoom;
+
+		Renderer.Instance.Camera = cam;
+	}
+}
+
+public class TweenCam : GameCommand
+{
+	[CommandParameter] private string path;
+	[CommandParameter] private float from;
+	[CommandParameter] private float to;
+	[CommandParameter] private bool relative;
+	[CommandParameter] private float duration = 0.5f;
+	[CommandParameter] private string easing = "Linear";
+	[CommandParameter] private string tweenId = "";
+
+	public override void OnEnter()
+	{
+		if (!Renderer.CameraMembers.TryGetValue(path, out var member))
+			throw new Exception($"Unknown path '{path}'");
+
+		Func<float> getter = () => (float)member.Get(Renderer.Instance.Camera);
+		Action<float> setter = v =>
+		{
+			object boxed = Renderer.Instance.Camera;
+			member.Set(boxed, v);
+			Renderer.Instance.Camera = (Camera2D)boxed;
+		};
+
+		var _from = relative ? getter() + from : from;
+		var _to = relative ? getter() + to : to;
+
+		var tween = new Tween<float>(getter, setter, _to, duration, _from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
+		tween.SetEasing(TweenUtil.ResolveEasing(easing));
+
+		TweenManager.Add(tween);
+	}
+}
+
+internal static class TweenUtil
+{
+	public static EasingFunction ResolveEasing(string name) => name.ToUpperInvariant() switch
+	{
+		"LINEAR" => Easing.Linear,
+		"QUAD" => Easing.QuadInOut,
+		"SHAKE" => Easing.QuadInOutLoop,
+		_ => Easing.Linear
+	};
 }

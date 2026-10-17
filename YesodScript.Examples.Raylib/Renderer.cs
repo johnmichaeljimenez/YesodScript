@@ -9,6 +9,7 @@ namespace YesodScript.Examples;
 public class Renderer : IDisposable
 {
 	public static readonly IReadOnlyDictionary<string, PathMember> RenderDataMembers = PathMemberCache.Build<RenderData>();
+	public static readonly IReadOnlyDictionary<string, PathMember> CameraMembers = PathMemberCache.Build<Camera2D>();
 	public static Renderer Instance { get; private set; }
 
 	private int renderID = 1;   //0 means stale default data
@@ -21,6 +22,12 @@ public class Renderer : IDisposable
 	const int VirtualHeight = 720 / scale;
 
 	private RenderTexture2D rt;
+
+	public Camera2D Camera = new()
+	{
+		Offset = new Vector2(VirtualWidth * 0.5f, VirtualHeight * 0.5f),
+		Zoom = 1f
+	};
 
 	public Renderer()
 	{
@@ -89,7 +96,7 @@ public class Renderer : IDisposable
 	public RenderData CreateRenderData(int x, int y)
 	{
 		var newID = renderID++;
-	
+
 		if (renderList.ContainsKey(newID))
 			throw new InvalidOperationException($"RenderData with ID '{newID}' already exists.");
 
@@ -161,33 +168,23 @@ public class Renderer : IDisposable
 
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();
-			foreach (var i in sortedRenderList)
+
+			Raylib.BeginMode2D(Camera);
+			foreach (var item in sortedRenderList)
 			{
-				if (i.Disabled)
+				if (item.Disabled || !item.World)
+					continue;
+					
+				DrawItem(item, alpha);
+			}
+			Raylib.EndMode2D();
+
+			foreach (var item in sortedRenderList)
+			{
+				if (item.Disabled || item.World)
 					continue;
 
-				var maxDist = 100f;
-				var drawX = Math.Abs(i.X - i.prevX) > maxDist ? i.X : i.prevX + (i.X - i.prevX) * alpha;
-				var drawY = Math.Abs(i.Y - i.prevY) > maxDist ? i.Y : i.prevY + (i.Y - i.prevY) * alpha;
-
-				if (i.Sprite.Id != 0)
-				{
-					var size = i.Sprite.Dimensions;
-					var pos = new Vector2(drawX, drawY);
-
-					var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
-					Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
-				}
-
-				if (string.IsNullOrWhiteSpace(i.Text))
-					continue;
-
-				var fontSize = i.FontSize;
-				var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
-				var textWidth = Raylib.MeasureText(i.Text, fontSize);
-				var textX = (int)drawX - (textWidth / 2);
-				var textY = (int)drawY - (fontSize / 2);
-				Raylib.DrawText(i.Text, textX, textY, fontSize, c2);
+				DrawItem(item, alpha);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -198,6 +195,32 @@ public class Renderer : IDisposable
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 		}
 		Raylib.EndDrawing();
+	}
+
+	private void DrawItem(RenderData i, float alpha)
+	{
+		var maxDist = 100f;
+		var drawX = Math.Abs(i.X - i.prevX) > maxDist ? i.X : i.prevX + (i.X - i.prevX) * alpha;
+		var drawY = Math.Abs(i.Y - i.prevY) > maxDist ? i.Y : i.prevY + (i.Y - i.prevY) * alpha;
+
+		if (i.Sprite.Id != 0)
+		{
+			var size = i.Sprite.Dimensions;
+			var pos = new Vector2(drawX, drawY);
+
+			var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
+			Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
+		}
+
+		if (string.IsNullOrWhiteSpace(i.Text))
+			return;
+
+		var fontSize = i.FontSize;
+		var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
+		var textWidth = Raylib.MeasureText(i.Text, fontSize);
+		var textX = (int)drawX - (textWidth / 2);
+		var textY = (int)drawY - (fontSize / 2);
+		Raylib.DrawText(i.Text, textX, textY, fontSize, c2);
 	}
 }
 
@@ -213,6 +236,7 @@ public class RenderData : IDisposable
 	public string Group = "";
 	public float Opacity = 1;
 	public Color Tint = Color.White;
+	public bool World = false;
 
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
