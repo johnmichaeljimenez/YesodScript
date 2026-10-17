@@ -88,8 +88,13 @@ public class Renderer : IDisposable
 
 	public RenderData CreateRenderData(int x, int y)
 	{
+		var newID = renderID++;
+	
+		if (renderList.ContainsKey(newID))
+			throw new InvalidOperationException($"RenderData with ID '{newID}' already exists.");
+
 		var r = new RenderData();
-		r.ID = renderID++;
+		r.ID = newID;
 		r.X = x;
 		r.Y = y;
 		r.prevX = x;
