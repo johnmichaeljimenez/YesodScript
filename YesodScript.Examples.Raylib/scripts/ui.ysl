@@ -40,7 +40,7 @@
     DEFVAR "TXTSCORE1" 0 int
     RENDER 160 30 "TXTSCORE1" 1
     EDIT [[TXTSCORE1]] "Text" 0
-    EDIT [[TXTSCORE1]] "FontSize" 20
+    EDIT [[TXTSCORE1]] "FontSize" 40
     EDIT [[TXTSCORE1]] "Tint.R" 0
     EDIT [[TXTSCORE1]] "Tint.G" 255
     EDIT [[TXTSCORE1]] "Tint.B" 255
@@ -48,7 +48,7 @@
     DEFVAR "TXTSCORE2" 0 int
     RENDER 480 30 "TXTSCORE2" 1
     EDIT [[TXTSCORE2]] "Text" 0
-    EDIT [[TXTSCORE2]] "FontSize" 20
+    EDIT [[TXTSCORE2]] "FontSize" 40
     EDIT [[TXTSCORE2]] "Tint.R" 255
     EDIT [[TXTSCORE2]] "Tint.G" 0
     EDIT [[TXTSCORE2]] "Tint.B" 0
@@ -96,12 +96,12 @@
 
     >P1
         SETVAR "IS_2PLAYER" false
-        TWEEN [[MENU_BUTTON1]] "Opacity" 0 1 false 1 "SHAKE"
+        CALL "BUTTON_PRESS [[MENU_BUTTON1]]"
         JUMP MENU_CLOSE
 
     >P2
         SETVAR "IS_2PLAYER" true
-        TWEEN [[MENU_BUTTON2]] "Opacity" 0 1 false 1 "SHAKE"
+        CALL "BUTTON_PRESS [[MENU_BUTTON2]]"
         JUMP MENU_CLOSE
 
     >MENU_CLOSE
@@ -129,14 +129,13 @@
         JUMP PAUSELOOP
 
     >UNPAUSE
-        TWEEN [[PAUSE_RESUME]] "Opacity" 0 1 false 1 "SHAKE"
-        WAIT 1
+        CALL "BUTTON_PRESS [[PAUSE_RESUME]]"
+        WAIT 0.5
         SHOW false "POPUP_PAUSE"
         BREAK
 
     >PAUSEQUIT
-        TWEEN [[PAUSE_EXIT]] "Opacity" 0 1 false 1 "SHAKE"
-        WAIT 1
+        CALL "BUTTON_PRESS [[PAUSE_EXIT]]"
         SHOW false "POPUP_PAUSE"
         SETVAR "REQ_MENU" true
         BREAK

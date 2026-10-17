@@ -12,5 +12,16 @@
     TWEEN [[P2]] "X" 0 8 true 0.3 "SHAKE"
     JUMP END
 
+@BALL_BOUNCE
+    PLAYSOUND "ball-bounce"
+
+@ON_SCORE
+    PLAYSOUND "score"
+
+@BUTTON_PRESS <btn>
+    PLAYSOUND "ui-press"
+    TWEEN <btn> "Opacity" 0 1 false 0.4 "SHAKE"
+    WAIT 0.4
+
 >END
     BREAK
