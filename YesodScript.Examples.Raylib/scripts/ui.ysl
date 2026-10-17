@@ -14,6 +14,23 @@
     RENDER 320 280 "MENU_BUTTON2" 20 "POPUP_MENU"
     EDIT [[MENU_BUTTON2]] "FontSize" 15
     EDIT [[MENU_BUTTON2]] "Text" "[2] 2 Players"
+
+    DEFVAR "PAUSE_TITLE" 0 int
+    DEFVAR "PAUSE_RESUME" 0 int
+    DEFVAR "PAUSE_EXIT" 0 int
+    
+    RENDER 320 140 "PAUSE_TITLE" 20 "POPUP_PAUSE"
+    EDIT [[PAUSE_TITLE]] "FontSize" 40
+    EDIT [[PAUSE_TITLE]] "Text" "Game Paused"
+    
+    RENDER 320 250 "PAUSE_RESUME" 20 "POPUP_PAUSE"
+    EDIT [[PAUSE_RESUME]] "FontSize" 15
+    EDIT [[PAUSE_RESUME]] "Text" "[Esc] Resume"
+    
+    RENDER 320 280 "PAUSE_EXIT" 20 "POPUP_PAUSE"
+    EDIT [[PAUSE_EXIT]] "FontSize" 15
+    EDIT [[PAUSE_EXIT]] "Text" "[Enter] Quit to Menu"
+    
     
     DEFVAR "TXTSCORE1" 0 int
     RENDER 160 30 "TXTSCORE1" 1
@@ -85,6 +102,40 @@
     >MENU_CLOSE
         WAIT 1
         SHOW false "POPUP_MENU"
+        BREAK
+
+@ON_PAUSE
+    SHOW true "POPUP_PAUSE"
+    
+    TWEEN [[PAUSE_TITLE]] "Y" -25 0 true 0.4 "QUAD"
+    TWEEN [[PAUSE_TITLE]] "Opacity" 0 1 false 0.3 "QUAD"
+
+    TWEEN [[PAUSE_RESUME]] "X" -10 0 true 0.8 "QUAD"
+    TWEEN [[PAUSE_RESUME]] "Opacity" 0 1 false 0.5 "QUAD"
+
+    TWEEN [[PAUSE_EXIT]] "X" 10 0 true 0.8 "QUAD"
+    TWEEN [[PAUSE_EXIT]] "Opacity" 0 1 false 0.5 "QUAD"
+
+    WAIT 1
+    
+    >PAUSELOOP
+    	JUMPKEY "Escape" UNPAUSE
+        JUMPKEY "Enter" PAUSEQUIT
+    
+        WAITFRAME
+        JUMP PAUSELOOP
+
+    >UNPAUSE
+        TWEEN [[PAUSE_RESUME]] "Opacity" 0 1 false 1 "SHAKE"
+        WAIT 1
+        SHOW false "POPUP_PAUSE"
+        BREAK
+
+    >PAUSEQUIT
+        TWEEN [[PAUSE_EXIT]] "Opacity" 0 1 false 1 "SHAKE"
+        WAIT 1
+        SHOW false "POPUP_PAUSE"
+        SETVAR "REQ_MENU" true
         BREAK
 
 @ON_SCORE
