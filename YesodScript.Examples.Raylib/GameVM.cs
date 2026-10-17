@@ -38,7 +38,7 @@ public class GameVM : VirtualMachine
 	{
 		mouseX = AddGlobalVar("SYS:MOUSE_X", typeof(int), 0);
 		mouseY = AddGlobalVar("SYS:MOUSE_Y", typeof(int), 0);
-		AddGlobalVar("SYS:REQ_EXIT", typeof(int), 0);
+		AddGlobalVar("SYS:REQ_EXIT", typeof(bool), 0);
 
 		AddGlobalList("SYS:DRAWLIST", typeof(int));
 	}

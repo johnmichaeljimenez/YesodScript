@@ -27,6 +27,7 @@ public class RaylibHost
 		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
 		Raylib.MaximizeWindow();
 		Raylib.InitAudioDevice();
+		Raylib.SetExitKey(0);
 
 		renderer = new();
 		assets = new();

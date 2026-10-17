@@ -58,15 +58,19 @@
 
     TWEEN [[MENU_BUTTON2]] "X" 10 0 true 0.8 "QUAD"
     TWEEN [[MENU_BUTTON2]] "Opacity" 0 1 false 0.5 "QUAD"
-
     WAIT 1
 
     >LOOP
+        JUMPKEY "Escape" EXIT
         JUMPKEY "One" P1
         JUMPKEY "Two" P2
         
         WAITFRAME
         JUMP LOOP
+    
+    >EXIT
+        SETVAR "SYS:REQ_EXIT" true
+        BREAK
 
     >P1
         SETVAR "IS_2PLAYER" false
