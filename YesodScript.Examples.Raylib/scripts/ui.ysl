@@ -30,6 +30,11 @@
     RENDER 320 280 "PAUSE_EXIT" 20 "POPUP_PAUSE"
     EDIT [[PAUSE_EXIT]] "FontSize" 15
     EDIT [[PAUSE_EXIT]] "Text" "[Enter] Quit to Menu"
+
+    DEFVAR "TXTSERVE" 0 int
+    RENDER 320 340 "TXTSERVE" 20 "POPUP_SERVE"
+    EDIT [[TXTSERVE]] "FontSize" 15
+    EDIT [[TXTSERVE]] "Text" "[Space] Begin!"
     
     
     DEFVAR "TXTSCORE1" 0 int
@@ -78,9 +83,9 @@
     WAIT 1
 
     >LOOP
-        JUMPKEY "Escape" EXIT
-        JUMPKEY "One" P1
-        JUMPKEY "Two" P2
+        JUMPKEYPRESS "Escape" EXIT
+        JUMPKEYPRESS "One" P1
+        JUMPKEYPRESS "Two" P2
         
         WAITFRAME
         JUMP LOOP
@@ -116,11 +121,9 @@
     TWEEN [[PAUSE_EXIT]] "X" 10 0 true 0.8 "QUAD"
     TWEEN [[PAUSE_EXIT]] "Opacity" 0 1 false 0.5 "QUAD"
 
-    WAIT 1
-    
     >PAUSELOOP
-    	JUMPKEY "Escape" UNPAUSE
-        JUMPKEY "Enter" PAUSEQUIT
+    	JUMPKEYPRESS "Escape" UNPAUSE
+        JUMPKEYPRESS "Enter" PAUSEQUIT
     
         WAITFRAME
         JUMP PAUSELOOP
@@ -137,6 +140,21 @@
         SHOW false "POPUP_PAUSE"
         SETVAR "REQ_MENU" true
         BREAK
+
+@SERVE_RESET
+    SHOW true "POPUP_SERVE"
+    TWEEN [[TXTSERVE]] "Opacity" 0 1 false 0.3 "QUAD"
+    BREAK
+
+@SERVE_CANCEL
+    SHOW false "POPUP_SERVE"
+    BREAK
+
+@SERVE_START
+    TWEEN [[TXTSERVE]] "Opacity" 1 0 false 0.2 "QUAD"
+    WAIT 0.2
+    SHOW false "POPUP_SERVE"
+    BREAK
 
 @ON_SCORE
 	EDIT [[TXTSCORE1]] "Text" [[SCORE1]]
