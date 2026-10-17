@@ -167,7 +167,7 @@ public class Renderer : IDisposable
 					var size = i.Sprite.Dimensions;
 					var pos = new Vector2(drawX, drawY);
 
-					var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
+					var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
 					Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
 				}
 
@@ -175,7 +175,7 @@ public class Renderer : IDisposable
 					continue;
 
 				var fontSize = i.FontSize;
-				var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, i.Tint.A * i.Opacity);
+				var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
 				var textWidth = Raylib.MeasureText(i.Text, fontSize);
 				var textX = (int)drawX - (textWidth / 2);
 				var textY = (int)drawY - (fontSize / 2);
