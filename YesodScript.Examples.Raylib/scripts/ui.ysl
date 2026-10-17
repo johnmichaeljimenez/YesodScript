@@ -65,8 +65,25 @@
     EDIT [[TXTHELP]] "Tint.R" 150
     EDIT [[TXTHELP]] "Tint.G" 150
     EDIT [[TXTHELP]] "Tint.B" 150
+
+    DEFVAR "TXTHELP1" 0 int
+    RENDER 120 320 "TXTHELP1" 1 "HELP1"
+    EDIT [[TXTHELP1]] "Text" "W/S P1 movement"
+    EDIT [[TXTHELP1]] "FontSize" 14
+    EDIT [[TXTHELP1]] "Tint.R" 0
+    EDIT [[TXTHELP1]] "Tint.G" 255
+    EDIT [[TXTHELP1]] "Tint.B" 255
+
+    DEFVAR "TXTHELP2" 0 int
+    RENDER 520 320 "TXTHELP2" 5 "HELP2"
+    EDIT [[TXTHELP2]] "Text" "Up/Down arrow P2 movement"
+    EDIT [[TXTHELP2]] "FontSize" 14
+    EDIT [[TXTHELP2]] "Tint.R" 255
+    EDIT [[TXTHELP2]] "Tint.G" 0
+    EDIT [[TXTHELP2]] "Tint.B" 0
     
     SHOW false "POPUP*"
+    SHOW false "HELP*"
 
 @MENU_SHOW
     WAIT 0.5
@@ -112,6 +129,12 @@
 @GAME_START
 	EDIT [[TXTSCORE1]] "Text" [[SCORE1]]
 	EDIT [[TXTSCORE2]] "Text" [[SCORE2]]
+
+    SHOW true "HELP1"
+    TWEEN [[TXTHELP1]] "Opacity" 1 0 false 5 "QUAD" "HELP1"
+
+    SHOW [[IS_2PLAYER]] "HELP2"
+    TWEEN [[TXTHELP2]] "Opacity" 1 0 false 5 "QUAD" "HELP2"
 
 @ON_PAUSE
     SHOW true "POPUP_PAUSE"

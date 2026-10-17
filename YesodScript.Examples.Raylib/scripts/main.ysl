@@ -42,7 +42,7 @@ DEFVAR "WINNER" 0 int
 DEFVAR "BG" 0 int
 
 
-RENDER 320 180 "BG"
+RENDER 320 180 "BG" -10
 EDIT [[BG]] "SpriteID" "bg"
 
 RENDER [[BALL_X]] [[BALL_Y]] "BALL"
