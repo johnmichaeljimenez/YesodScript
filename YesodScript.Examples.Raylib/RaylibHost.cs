@@ -15,6 +15,7 @@ public class RaylibHost
 	private Renderer renderer;
 	private Assets assets;
 
+	private readonly HashSet<KeyboardKey> holdKeys = new();
 	private readonly HashSet<KeyboardKey> pressedKeys = new();
 	private static readonly KeyboardKey[] allKeys = Enum.GetValues<KeyboardKey>();
 
@@ -48,7 +49,8 @@ public class RaylibHost
 
 			foreach (var key in allKeys)
 			{
-				if (Raylib.IsKeyDown(key)) pressedKeys.Add(key);
+				if (Raylib.IsKeyPressed(key)) pressedKeys.Add(key);
+				if (Raylib.IsKeyDown(key)) holdKeys.Add(key);
 			}
 
 			var mousePos = renderer.GetVirtualMousePosition();
@@ -69,6 +71,7 @@ public class RaylibHost
 			if (vmTickedThisFrame)
 			{
 				latchedClick = false;
+				holdKeys.Clear();
 				pressedKeys.Clear();
 			}
 
@@ -86,6 +89,11 @@ public class RaylibHost
 		renderer.Dispose();
 		Raylib.CloseAudioDevice();
 		Raylib.CloseWindow();
+	}
+
+	public bool IsKeyHeld(KeyboardKey key)
+	{
+		return holdKeys.Contains(key);
 	}
 
 	public bool IsKeyPressed(KeyboardKey key)

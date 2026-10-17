@@ -123,6 +123,21 @@ public class JumpKey : GameCommand
 
 	public override void OnEnter()
 	{
+		if (RaylibHost.Instance.IsKeyHeld(key))
+			Instruction.Jump(labelName);
+	}
+}
+
+public class JumpKeyPress : GameCommand
+{
+	[CommandParameter]
+	private KeyboardKey key;
+
+	[CommandParameter]
+	private string labelName;
+
+	public override void OnEnter()
+	{
 		if (RaylibHost.Instance.IsKeyPressed(key))
 			Instruction.Jump(labelName);
 	}
