@@ -37,8 +37,25 @@
     SHOW true "POPUP"
     PRINT "PLAY"
     WAIT 1
-    CALL "WAITPRESS Space"
-    JUMP END
+
+    >LOOP
+        JUMPKEY "One" P1
+        JUMPKEY "Two" P2
+        
+        WAITFRAME
+        JUMP LOOP
+
+    >P1
+        SETVAR "IS_2PLAYER" false
+        JUMP MENU_CLOSE
+
+    >P2
+        SETVAR "IS_2PLAYER" true
+        JUMP MENU_CLOSE
+
+    >MENU_CLOSE
+        WAIT 0.5
+        BREAK
 
 @ON_SCORE
 	EDIT [[TXTSCORE1]] "Text" [[SCORE1]]
