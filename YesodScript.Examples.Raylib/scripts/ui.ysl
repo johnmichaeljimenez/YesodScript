@@ -109,6 +109,10 @@
         SHOW false "POPUP_MENU"
         BREAK
 
+@GAME_START
+	EDIT [[TXTSCORE1]] "Text" [[SCORE1]]
+	EDIT [[TXTSCORE2]] "Text" [[SCORE2]]
+
 @ON_PAUSE
     SHOW true "POPUP_PAUSE"
     

@@ -24,7 +24,7 @@ public class RaylibHost
 		Instance = this;
 
 		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
-		Raylib.InitWindow(screenWidth, screenHeight, "YesodScript Raylib-cs example");
+		Raylib.InitWindow(screenWidth, screenHeight, "Pong");
 		Raylib.MaximizeWindow();
 		Raylib.InitAudioDevice();
 		Raylib.SetExitKey(0);
