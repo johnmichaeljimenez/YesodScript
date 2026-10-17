@@ -132,8 +132,12 @@ public class Renderer : IDisposable
 				if (string.IsNullOrWhiteSpace(i.Value.Text))
 					continue;
 
+				var fontSize = i.Value.FontSize;
 				var c2 = new Color(i.Value.Tint.R, i.Value.Tint.G, i.Value.Tint.B, i.Value.Tint.A * i.Value.Opacity);
-				Raylib.DrawText(i.Value.Text, (int)i.Value.X, (int)i.Value.Y, 14, c2);
+				var textWidth = Raylib.MeasureText(i.Value.Text, fontSize);
+				var textX = (int)i.Value.X - (textWidth / 2);
+				var textY = (int)i.Value.Y - (fontSize / 2);
+				Raylib.DrawText(i.Value.Text, textX, textY, fontSize, c2);
 			}
 		}
 		Raylib.EndTextureMode();
@@ -163,8 +167,9 @@ public class RenderData : IDisposable
 
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
+    public int FontSize = 14;
 
-	public List<TweenBase> activeTweens = new();
+    public List<TweenBase> activeTweens = new();
 
 	public void Sync()
 	{
