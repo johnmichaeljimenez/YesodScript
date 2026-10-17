@@ -188,8 +188,6 @@ public class Renderer : IDisposable
 		{
 			Raylib.ClearBackground(Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
-
-			Raylib.DrawFPS(4, 4);
 		}
 		Raylib.EndDrawing();
 	}

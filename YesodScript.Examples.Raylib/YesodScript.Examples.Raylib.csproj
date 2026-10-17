@@ -5,10 +5,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <AssemblyName>Pong</AssemblyName>
+    <Product>Pong</Product>
+    <AssemblyTitle>Pong</AssemblyTitle>
+    <ApplicationIcon>Pong.ico</ApplicationIcon>
   </PropertyGroup>
 
 <!-- itch.io stuff -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputType>WinExe</OutputType>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
