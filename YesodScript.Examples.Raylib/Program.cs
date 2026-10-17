@@ -5,8 +5,29 @@ public static class Program
 	[STAThread]
 	public static void Main()
 	{
-		var host = new RaylibHost(GameVM.Create());
-		host.Tick();
-		host.Cleanup();
+		RaylibHost? host = null;
+		try
+		{
+			var vm = GameVM.Create();
+			host = new RaylibHost(vm);
+			host.Tick();
+		}
+		catch (Exception ex)
+		{
+			
+			ErrorReport.Write(ex, "Startup");
+			ErrorReport.ShowMessageBox(ErrorReport.FormatMessageBox(ex, "Startup"));
+		}
+		finally
+		{
+			try
+			{
+				host?.Cleanup();
+			}
+			catch
+			{
+				
+			}
+		}
 	}
 }

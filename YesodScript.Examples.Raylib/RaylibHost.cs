@@ -14,6 +14,9 @@ public class RaylibHost
 	private GameVM vm;
 	private Renderer renderer;
 	private Assets assets;
+	private string? fatalErrorText;
+	private bool windowReady;
+	private bool audioReady;
 
 	private readonly HashSet<KeyboardKey> holdKeys = new();
 	private readonly HashSet<KeyboardKey> pressedKeys = new();
@@ -25,15 +28,24 @@ public class RaylibHost
 
 		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
 		Raylib.InitWindow(screenWidth, screenHeight, "Pong");
+		windowReady = true;
 		Raylib.MaximizeWindow();
 		Raylib.InitAudioDevice();
+		audioReady = true;
 		Raylib.SetExitKey(0);
 
 		renderer = new();
 		assets = new();
 
 		this.vm = vm;
-		vm.Initialize();
+		try
+		{
+			vm.Initialize();
+		}
+		catch (Exception ex)
+		{
+			SetFatal(ex, "Initialization");
+		}
 	}
 
 	public void Tick()
@@ -43,6 +55,12 @@ public class RaylibHost
 
 		while (!Raylib.WindowShouldClose())
 		{
+			if (fatalErrorText != null)
+			{
+				DrawFatalError();
+				continue;
+			}
+
 			var frameTime = Raylib.GetFrameTime();
 			if (frameTime > 0.25f) frameTime = 0.25f;
 
@@ -58,15 +76,23 @@ public class RaylibHost
 			accumulator += frameTime;
 
 			bool vmTickedThisFrame = false;
-			while (accumulator >= hz)
+			try
 			{
-				renderer.SnapshotPosition();
-				vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
-				vm.Tick(hz);
-				accumulator -= hz;
-				vmTickedThisFrame = true;
+				while (accumulator >= hz)
+				{
+					renderer.SnapshotPosition();
+					vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
+					vm.Tick(hz);
+					accumulator -= hz;
+					vmTickedThisFrame = true;
 
-				if (!vm.IsRunning) break;
+					if (!vm.IsRunning) break;
+				}
+			}
+			catch (Exception ex)
+			{
+				SetFatal(ex, "Runtime");
+				continue;
 			}
 
 			if (vmTickedThisFrame)
@@ -78,18 +104,35 @@ public class RaylibHost
 
 			if (!vm.IsRunning) break;
 
-			TweenManager.Update(frameTime, frameTime);
-			renderer.Draw();
+			try
+			{
+				TweenManager.Update(frameTime, frameTime);
+				renderer.Draw();
+			}
+			catch (Exception ex)
+			{
+				SetFatal(ex, "Render");
+			}
 		}
 	}
 
 	public void Cleanup()
 	{
-		vm.Dispose();
-		assets.Dispose();
-		renderer.Dispose();
-		Raylib.CloseAudioDevice();
-		Raylib.CloseWindow();
+		try { vm.Dispose(); } catch {  }
+		try { assets.Dispose(); } catch { }
+		try { renderer.Dispose(); } catch {  }
+
+		if (audioReady)
+		{
+			Raylib.CloseAudioDevice();
+			audioReady = false;
+		}
+
+		if (windowReady)
+		{
+			Raylib.CloseWindow();
+			windowReady = false;
+		}
 	}
 
 	public bool IsKeyHeld(KeyboardKey key)
@@ -105,7 +148,42 @@ public class RaylibHost
 		{
 			pressedKeys.Remove(key);    //consume immediately if true
 		}
-		
+
 		return pressed;
+	}
+
+	private void SetFatal(Exception ex, string stage)
+	{
+		if (fatalErrorText != null)
+			return;
+
+		ErrorReport.Write(ex, stage);
+		fatalErrorText = ErrorReport.FormatOnScreen(ex, stage);
+		if (windowReady)
+			Raylib.SetWindowTitle("YesodScript — Error");
+	}
+
+	private void DrawFatalError()
+	{
+		Raylib.BeginDrawing();
+		Raylib.ClearBackground(new Color(20, 12, 12, 255));
+
+		var fontSize = 20;
+		var lineHeight = 26;
+		var marginX = 40;
+		var y = 40;
+
+		Raylib.DrawText("YesodScript", marginX, y, 28, new Color(255, 120, 120, 255));
+		y += 40;
+
+		foreach (var line in (fatalErrorText ?? "Unknown error.").Replace("\r\n", "\n").Split('\n'))
+		{
+			Raylib.DrawText(line, marginX, y, fontSize, Color.RayWhite);
+			y += lineHeight;
+			if (y > Raylib.GetScreenHeight() - 40)
+				break;
+		}
+
+		Raylib.EndDrawing();
 	}
 }

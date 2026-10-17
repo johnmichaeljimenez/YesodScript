@@ -117,7 +117,10 @@ public class Renderer : IDisposable
 
 	public RenderData GetRenderData(int id)
 	{
-		return renderList[id];
+		if (!renderList.TryGetValue(id, out var data))
+			throw new InvalidOperationException($"RenderData id '{id}' not found.");
+
+		return data;
 	}
 
 	public Vector2 GetVirtualMousePosition()
