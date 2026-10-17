@@ -1,6 +1,19 @@
 @GAME_INIT
-    DEFVAR "UI_BG_DARK" 0 int
-    DEFVAR "UI_BG_BAR" 0 int
+    DEFVAR "MENU_TITLE" 0 int
+    DEFVAR "MENU_BUTTON1" 0 int
+    DEFVAR "MENU_BUTTON2" 0 int
+    
+    RENDER 320 140 "MENU_TITLE" 20 "POPUP_MENU"
+    EDIT [[MENU_TITLE]] "FontSize" 60
+    EDIT [[MENU_TITLE]] "Text" "PONG"
+    
+    RENDER 320 250 "MENU_BUTTON1" 20 "POPUP_MENU"
+    EDIT [[MENU_BUTTON1]] "FontSize" 15
+    EDIT [[MENU_BUTTON1]] "Text" "[1] 1 Player"
+    
+    RENDER 320 280 "MENU_BUTTON2" 20 "POPUP_MENU"
+    EDIT [[MENU_BUTTON2]] "FontSize" 15
+    EDIT [[MENU_BUTTON2]] "Text" "[2] 2 Players"
     
     DEFVAR "TXTSCORE1" 0 int
     RENDER 160 30 "TXTSCORE1" 1
@@ -31,11 +44,21 @@
     EDIT [[TXTHELP]] "Tint.G" 150
     EDIT [[TXTHELP]] "Tint.B" 150
     
-    SHOW false "POPUP_SCORE"
+    SHOW false "POPUP*"
 
 @MENU_SHOW
-    SHOW true "POPUP"
-    PRINT "PLAY"
+    WAIT 0.5
+    SHOW true "POPUP_MENU"
+    
+    TWEEN [[MENU_TITLE]] "Y" -25 0 true 0.4 "QUAD"
+    TWEEN [[MENU_TITLE]] "Opacity" 0 1 false 0.3 "QUAD"
+
+    TWEEN [[MENU_BUTTON1]] "X" -10 0 true 0.8 "QUAD"
+    TWEEN [[MENU_BUTTON1]] "Opacity" 0 1 false 0.5 "QUAD"
+
+    TWEEN [[MENU_BUTTON2]] "X" 10 0 true 0.8 "QUAD"
+    TWEEN [[MENU_BUTTON2]] "Opacity" 0 1 false 0.5 "QUAD"
+
     WAIT 1
 
     >LOOP
@@ -47,14 +70,17 @@
 
     >P1
         SETVAR "IS_2PLAYER" false
+        TWEEN [[MENU_BUTTON1]] "Opacity" 0 1 false 1 "SHAKE"
         JUMP MENU_CLOSE
 
     >P2
         SETVAR "IS_2PLAYER" true
+        TWEEN [[MENU_BUTTON2]] "Opacity" 0 1 false 1 "SHAKE"
         JUMP MENU_CLOSE
 
     >MENU_CLOSE
-        WAIT 0.5
+        WAIT 1
+        SHOW false "POPUP_MENU"
         BREAK
 
 @ON_SCORE
