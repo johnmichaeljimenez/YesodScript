@@ -56,6 +56,7 @@ public class DefVar : Command
 			"float" => typeof(float),
 			"string" => typeof(string),
 			"bool" => typeof(bool),
+			"vector2" => typeof(System.Numerics.Vector2),
 			_ => null
 		};
 	}

@@ -613,7 +613,7 @@ public class VirtualMachine : IDisposable
 			if (referenced.Value == null)
 				throw new InvalidOperationException($"Referenced Var '{refName}' has no value.");
 
-			return Convert.ToString(referenced.Value, CultureInfo.InvariantCulture);
+			return Utils.FormatValue(referenced.Value);
 		});
 
 		current = Regex.Replace(current, @"<(.*?)>", match =>
@@ -624,7 +624,7 @@ public class VirtualMachine : IDisposable
 			   if (localValue == null)
 				   throw new InvalidOperationException($"Local parameter '{refName}' was not found.");
 
-			   return Convert.ToString(localValue, CultureInfo.InvariantCulture);
+			   return Utils.FormatValue(localValue);
 		   });
 
 		return current;

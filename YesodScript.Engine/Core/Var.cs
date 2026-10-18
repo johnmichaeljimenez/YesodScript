@@ -1,11 +1,12 @@
 using System.Globalization;
+using System.Numerics;
 
 namespace YesodScript.Engine.Core;
 
 public class Var
 {
 	public string Name;
-	public Type Type;   // only holds bool, string, int, float
+	public Type Type;   // only holds bool, string, int, float, Vector2
 	public object Value;
 
 	public void SetValue(string effective, bool relative = false)
@@ -32,6 +33,13 @@ public class Var
 		{
 			float parsed = float.Parse(s, NumberStyles.Float, CultureInfo.InvariantCulture);
 			Value = relative ? Convert.ToSingle(Value, CultureInfo.InvariantCulture) + parsed : parsed;
+		}
+		else if (Type == typeof(Vector2))
+		{
+			if (!Utils.TryParseVector2(s, out var parsed))
+				throw new FormatException($"Cannot parse vector2 value '{effective}' for Var '{Name}'.");
+
+			Value = relative ? (Vector2)Value + parsed : parsed;
 		}
 		else
 		{

@@ -52,6 +52,7 @@ public class DefList : Command
 			"float" => typeof(float),
 			"string" => typeof(string),
 			"bool" => typeof(bool),
+			"vector2" => typeof(System.Numerics.Vector2),
 			_ => throw new NotSupportedException($"Unknown list element type '{elementType}'.")
 		};
 

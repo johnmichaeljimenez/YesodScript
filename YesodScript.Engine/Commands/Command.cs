@@ -69,7 +69,7 @@ namespace YesodScript.Engine.Commands
 					var nakedVar = VM.GetVar(raw, Instruction);
 					if (nakedVar != null && nakedVar.Value != null)
 					{
-						resolved = Convert.ToString(nakedVar.Value, CultureInfo.InvariantCulture);
+						resolved = Utils.FormatValue(nakedVar.Value);
 					}
 				}
 
@@ -116,6 +116,14 @@ namespace YesodScript.Engine.Commands
 					return n;
 
 				throw new FormatException($"Could not parse '{arg}' as int for parameter '{fieldName}'");
+			}
+
+			if (type == typeof(System.Numerics.Vector2))
+			{
+				if (Utils.TryParseVector2(arg, out var v))
+					return v;
+
+				throw new FormatException($"Could not parse '{arg}' as vector2 for parameter '{fieldName}'");
 			}
 
 			if (type.IsEnum)

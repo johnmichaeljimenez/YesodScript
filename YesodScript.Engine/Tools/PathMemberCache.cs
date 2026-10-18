@@ -12,8 +12,9 @@ public sealed class PathMember
 		typeof(string),
 		typeof(int),
 		typeof(float),  //no double
-        typeof(bool),
-        typeof(byte),
+		typeof(bool),
+		typeof(byte),
+		typeof(System.Numerics.Vector2),
 	};
 
 	private readonly MemberInfo[] _chain;
@@ -114,7 +115,7 @@ public sealed class PathMember
 
 		if (!AllowedLeafTypes.Contains(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte, Vector2).");
 
 		if (destination == typeof(string)) return value;
 		if (destination == typeof(bool))
@@ -130,6 +131,12 @@ public sealed class PathMember
 			return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
 		if (destination == typeof(byte))
 			return ParseByte(value);
+		if (destination == typeof(System.Numerics.Vector2))
+		{
+			if (Core.Utils.TryParseVector2(value, out var vec))
+				return vec;
+			throw new FormatException($"Cannot parse '{value}' as vector2.");
+		}
 
 		return ConvertTo(value, targetType);
 	}
@@ -239,7 +246,7 @@ public sealed class PathMember
 
 		if (!AllowedLeafTypes.Contains(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte, Vector2).");
 
 		Type source = value.GetType();
 		if (destination.IsAssignableFrom(source))
@@ -261,6 +268,12 @@ public sealed class PathMember
 				return float.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture);
 			if (destination == typeof(byte))
 				return ParseByte(text);
+			if (destination == typeof(System.Numerics.Vector2))
+			{
+				if (Core.Utils.TryParseVector2(text, out var vec))
+					return vec;
+				throw new FormatException($"Cannot parse '{text}' as vector2.");
+			}
 
 			throw new InvalidOperationException(
 				$"Cannot convert string to allowed leaf type '{destination.Name}'.");
