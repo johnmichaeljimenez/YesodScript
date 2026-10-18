@@ -174,7 +174,7 @@ public class Renderer : IDisposable
 			{
 				if (item.Disabled || !item.World)
 					continue;
-					
+
 				DrawItem(item, alpha);
 			}
 			Raylib.EndMode2D();
@@ -206,10 +206,23 @@ public class Renderer : IDisposable
 		if (i.Sprite.Id != 0)
 		{
 			var size = i.Sprite.Dimensions;
-			var pos = new Vector2(drawX, drawY);
+			var scaleX = i.ScaleX;
+			var scaleY = i.ScaleY;
+
+			var source = new Rectangle(
+				0,
+				0,
+				scaleX < 0 ? -size.X : size.X,
+				scaleY < 0 ? -size.Y : size.Y
+			);
+
+			var destW = size.X * MathF.Abs(scaleX);
+			var destH = size.Y * MathF.Abs(scaleY);
+			var dest = new Rectangle(drawX, drawY, destW, destH);
+			var origin = new Vector2(destW * 0.5f, destH * 0.5f);
 
 			var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
-			Raylib.DrawTextureV(i.Sprite, pos - (size * 0.5f), c1);
+			Raylib.DrawTexturePro(i.Sprite, source, dest, origin, 0f, c1);
 		}
 
 		if (string.IsNullOrWhiteSpace(i.Text))
@@ -232,6 +245,8 @@ public class RenderData : IDisposable
 	public float X;
 	public float Y;
 	public float prevX, prevY;
+	public float ScaleX = 1;
+	public float ScaleY = 1;
 	public string Text;
 	public string Group = "";
 	public float Opacity = 1;
