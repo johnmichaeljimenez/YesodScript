@@ -9,7 +9,7 @@
 			"program": "${workspaceFolder}/YesodScript.Examples.Raylib/bin/Debug/net8.0/Pong.dll",
 			"args": [
 				"--game",
-				"pong"
+				"ofdp"
 			],
 			"cwd": "${workspaceFolder}/YesodScript.Examples.Raylib",
 			"console": "externalTerminal",

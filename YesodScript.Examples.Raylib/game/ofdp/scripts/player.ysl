@@ -1,0 +1,48 @@
+@P_INIT
+    DEFVAR "P" 0 int
+    DEFVAR "PX" 0 float
+    DEFVAR "SPD" 0.1 float
+    DEFVAR "DIST" 130 float
+
+    #true = facing right
+    DEFVAR "PFR" true bool
+    CALL "CREATESPRITE P 0 0 idle/00"
+    EDIT [[P]] "Depth" 10
+
+
+@P_RESET
+
+    >LOOP
+        JUMPIF "P_END" END
+        JUMPKEYPRESS "A" ATK_LEFT
+        JUMPKEYPRESS "D" ATK_RIGHT
+
+        JUMP AFTER
+
+    >ATK_LEFT
+        SETVAR PFR false
+        CALL "GETNEAREST [[PX]] [[PFR]]"
+        ADD "PX" "-[[DIST]]"
+
+        TWEEN [[P]] "X" 0 "-[[DIST]]" true [[SPD]] "QUAD" "MOVE"
+        WAIT [[SPD]]
+        WAIT 0.1
+        JUMP AFTER
+
+    >ATK_RIGHT
+        SETVAR PFR true
+        CALL "GETNEAREST [[PX]] [[PFR]]"
+        ADD "PX" [[DIST]]
+
+        TWEEN [[P]] "X" 0 [[DIST]] true [[SPD]] "QUAD" "MOVE"
+        WAIT [[SPD]]
+        WAIT 0.1
+        JUMP AFTER
+
+    >AFTER
+        WAITFRAME
+        JUMP LOOP
+
+    @END
+        PRINT "STOPPING"
+        BREAK

@@ -1,0 +1,7 @@
+@CREATESPRITE <varname> <x> <y> <sprite>
+DEFVAR _T 0 int
+
+RENDER <x> <y> _T
+SETVAR <varname> [[_T]]
+EDIT [[_T]] "SpriteID" <sprite>
+EDIT [[_T]] "World" true

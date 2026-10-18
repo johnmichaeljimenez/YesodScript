@@ -1,0 +1,70 @@
+@_INIT
+DEFLIST E int
+DEFLIST EX float
+DEFVAR EC 0 int
+DEFVAR ES 0 int
+
+@SPAWN <playerx> <offset>
+    DEFVAR _TO 0 float
+
+    SETVAR _TO <playerx>
+    ADD _TO <offset>
+    CALL "CREATESPRITE ES [[_TO]] 0 idle/00"
+
+    PRINT "Spawned [[ES]] at [[_TO]]"
+    LISTADD E [[ES]]
+    LISTADD EX [[_TO]]
+    ADD EC 1
+    BREAK
+
+@GETNEAREST <playerx> <facingright>
+    DEFVAR _i 0 int
+    DEFVAR _id 0 int
+    DEFVAR _ex 0 float
+    DEFVAR _dist 0 float
+    DEFVAR _bestDist 999999 float
+
+    #-1 means null (player missed)
+    DEFVAR _enemyID -1 int
+
+    #find the nearest enemy on current player x position and only the ones where facingright is (true right, false left)
+    >LOOP
+        JUMPGE _i EC END
+        LISTGET E [[_i]] _id
+        LISTGET EX [[_i]] _ex
+        JUMPEQ <facingright> true LOOPRIGHT
+        JUMP LOOPLEFT
+
+    >LOOPLEFT
+        # only enemies strictly left of the player
+        JUMPGE _ex <playerx> LOOPAFTER
+        SETVAR _dist <playerx>
+        SUB _dist [[_ex]]
+        JUMP CHECKBEST
+
+    >LOOPRIGHT
+        # only enemies strictly right of the player
+        JUMPLE _ex <playerx> LOOPAFTER
+        SETVAR _dist [[_ex]]
+        SUB _dist <playerx>
+        JUMP CHECKBEST
+
+    >CHECKBEST
+        JUMPGE _dist _bestDist LOOPAFTER
+        SETVAR _bestDist [[_dist]]
+        SETVAR _enemyID [[_id]]
+        JUMP LOOPAFTER
+
+    >LOOPAFTER
+        ADD _i 1
+        JUMP LOOP
+
+    >END
+        JUMPLE [[_enemyID]] 0 END2
+        TWEEN [[_enemyID]] "Opacity" 1 0 false 0.4 "SHAKE" "OP-[[_enemyID]]"
+
+        JUMP END2
+
+    >END2
+        PRINT "CURRENT at [[PX]]: [[_enemyID]], Enemy count: [[EC]]"
+        BREAK

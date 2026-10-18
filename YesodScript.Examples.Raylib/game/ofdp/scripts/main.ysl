@@ -1,0 +1,37 @@
+@_INIT
+
+PRINT "Initializing game..."
+LOADSPRITES "assets"
+
+CLEAR
+
+DEFVAR C 0 int
+CAM 0 0 1
+
+
+DEFVAR P_END false bool
+CALL "P_INIT"
+CALL "P_RESET" * true
+
+CALL "SPAWN [[PX]] 200"
+CALL "SPAWN [[PX]] 450"
+CALL "SPAWN [[PX]] -200"
+CALL "SPAWN [[PX]] -450"
+
+>LOOP
+    JUMPKEYPRESS "Escape" END
+    JUMPKEYPRESS "Q" TESTNEAR
+    JUMP AFTER
+
+>TESTNEAR
+    CALL "GETNEAREST [[PX]] [[PFR]]"
+    JUMP AFTER
+
+>AFTER
+    WAITFRAME
+    JUMP LOOP
+
+>END
+    SETVAR P_END true
+    PRINT "Exiting game..."
+    BREAK
