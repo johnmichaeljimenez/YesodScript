@@ -66,7 +66,7 @@
     },
     "type": {
       "name": "storage.type.ysl",
-      "match": "(?i)(?<=\\s)\\b(int|float|string|bool)\\b"
+      "match": "(?i)(?<=\\s)\\b(int|float|string|bool|vector2)\\b"
     },
     "boolean": {
       "name": "constant.language.boolean.ysl",
