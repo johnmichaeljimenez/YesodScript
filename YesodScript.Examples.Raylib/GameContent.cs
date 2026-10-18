@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 
 namespace YesodScript.Examples;
@@ -14,7 +15,8 @@ public static class GameContent
 	public static string GameId { get; private set; } = "pong";
 	public static string Title { get; private set; } = "YesodScript";
 	public static string Root { get; private set; } = AppContext.BaseDirectory;
-	
+	public static Vector2 VirtualResolution { get; private set; } = new(1280, 720);
+
 	public static string CorePath { get; private set; } = Path.Combine(AppContext.BaseDirectory, "core");
 	public static string ScriptsPath => Path.Combine(Root, "scripts");
 	public static string AssetsPath => Path.Combine(Root, "assets");
@@ -161,6 +163,16 @@ public static class GameContent
 				GameId = NormalizeId(manifest.Id);
 			if (!string.IsNullOrWhiteSpace(manifest.Itch))
 				ItchTarget = manifest.Itch.Trim();
+
+			if (manifest.VirtualWidth != null && manifest.VirtualHeight != null)
+			{
+				if (manifest.VirtualWidth > 0 && 
+					manifest.VirtualHeight > 0 && 
+					manifest.VirtualWidth <= 1920 && 
+					manifest.VirtualHeight <= 1080)
+
+				VirtualResolution = new(manifest.VirtualWidth.Value, manifest.VirtualHeight.Value);
+			}
 		}
 		catch (Exception ex)
 		{
@@ -189,5 +201,7 @@ public static class GameContent
 		public string? Title { get; set; }
 		public string? Icon { get; set; }
 		public string? Itch { get; set; }
+		public float? VirtualWidth { get; set; } = 1280;
+		public float? VirtualHeight { get; set; } = 720;
 	}
 }

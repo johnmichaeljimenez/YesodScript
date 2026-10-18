@@ -2,5 +2,7 @@
   "id": "pong",
   "title": "Pong",
   "icon": "Pong.ico",
-  "itch": "rateater93/pong:windows"
+  "itch": "rateater93/pong:windows",
+  "virtualwidth": 640,
+  "virtualheight": 360
 }

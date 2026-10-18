@@ -17,22 +17,22 @@ public class Renderer : IDisposable
 	private readonly List<RenderData> sortedRenderList = new();
 	private bool sortDirty;
 
-	const int scale = 2;
-	const int VirtualWidth = 1280 / scale;
-	const int VirtualHeight = 720 / scale;
+	private int VirtualWidth;
+	private int VirtualHeight;
 
 	private RenderTexture2D rt;
 
 	public Camera2D Camera = new()
 	{
-		Offset = new Vector2(VirtualWidth * 0.5f, VirtualHeight * 0.5f),
+		Offset = new Vector2(GameContent.VirtualResolution.X * 0.5f, GameContent.VirtualResolution.Y * 0.5f),
 		Zoom = 1f
 	};
 
 	public Renderer()
 	{
 		Instance = this;
-
+		VirtualWidth = (int)GameContent.VirtualResolution.X;
+		VirtualHeight = (int)GameContent.VirtualResolution.Y;
 		rt = Raylib.LoadRenderTexture(VirtualWidth, VirtualHeight);
 		renderID = 0;
 	}
