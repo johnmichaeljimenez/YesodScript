@@ -116,6 +116,23 @@ public class ListClear : Command
 	public override void OnEnter() => ListAccess.Get(VM, key, Instruction).Items.Clear();
 }
 
+public class ListFind : Command
+{
+	[CommandParameter] private string key;
+	[CommandParameter] private string value;
+	[CommandParameter] private string outVar;
+
+	public override void OnEnter()
+	{
+		var l = ListAccess.Get(VM, key, Instruction);
+		var v = VM.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
+
+		object target = ListAccess.Parse(l, value, nameof(value));
+		int found = l.Items.IndexOf(target);
+		v.SetValue(found.ToString(CultureInfo.InvariantCulture), false);
+	}
+}
+
 public class ListGet : Command
 {
 	[CommandParameter] private string key;
