@@ -164,7 +164,7 @@ public class Renderer : IDisposable
 		var sourceRect = new Rectangle(0, 0, VirtualWidth, -VirtualHeight);
 		Raylib.BeginTextureMode(rt);
 		{
-			Raylib.ClearBackground(Color.RayWhite);
+			Raylib.ClearBackground(Color.Black);
 
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();

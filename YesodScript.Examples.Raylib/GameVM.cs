@@ -170,6 +170,17 @@ public class Render : GameCommand
 	}
 }
 
+public class RemoveRender : GameCommand
+{
+	[CommandParameter]
+	private int id;
+
+    public override void OnEnter()
+    {
+	Renderer.Instance.RemoveRenderData(id);
+    }
+}
+
 public class Edit : EditPropertyCommand<RenderData>
 {
 	public override void OnEnter()
