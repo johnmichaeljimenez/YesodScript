@@ -1,0 +1,150 @@
+using System.Text.Json;
+
+namespace YesodScript.Examples;
+
+public static class GameContent
+{
+	private static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		PropertyNameCaseInsensitive = true,
+		ReadCommentHandling = JsonCommentHandling.Skip,
+		AllowTrailingCommas = true,
+	};
+
+	public static string GameId { get; private set; } = "pong";
+	public static string Title { get; private set; } = "YesodScript";
+	public static string Root { get; private set; } = AppContext.BaseDirectory;
+	public static string ScriptsPath => Path.Combine(Root, "scripts");
+	public static string AssetsPath => Path.Combine(Root, "assets");
+	public static string? ItchTarget { get; private set; }
+
+	public static void Initialize(string[]? args = null)
+	{
+		var baseDir = AppContext.BaseDirectory;
+		var gameId = ResolveGameId(args, baseDir);
+		GameId = gameId;
+
+		Root = ResolveRoot(baseDir, gameId);
+		Directory.SetCurrentDirectory(Root);
+
+		ApplyManifest(Path.Combine(Root, "game.json"), gameId);
+	}
+
+	private static string ResolveGameId(string[]? args, string baseDir)
+	{
+		if (args != null)
+		{
+			for (var i = 0; i < args.Length; i++)
+			{
+				var arg = args[i];
+				if (arg.Equals("--game", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+					return NormalizeId(args[i + 1]);
+
+				if (arg.StartsWith("--game=", StringComparison.OrdinalIgnoreCase))
+					return NormalizeId(arg["--game=".Length..]);
+			}
+		}
+
+		var gamesRoot = Path.Combine(baseDir, "game");
+		if (Directory.Exists(gamesRoot))
+		{
+			var dirs = Directory.GetDirectories(gamesRoot)
+				.Select(Path.GetFileName)
+				.Where(name => !string.IsNullOrEmpty(name))
+				.OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+				.ToList();
+
+			if (dirs.Count == 1)
+				return dirs[0]!;
+		}
+
+		return "pong";
+	}
+
+	private static string ResolveRoot(string baseDir, string gameId)
+	{
+		var nested = Path.Combine(baseDir, "game", gameId);
+		if (IsContentRoot(nested))
+			return Path.GetFullPath(nested);
+
+		if (IsContentRoot(baseDir))
+			return Path.GetFullPath(baseDir);
+
+		var projectGame = FindProjectGameRoot(gameId);
+		if (projectGame != null)
+			return projectGame;
+
+		throw new DirectoryNotFoundException(
+			$"Game content not found for '{gameId}'. Expected '{nested}' or flat assets/scripts under '{baseDir}'.");
+	}
+
+	private static string? FindProjectGameRoot(string gameId)
+	{
+		var dir = new DirectoryInfo(AppContext.BaseDirectory);
+		for (var i = 0; i < 6 && dir != null; i++, dir = dir.Parent)
+		{
+			var candidate = Path.Combine(dir.FullName, "game", gameId);
+			if (IsContentRoot(candidate))
+				return Path.GetFullPath(candidate);
+		}
+
+		return null;
+	}
+
+	private static bool IsContentRoot(string path)
+	{
+		return Directory.Exists(Path.Combine(path, "scripts"))
+			|| Directory.Exists(Path.Combine(path, "assets"));
+	}
+
+	private static void ApplyManifest(string manifestPath, string gameId)
+	{
+		Title = ToTitleCaseId(gameId);
+		ItchTarget = null;
+
+		if (!File.Exists(manifestPath))
+			return;
+
+		try
+		{
+			var json = File.ReadAllText(manifestPath);
+			var manifest = JsonSerializer.Deserialize<GameManifest>(json, JsonOptions);
+			if (manifest == null)
+				return;
+
+			if (!string.IsNullOrWhiteSpace(manifest.Title))
+				Title = manifest.Title.Trim();
+			if (!string.IsNullOrWhiteSpace(manifest.Id))
+				GameId = NormalizeId(manifest.Id);
+			if (!string.IsNullOrWhiteSpace(manifest.Itch))
+				ItchTarget = manifest.Itch.Trim();
+		}
+		catch (Exception ex)
+		{
+			throw new InvalidOperationException($"Failed to read game manifest '{manifestPath}'.", ex);
+		}
+	}
+
+	private static string NormalizeId(string id)
+	{
+		id = id.Trim().Replace('\\', '/').Trim('/');
+		if (id.Contains('/') || id.Contains(".."))
+			throw new ArgumentException($"Invalid game id '{id}'.");
+		return id.ToLowerInvariant();
+	}
+
+	private static string ToTitleCaseId(string id)
+	{
+		if (string.IsNullOrEmpty(id))
+			return "YesodScript";
+		return char.ToUpperInvariant(id[0]) + id[1..];
+	}
+
+	private sealed class GameManifest
+	{
+		public string? Id { get; set; }
+		public string? Title { get; set; }
+		public string? Icon { get; set; }
+		public string? Itch { get; set; }
+	}
+}

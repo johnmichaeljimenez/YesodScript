@@ -27,7 +27,7 @@ public class RaylibHost
 		Instance = this;
 
 		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
-		Raylib.InitWindow(screenWidth, screenHeight, "Pong");
+		Raylib.InitWindow(screenWidth, screenHeight, GameContent.Title);
 		windowReady = true;
 		Raylib.MaximizeWindow();
 		Raylib.InitAudioDevice();

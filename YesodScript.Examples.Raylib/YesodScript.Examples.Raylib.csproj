@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,13 +6,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <AssemblyName>Pong</AssemblyName>
-    <Product>Pong</Product>
-    <AssemblyTitle>Pong</AssemblyTitle>
-    <ApplicationIcon>Pong.ico</ApplicationIcon>
+    <!-- select game content pack. override with -p:GameId=pong -->
+    <GameId Condition="'$(GameId)' == ''">pong</GameId>
+    <GameTitle Condition="'$(GameTitle)' == ''">Pong</GameTitle>
+    <GameIcon Condition="'$(GameIcon)' == ''">game/$(GameId)/$(GameTitle).ico</GameIcon>
+
+    <AssemblyName>$(GameTitle)</AssemblyName>
+    <Product>$(GameTitle)</Product>
+    <AssemblyTitle>$(GameTitle)</AssemblyTitle>
+    <ApplicationIcon Condition="Exists('$(GameIcon)')">$(GameIcon)</ApplicationIcon>
   </PropertyGroup>
 
-<!-- itch.io stuff -->
+  <!-- itch.io stuff -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <OutputType>WinExe</OutputType>
     <PublishSingleFile>true</PublishSingleFile>
@@ -23,23 +28,38 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
-
-  <ItemGroup>
-
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Tween\Tween.csproj" />
     <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="assets/**/*" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="scripts/**/*" CopyToOutputDirectory="PreserveNewest" />
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
+    <None Include="game/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <None Include="game/$(GameId)/assets/**/*">
+      <Link>assets/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="game/$(GameId)/scripts/**/*">
+      <Link>scripts/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="game/$(GameId)/game.json" Condition="Exists('game/$(GameId)/game.json')">
+      <Link>game.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="8.1.0" />
   </ItemGroup>
+
+  <Target Name="ValidateGameContent" BeforeTargets="Build">
+    <Error
+      Condition="!Exists('game/$(GameId)/scripts') and !Exists('game/$(GameId)/assets')"
+      Text="Game content not found for GameId=$(GameId). Expected game/$(GameId)/scripts and/or assets." />
+  </Target>
 
 </Project>
