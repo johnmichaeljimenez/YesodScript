@@ -2,7 +2,8 @@
     DEFVAR "P" 0 int
     DEFVAR "PX" 0 float
     DEFVAR "SPD" 0.1 float
-    DEFVAR "DIST" 130 float
+    DEFVAR "RANGE" 50 float
+    DEFVAR "HITENEMY" 0 int
 
     #true = facing right
     DEFVAR "PFR" true bool
@@ -21,20 +22,22 @@
 
     >ATK_LEFT
         SETVAR PFR false
-        CALL "GETNEAREST [[PX]] [[PFR]]"
-        ADD "PX" "-[[DIST]]"
+        CALL "GETNEAREST [[PX]] [[PFR]] [[RANGE]] HITENEMY"
+        CALL "ENEMY_HIT [[HITENEMY]]"
+        ADD "PX" "-[[RANGE]]"
 
-        TWEEN [[P]] "X" 0 "-[[DIST]]" true [[SPD]] "QUAD" "MOVE"
+        TWEEN [[P]] "X" 0 "-[[RANGE]]" true [[SPD]] "QUAD" "MOVE"
         WAIT [[SPD]]
         WAIT 0.1
         JUMP AFTER
 
     >ATK_RIGHT
         SETVAR PFR true
-        CALL "GETNEAREST [[PX]] [[PFR]]"
-        ADD "PX" [[DIST]]
+        CALL "GETNEAREST [[PX]] [[PFR]] [[RANGE]] HITENEMY"
+        CALL "ENEMY_HIT [[HITENEMY]]"
+        ADD "PX" [[RANGE]]
 
-        TWEEN [[P]] "X" 0 [[DIST]] true [[SPD]] "QUAD" "MOVE"
+        TWEEN [[P]] "X" 0 [[RANGE]] true [[SPD]] "QUAD" "MOVE"
         WAIT [[SPD]]
         WAIT 0.1
         JUMP AFTER

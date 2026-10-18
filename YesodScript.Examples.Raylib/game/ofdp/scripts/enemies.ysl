@@ -1,6 +1,8 @@
 @_INIT
 DEFLIST E int
 DEFLIST EX float
+DEFLIST EHP int
+
 DEFVAR EC 0 int
 DEFVAR ES 0 int
 
@@ -13,19 +15,32 @@ DEFVAR ES 0 int
 
     PRINT "Spawned [[ES]] at [[_TO]]"
     LISTADD E [[ES]]
+    LISTADD EHP 1
     LISTADD EX [[_TO]]
     ADD EC 1
     BREAK
 
-@GETNEAREST <playerx> <facingright>
+@DESPAWN <id>
+    DEFVAR _t 0 int
+    LISTGET E <id> _t
+    REMOVERENDER [[_t]]
+
+    LISTREMOVE E <id>
+    LISTREMOVE EHP <id>
+    LISTREMOVE EX <id>
+    SUB EC 1
+
+@GETNEAREST <playerx> <facingright> <range> <outvar>
     DEFVAR _i 0 int
     DEFVAR _id 0 int
     DEFVAR _ex 0 float
     DEFVAR _dist 0 float
     DEFVAR _bestDist 999999 float
+    
+    SETVAR <outvar> -1
 
     #-1 means null (player missed)
-    DEFVAR _enemyID -1 int
+    DEFVAR _enemyIndex -1 int
 
     #find the nearest enemy on current player x position and only the ones where facingright is (true right, false left)
     >LOOP
@@ -50,9 +65,10 @@ DEFVAR ES 0 int
         JUMP CHECKBEST
 
     >CHECKBEST
+        JUMPGT _dist <range> LOOPAFTER
         JUMPGE _dist _bestDist LOOPAFTER
         SETVAR _bestDist [[_dist]]
-        SETVAR _enemyID [[_id]]
+        SETVAR _enemyIndex [[_i]]
         JUMP LOOPAFTER
 
     >LOOPAFTER
@@ -60,11 +76,6 @@ DEFVAR ES 0 int
         JUMP LOOP
 
     >END
-        JUMPLE [[_enemyID]] 0 END2
-        TWEEN [[_enemyID]] "Opacity" 1 0 false 0.4 "SHAKE" "OP-[[_enemyID]]"
-
-        JUMP END2
-
-    >END2
-        PRINT "CURRENT at [[PX]]: [[_enemyID]], Enemy count: [[EC]]"
+        SETVAR <outvar> [[_enemyIndex]]
+        PRINT "CURRENT at [[PX]]: [[_enemyIndex]], Enemy count: [[EC]]"
         BREAK
