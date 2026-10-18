@@ -2,7 +2,7 @@
 Usage:
   python package.py               packages default game (pong)
   python package.py pong          packages game/pong
-  python package.py pong --no-push
+  python package.py pong --upload push zip to itch.io via butler
 
 Content lives under game/<id>/ (assets, scripts, game.json).
 Shared stdlib is project-level core/ and is shipped beside scripts/assets.
@@ -62,9 +62,9 @@ def main() -> int:
         help="Game content pack id (folder under game/). Default: pong",
     )
     parser.add_argument(
-        "--no-push",
+        "--upload",
         action="store_true",
-        help="Skip the butler push step even if an itch target is defined.",
+        help="Push the zip to itch.io with butler when an itch target is defined.",
     )
     args = parser.parse_args()
 
@@ -79,7 +79,7 @@ def main() -> int:
     dist_dir = script_dir / "dist"
 
     game_id = args.game_id
-    push = not args.no_push
+    upload = args.upload
 
     game_dir = script_dir / "game" / game_id
     if not game_dir.is_dir():
@@ -216,7 +216,7 @@ def main() -> int:
         print(f'      butler push "{zip_path}" {itch_target}')
     print()
 
-    if push:
+    if upload:
         if itch_target:
             if shutil.which("butler"):
                 try:
@@ -225,9 +225,9 @@ def main() -> int:
                     print("WARNING: butler push failed.")
                     return 1
             else:
-                print("SKIP push: butler not found on PATH.")
+                print("SKIP upload: butler not found on PATH.")
         else:
-            print("SKIP push: no itch target in game.json")
+            print("SKIP upload: no itch target in game.json")
 
     return 0
 
