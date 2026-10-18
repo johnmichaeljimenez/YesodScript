@@ -28,6 +28,7 @@ public class GameVM : VirtualMachine
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
 		};
 
+		vm.CompileDirectory(GameContent.CorePath);
 		vm.CompileDirectory(GameContent.ScriptsPath);
 
 		Instance = vm;

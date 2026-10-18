@@ -14,6 +14,8 @@ public static class GameContent
 	public static string GameId { get; private set; } = "pong";
 	public static string Title { get; private set; } = "YesodScript";
 	public static string Root { get; private set; } = AppContext.BaseDirectory;
+	
+	public static string CorePath { get; private set; } = Path.Combine(AppContext.BaseDirectory, "core");
 	public static string ScriptsPath => Path.Combine(Root, "scripts");
 	public static string AssetsPath => Path.Combine(Root, "assets");
 	public static string? ItchTarget { get; private set; }
@@ -25,6 +27,7 @@ public static class GameContent
 		GameId = gameId;
 
 		Root = ResolveRoot(baseDir, gameId);
+		CorePath = ResolveCorePath(baseDir, Root);
 		Directory.SetCurrentDirectory(Root);
 
 		ApplyManifest(Path.Combine(Root, "game.json"), gameId);
@@ -89,6 +92,46 @@ public static class GameContent
 		}
 
 		return null;
+	}
+
+	private static string ResolveCorePath(string baseDir, string contentRoot)
+	{
+		var besideBase = Path.Combine(baseDir, "core");
+		if (Directory.Exists(besideBase))
+			return Path.GetFullPath(besideBase);
+
+		var besideContent = Path.Combine(contentRoot, "core");
+		if (Directory.Exists(besideContent) && IsSamePath(contentRoot, baseDir))
+			return Path.GetFullPath(besideContent);
+
+		var projectCore = FindProjectCore(baseDir) ?? FindProjectCore(contentRoot);
+		if (projectCore != null)
+			return projectCore;
+
+		throw new DirectoryNotFoundException(
+			$"Shared core/ stdlib not found. Expected '{besideBase}' next to the app, or a project core/ folder.");
+	}
+
+	private static string? FindProjectCore(string startPath)
+	{
+		var dir = new DirectoryInfo(startPath);
+		for (var i = 0; i < 8 && dir != null; i++, dir = dir.Parent)
+		{
+			var core = Path.Combine(dir.FullName, "core");
+			var games = Path.Combine(dir.FullName, "game");
+			if (Directory.Exists(core) && Directory.Exists(games))
+				return Path.GetFullPath(core);
+		}
+
+		return null;
+	}
+
+	private static bool IsSamePath(string a, string b)
+	{
+		return string.Equals(
+			Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+			Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+			StringComparison.OrdinalIgnoreCase);
 	}
 
 	private static bool IsContentRoot(string path)

@@ -4,7 +4,8 @@ Usage:
   python package.py pong          packages game/pong
   python package.py pong --no-push
 
-Content lives under game/<id>/ (assets, scripts, game.json). Only that pack is shipped.
+Content lives under game/<id>/ (assets, scripts, game.json).
+Shared stdlib is project-level core/ and is shipped beside scripts/assets.
 """
 
 from __future__ import annotations
@@ -183,6 +184,9 @@ def main() -> int:
         return 1
     if not (out_dir / "scripts").is_dir():
         print("ERROR: scripts folder missing from publish output.")
+        return 1
+    if not (out_dir / "core").is_dir():
+        print("ERROR: core/ stdlib folder missing from publish output.")
         return 1
 
     nested_game = out_dir / "game"
