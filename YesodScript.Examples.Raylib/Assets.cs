@@ -20,7 +20,10 @@ public class Assets : IDisposable
 		if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
 			throw new FileNotFoundException($"Sprite file not found for id '{id}': '{path}'", path);
 
-		sprites[id] = Raylib.LoadTexture(path);
+		var texture = Raylib.LoadTexture(path);
+		var filter = GameContent.PixelArt ? TextureFilter.Point : TextureFilter.Bilinear;
+		Raylib.SetTextureFilter(texture, filter);
+		sprites[id] = texture;
 	}
 
 	public Texture2D GetSprite(string id)

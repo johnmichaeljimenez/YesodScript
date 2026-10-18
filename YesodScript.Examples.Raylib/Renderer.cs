@@ -34,6 +34,10 @@ public class Renderer : IDisposable
 		VirtualWidth = (int)GameContent.VirtualResolution.X;
 		VirtualHeight = (int)GameContent.VirtualResolution.Y;
 		rt = Raylib.LoadRenderTexture(VirtualWidth, VirtualHeight);
+
+		var filter = GameContent.PixelArt ? TextureFilter.Point : TextureFilter.Bilinear;
+		Raylib.SetTextureFilter(rt.Texture, filter);
+
 		renderID = 0;
 	}
 
