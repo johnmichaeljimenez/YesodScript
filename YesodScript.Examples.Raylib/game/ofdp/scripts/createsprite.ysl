@@ -1,7 +1,13 @@
-@CREATESPRITE <varname> <x> <y> <sprite>
+@CREATESPRITE <varname> <x> <y> <sprite> <facingright>
 DEFVAR _T 0 int
 
 RENDER <x> <y> _T
 SETVAR <varname> [[_T]]
 EDIT [[_T]] "SpriteID" <sprite>
 EDIT [[_T]] "World" true
+EDIT [[_T]] "ScaleX" 1
+JUMPEQ <facingright> true END
+EDIT [[_T]] "ScaleX" -1
+
+>END
+    BREAK

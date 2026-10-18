@@ -12,13 +12,13 @@ DEFVAR ES 0 int
     SETVAR _TO <playerx>
     ADD _TO <offset>
     CALL "CREATESPRITE ES [[_TO]] 0 idle/00"
-
     PRINT "Spawned [[ES]] at [[_TO]]"
     LISTADD E [[ES]]
     LISTADD EHP 1
     LISTADD EX [[_TO]]
     ADD EC 1
-    BREAK
+
+    CAll "SETFACING [[ES]] [[_TO]] <playerx>"
 
 @DESPAWN <id>
     DEFVAR _t 0 int
@@ -29,6 +29,21 @@ DEFVAR ES 0 int
     LISTREMOVE EHP <id>
     LISTREMOVE EX <id>
     SUB EC 1
+
+@ENEMY_TICK
+    DEFVAR _i 0 int
+    >TICKLOOP
+        JUMPGE _i EC TICKEND
+
+        ADD _i 1
+        JUMP TICKAFTER
+
+    >TICKAFTER
+        JUMP TICKLOOP
+
+    >TICKEND
+        BREAK
+    
 
 @GETNEAREST <playerx> <facingright> <range> <outvar>
     DEFVAR _i 0 int
