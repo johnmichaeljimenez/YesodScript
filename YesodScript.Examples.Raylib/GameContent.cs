@@ -16,6 +16,7 @@ public static class GameContent
 	public static string Title { get; private set; } = "YesodScript";
 	public static string Root { get; private set; } = AppContext.BaseDirectory;
 	public static Vector2 VirtualResolution { get; private set; } = new(1280, 720);
+	public static string DefaultFontName { get; private set; } = "";
 
 	public static bool PixelArt { get; private set; }
 
@@ -166,6 +167,8 @@ public static class GameContent
 				GameId = NormalizeId(manifest.Id);
 			if (!string.IsNullOrWhiteSpace(manifest.Itch))
 				ItchTarget = manifest.Itch.Trim();
+			if (!string.IsNullOrWhiteSpace(manifest.DefaultFontName))
+				DefaultFontName = manifest.DefaultFontName.Trim();
 
 			if (manifest.PixelArt != null)
 				PixelArt = manifest.PixelArt.Value;
@@ -210,7 +213,8 @@ public static class GameContent
 		public string? Itch { get; set; }
 		public float? VirtualWidth { get; set; } = 1280;
 		public float? VirtualHeight { get; set; } = 720;
-		
+
 		public bool? PixelArt { get; set; }
+		public string? DefaultFontName { get; set; }
 	}
 }

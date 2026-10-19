@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Raylib_cs;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
@@ -9,10 +10,13 @@ public class Assets : IDisposable
 	public static Assets Instance { get; private set; }
 	private readonly Dictionary<string, Texture2D> sprites = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, Sound> sounds = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, Font> fonts = new(StringComparer.InvariantCultureIgnoreCase);
 
 	public Assets()
 	{
 		Instance = this;
+
+		fonts[""] = Raylib.GetFontDefault();
 	}
 
 	public void LoadSprite(string id, string path)
@@ -50,6 +54,28 @@ public class Assets : IDisposable
 		return sound;
 	}
 
+	public void LoadFont(string id, string path)
+	{
+		if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+			throw new FileNotFoundException($"Font file not found for id '{id}': '{path}'", path);
+
+		var f = Raylib.LoadFontEx(path, 20, null, 0);
+		if (id.Equals(GameContent.DefaultFontName, StringComparison.InvariantCultureIgnoreCase))
+		{
+			fonts[""] = f;
+		}
+
+		fonts[id] = f;
+	}
+
+	public Font GetFont(string id)
+	{
+		if (!fonts.TryGetValue(id, out var font))
+			throw new InvalidOperationException($"Font '{id}' not found. Load it first or check the asset id.");
+
+		return font;
+	}
+
 	public void Dispose()
 	{
 		foreach (var i in sprites.Values)
@@ -65,59 +91,66 @@ public class Assets : IDisposable
 		}
 
 		sounds.Clear();
+
+		fonts.Remove("");	//no need to unload this as it's either default font, or the existing keyed one
+		foreach (var i in fonts.Values)
+		{
+			Raylib.UnloadFont(i);
+		}
+
+		fonts.Clear();
 	}
 }
 
-public class LoadSprites : GameCommand
+public class LoadAssets : GameCommand
 {
 	[CommandParameter]
 	private string relativePath;
 
-	private Dictionary<string, string> paths;
-	private List<string> keys;
+	private Dictionary<string, string> spritePaths;
+	private List<string> spriteKeys;
+	private Dictionary<string, string> sfxPaths;
+	private List<string> sfxKeys;
+	private Dictionary<string, string> fontPaths;
+	private List<string> fontKeys;
 
 	public override void OnEnter()
 	{
-		paths = DirectoryExtractor.GetPaths(relativePath, "png");
-		keys = paths.Keys.ToList();
+		spritePaths = DirectoryExtractor.GetPaths(relativePath, "png");
+		spriteKeys = spritePaths.Keys.ToList();
+
+		sfxPaths = DirectoryExtractor.GetPaths(relativePath, "wav", "ogg");
+		sfxKeys = sfxPaths.Keys.ToList();
+
+		fontPaths = DirectoryExtractor.GetPaths(relativePath, "ttf", "otf");
+		fontKeys = fontPaths.Keys.ToList();
 	}
 
 	public override bool OnTick(float deltaTime)
 	{
-		if (keys.Count > 0)
+		if (spriteKeys.Count > 0)
 		{
-			var key = keys[0];
-			Assets.Instance.LoadSprite(key, paths[key]);
-			keys.RemoveAt(0);
+			var key = spriteKeys[0];
+			Assets.Instance.LoadSprite(key, spritePaths[key]);
+			spriteKeys.RemoveAt(0);
 
 			return false;
 		}
 
-		return true;
-	}
-}
-
-public class LoadSounds : GameCommand
-{
-	[CommandParameter]
-	private string relativePath;
-
-	private Dictionary<string, string> paths;
-	private List<string> keys;
-
-	public override void OnEnter()
-	{
-		paths = DirectoryExtractor.GetPaths(relativePath, "wav");
-		keys = paths.Keys.ToList();
-	}
-
-	public override bool OnTick(float deltaTime)
-	{
-		if (keys.Count > 0)
+		if (sfxKeys.Count > 0)
 		{
-			var key = keys[0];
-			Assets.Instance.LoadSound(key, paths[key]);
-			keys.RemoveAt(0);
+			var key = sfxKeys[0];
+			Assets.Instance.LoadSound(key, sfxPaths[key]);
+			sfxKeys.RemoveAt(0);
+
+			return false;
+		}
+
+		if (fontKeys.Count > 0)
+		{
+			var key = fontKeys[0];
+			Assets.Instance.LoadFont(key, fontPaths[key]);
+			fontKeys.RemoveAt(0);
 
 			return false;
 		}
