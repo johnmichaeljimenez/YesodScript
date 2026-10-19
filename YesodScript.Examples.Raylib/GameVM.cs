@@ -12,6 +12,7 @@ public class GameVM : VirtualMachine
 	public bool mouseClicked;
 	private Var mouseX, mouseY;
 	private Var hoveredId, clickedId;
+	private Var logString;
 
 	public GameVM(int randomSeed = 0) : base(randomSeed)
 	{
@@ -26,6 +27,10 @@ public class GameVM : VirtualMachine
 		var vm = new GameVM(Environment.TickCount);
 		vm.OnOutput += (msg) =>
 		{
+			var logs = vm.logString.Value.ToString();
+			logs += msg;
+			vm.logString.Value = logs;
+
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
 		};
 
@@ -38,6 +43,7 @@ public class GameVM : VirtualMachine
 
 	protected override void OnInitialize()
 	{
+		logString = AddGlobalVar("SYS:LOG", typeof(string), "");
 		mouseX = AddGlobalVar("SYS:MOUSE_X", typeof(int), 0);
 		mouseY = AddGlobalVar("SYS:MOUSE_Y", typeof(int), 0);
 		AddGlobalVar("SYS:REQ_EXIT", typeof(bool), 0);
