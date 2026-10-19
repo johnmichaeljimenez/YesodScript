@@ -1,0 +1,155 @@
+@MENU <opt0> <opt1> <opt2> <opt3> <opt4> <result>
+	DEFVAR _sel 0 int
+	DEFVAR _count 0 int
+	DEFVAR _i 0 int
+	DEFVAR _id 0 int
+	DEFVAR _y 0 int
+	DEFVAR _startY 0 int
+	DEFVAR _line 28 int
+	DEFLIST _ids int
+
+	JUMPEQ <opt0> "*" MENU_COUNTED
+	JUMPEQ <opt0> "" MENU_COUNTED
+	ADD _count 1
+	JUMPEQ <opt1> "*" MENU_COUNTED
+	JUMPEQ <opt1> "" MENU_COUNTED
+	ADD _count 1
+	JUMPEQ <opt2> "*" MENU_COUNTED
+	JUMPEQ <opt2> "" MENU_COUNTED
+	ADD _count 1
+	JUMPEQ <opt3> "*" MENU_COUNTED
+	JUMPEQ <opt3> "" MENU_COUNTED
+	ADD _count 1
+	JUMPEQ <opt4> "*" MENU_COUNTED
+	JUMPEQ <opt4> "" MENU_COUNTED
+	ADD _count 1
+
+	>MENU_COUNTED
+		JUMPLE _count 0 MENU_ABORT
+
+		SETVAR _startY 180
+		SETVAR _i [[_count]]
+		MUL _i [[_line]]
+		DIV _i 2
+		SUB _startY [[_i]]
+		SETVAR _y [[_startY]]
+
+		JUMPEQ <opt0> "*" MENU_BUILT
+		JUMPEQ <opt0> "" MENU_BUILT
+		RENDER 320 [[_y]] _id 100 "MENU"
+		EDIT [[_id]] "Text" <opt0>
+		EDIT [[_id]] "FontSize" 18
+		EDIT [[_id]] "TextHAlign" 0
+		EDIT [[_id]] "TextVAlign" 0
+		LISTADD _ids [[_id]]
+		ADD _y [[_line]]
+		JUMPLE _count 1 MENU_BUILT
+
+		JUMPEQ <opt1> "*" MENU_BUILT
+		JUMPEQ <opt1> "" MENU_BUILT
+		RENDER 320 [[_y]] _id 100 "MENU"
+		EDIT [[_id]] "Text" <opt1>
+		EDIT [[_id]] "FontSize" 18
+		EDIT [[_id]] "TextHAlign" 0
+		EDIT [[_id]] "TextVAlign" 0
+		LISTADD _ids [[_id]]
+		ADD _y [[_line]]
+		JUMPLE _count 2 MENU_BUILT
+
+		JUMPEQ <opt2> "*" MENU_BUILT
+		JUMPEQ <opt2> "" MENU_BUILT
+		RENDER 320 [[_y]] _id 100 "MENU"
+		EDIT [[_id]] "Text" <opt2>
+		EDIT [[_id]] "FontSize" 18
+		EDIT [[_id]] "TextHAlign" 0
+		EDIT [[_id]] "TextVAlign" 0
+		LISTADD _ids [[_id]]
+		ADD _y [[_line]]
+		JUMPLE _count 3 MENU_BUILT
+
+		JUMPEQ <opt3> "*" MENU_BUILT
+		JUMPEQ <opt3> "" MENU_BUILT
+		RENDER 320 [[_y]] _id 100 "MENU"
+		EDIT [[_id]] "Text" <opt3>
+		EDIT [[_id]] "FontSize" 18
+		EDIT [[_id]] "TextHAlign" 0
+		EDIT [[_id]] "TextVAlign" 0
+		LISTADD _ids [[_id]]
+		ADD _y [[_line]]
+		JUMPLE _count 4 MENU_BUILT
+
+		JUMPEQ <opt4> "*" MENU_BUILT
+		JUMPEQ <opt4> "" MENU_BUILT
+		RENDER 320 [[_y]] _id 100 "MENU"
+		EDIT [[_id]] "Text" <opt4>
+		EDIT [[_id]] "FontSize" 18
+		EDIT [[_id]] "TextHAlign" 0
+		EDIT [[_id]] "TextVAlign" 0
+		LISTADD _ids [[_id]]
+
+	>MENU_BUILT
+		JUMP MENU_REFRESH
+
+	>MENU_REFRESH
+		SETVAR _i 0
+
+	>MENU_COLOR_LOOP
+		JUMPGE _i [[_count]] MENU_INPUT
+		LISTGET _ids [[_i]] _id
+		JUMPEQ _i [[_sel]] MENU_COLOR_SEL
+
+		EDIT [[_id]] "Tint.R" 140
+		EDIT [[_id]] "Tint.G" 140
+		EDIT [[_id]] "Tint.B" 140
+		JUMP MENU_COLOR_NEXT
+
+	>MENU_COLOR_SEL
+		EDIT [[_id]] "Tint.R" 255
+		EDIT [[_id]] "Tint.G" 220
+		EDIT [[_id]] "Tint.B" 64
+
+	>MENU_COLOR_NEXT
+		ADD _i 1
+		JUMP MENU_COLOR_LOOP
+
+	>MENU_INPUT
+		JUMPKEYPRESS "W" MENU_UP
+		JUMPKEYPRESS "S" MENU_DOWN
+		JUMPKEYPRESS "Space" MENU_CHOOSE
+
+		WAITFRAME
+		JUMP MENU_INPUT
+
+	>MENU_UP
+		SUB _sel 1
+		JUMPGE _sel 0 MENU_REFRESH
+		SETVAR _sel [[_count]]
+		SUB _sel 1
+		JUMP MENU_REFRESH
+
+	>MENU_DOWN
+		ADD _sel 1
+		JUMPLT _sel [[_count]] MENU_REFRESH
+		SETVAR _sel 0
+		JUMP MENU_REFRESH
+
+	>MENU_CHOOSE
+		SETVAR <result> [[_sel]]
+		JUMP MENU_CLEANUP
+
+	>MENU_CLEANUP
+		SETVAR _i 0
+
+	>MENU_CLEAN_LOOP
+		JUMPGE _i [[_count]] MENU_DONE
+		LISTGET _ids [[_i]] _id
+		REMOVERENDER [[_id]]
+		ADD _i 1
+		JUMP MENU_CLEAN_LOOP
+
+	>MENU_DONE
+		BREAK
+
+	>MENU_ABORT
+		SETVAR <result> -1
+		BREAK
