@@ -28,8 +28,9 @@ public class GameVM : VirtualMachine
 		vm.OnOutput += (msg) =>
 		{
 			var logs = vm.logString.Value.ToString();
-			logs += msg;
+			logs += msg + "\n";
 			vm.logString.Value = logs;
+			vm.FireTrigger("SYS:LOG_RECEIVED");
 
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
 		};
