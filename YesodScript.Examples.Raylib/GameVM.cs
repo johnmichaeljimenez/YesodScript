@@ -11,6 +11,7 @@ public class GameVM : VirtualMachine
 {
 	public bool mouseClicked;
 	private Var mouseX, mouseY;
+	private Var hoveredId, clickedId;
 
 	public GameVM(int randomSeed = 0) : base(randomSeed)
 	{
@@ -41,6 +42,9 @@ public class GameVM : VirtualMachine
 		mouseY = AddGlobalVar("SYS:MOUSE_Y", typeof(int), 0);
 		AddGlobalVar("SYS:REQ_EXIT", typeof(bool), 0);
 
+		hoveredId = AddGlobalVar("SYS:HOVERED", typeof(int), -1);
+		clickedId = AddGlobalVar("SYS:CLICKED", typeof(int), -1);
+
 		AddGlobalList("SYS:DRAWLIST", typeof(int));
 	}
 
@@ -49,6 +53,11 @@ public class GameVM : VirtualMachine
 		mouseClicked = mouse;
 		mouseX.Value = mx;
 		mouseY.Value = my;
+
+		var mousePos = new Vector2(mx, my);
+		var hovered = Renderer.Instance.GetHoveredRenderId(mousePos);
+		hoveredId.Value = hovered;
+		clickedId.Value = (mouse && hovered != -1) ? hovered : -1;
 	}
 }
 

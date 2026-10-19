@@ -151,6 +151,66 @@ public class Renderer : IDisposable
 		return new Vector2(virtualMouseX, virtualMouseY);
 	}
 
+	public int GetHoveredRenderId(Vector2 virtualMouse)
+	{
+		EnsureSorted();
+
+		var worldMouse = ScreenToWorld(virtualMouse);
+
+		for (int i = sortedRenderList.Count - 1; i >= 0; i--)
+		{
+			var item = sortedRenderList[i];
+			if (item.Disabled || !item.IsClickable)
+				continue;
+
+			var testPos = item.World ? worldMouse : virtualMouse;
+			if (HitTest(item, testPos))
+				return item.ID;
+		}
+
+		return -1;
+	}
+
+	private Vector2 ScreenToWorld(Vector2 screen)
+	{
+		var cam = Camera;
+		var zoom = cam.Zoom == 0f ? 1f : cam.Zoom;
+		return new Vector2(
+			(screen.X - cam.Offset.X) / zoom + cam.Target.X,
+			(screen.Y - cam.Offset.Y) / zoom + cam.Target.Y
+		);
+	}
+
+	private static bool HitTest(RenderData item, Vector2 point)
+	{
+		var bounds = GetBounds(item);
+		if (bounds.Width <= 0f || bounds.Height <= 0f)
+			return false;
+
+		return Raylib.CheckCollisionPointRec(point, bounds);
+	}
+
+	private static Rectangle GetBounds(RenderData item)
+	{
+		float w = 0f, h = 0f;
+
+		if (item.Sprite.Id != 0)
+		{
+			var size = item.Sprite.Dimensions;
+			w = size.X * MathF.Abs(item.ScaleX);
+			h = size.Y * MathF.Abs(item.ScaleY);
+		}
+		else if (!string.IsNullOrWhiteSpace(item.Text))
+		{
+			var font = Assets.Instance.GetFont(item.FontName);
+			var textSize = Raylib.MeasureTextEx(font, item.Text, item.FontSize, 1);
+			w = textSize.X;
+			h = textSize.Y;
+		}
+
+		return new Rectangle(item.X - w * 0.5f, item.Y - h * 0.5f, w, h);
+	}
+
 	public void Draw()
 	{
 		var windowWidth = Raylib.GetScreenWidth();
@@ -232,12 +292,13 @@ public class Renderer : IDisposable
 		if (string.IsNullOrWhiteSpace(i.Text))
 			return;
 
+		var font = Assets.Instance.GetFont(i.FontName);
 		var fontSize = i.FontSize;
 		var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
-		var textWidth = Raylib.MeasureText(i.Text, fontSize);
-		var textX = (int)drawX - (textWidth / 2);
-		var textY = (int)drawY - (fontSize / 2);
-		Raylib.DrawText(i.Text, textX, textY, fontSize, c2);
+		var textSize = Raylib.MeasureTextEx(font, i.Text, fontSize, 1);
+		var textX = (int)drawX - (textSize.X / 2);
+		var textY = (int)drawY - (textSize.Y / 2);
+		Raylib.DrawTextEx(font, i.Text, new (textX, textY), fontSize, 1, c2);
 	}
 }
 
@@ -245,6 +306,7 @@ public class RenderData : IDisposable
 {
 	public int ID;
 	public bool Disabled;
+	public bool IsClickable;
 
 	public float X;
 	public float Y;
@@ -260,6 +322,7 @@ public class RenderData : IDisposable
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
 	public int FontSize = 14;
+	public string FontName = "";
 
 	private int _depth;
 	public int Depth
