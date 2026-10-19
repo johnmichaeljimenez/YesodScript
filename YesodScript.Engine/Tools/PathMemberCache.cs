@@ -37,8 +37,14 @@ public sealed class PathMember
 	public bool IsProperty => _chain[^1] is PropertyInfo;
 	public int Depth => _chain.Length;
 
-	public static bool IsAllowedLeafType(Type type) =>
-		AllowedLeafTypes.Contains(Nullable.GetUnderlyingType(type) ?? type);
+	private static readonly string AllowedLeafTypeNames =
+		"string, int, float, bool, byte, Vector2, enum";
+
+	public static bool IsAllowedLeafType(Type type)
+	{
+		Type actual = Nullable.GetUnderlyingType(type) ?? type;
+		return AllowedLeafTypes.Contains(actual) || actual.IsEnum;
+	}
 
 	public object? Get(object root)
 	{
@@ -113,9 +119,9 @@ public sealed class PathMember
 
 		Type destination = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
-		if (!AllowedLeafTypes.Contains(destination))
+		if (!IsAllowedLeafType(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte, Vector2).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: {AllowedLeafTypeNames}).");
 
 		if (destination == typeof(string)) return value;
 		if (destination == typeof(bool))
@@ -137,8 +143,32 @@ public sealed class PathMember
 				return vec;
 			throw new FormatException($"Cannot parse '{value}' as vector2.");
 		}
+		if (destination.IsEnum)
+			return ParseEnum(value, destination);
 
 		return ConvertTo(value, targetType);
+	}
+
+	private static object ParseEnum(string value, Type enumType)
+	{
+		string s = value.Trim();
+		if (int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int numeric))
+		{
+			object boxed = Enum.ToObject(enumType, numeric);
+			if (Enum.IsDefined(enumType, boxed))
+				return boxed;
+
+			throw new FormatException($"Cannot parse '{value}' as {enumType.Name} (undefined value).");
+		}
+
+		try
+		{
+			return Enum.Parse(enumType, s, ignoreCase: true);
+		}
+		catch (ArgumentException ex)
+		{
+			throw new FormatException($"Cannot parse '{value}' as {enumType.Name}.", ex);
+		}
 	}
 
 	private static byte ParseByte(string value)
@@ -244,9 +274,9 @@ public sealed class PathMember
 
 		Type destination = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
-		if (!AllowedLeafTypes.Contains(destination))
+		if (!IsAllowedLeafType(destination))
 			throw new InvalidOperationException(
-				$"Type '{destination.Name}' is not an allowed leaf type (allowed: string, int, float, bool, byte, Vector2).");
+				$"Type '{destination.Name}' is not an allowed leaf type (allowed: {AllowedLeafTypeNames}).");
 
 		Type source = value.GetType();
 		if (destination.IsAssignableFrom(source))
@@ -274,9 +304,21 @@ public sealed class PathMember
 					return vec;
 				throw new FormatException($"Cannot parse '{text}' as vector2.");
 			}
+			if (destination.IsEnum)
+				return ParseEnum(text, destination);
 
 			throw new InvalidOperationException(
 				$"Cannot convert string to allowed leaf type '{destination.Name}'.");
+		}
+
+		if (destination.IsEnum)
+		{
+			if (source.IsEnum)
+				return Enum.ToObject(destination, Convert.ToInt64(value, CultureInfo.InvariantCulture));
+
+			return Enum.ToObject(
+				destination,
+				Convert.ChangeType(value, Enum.GetUnderlyingType(destination), CultureInfo.InvariantCulture)!);
 		}
 
 		return Convert.ChangeType(value, destination, CultureInfo.InvariantCulture);
