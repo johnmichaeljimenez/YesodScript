@@ -65,6 +65,7 @@ public class Assets : IDisposable
 			fonts[""] = f;
 		}
 
+		Raylib.SetTextureFilter(f.Texture, GameContent.PixelArt ? TextureFilter.Point : TextureFilter.Bilinear);
 		fonts[id] = f;
 	}
 

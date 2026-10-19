@@ -192,23 +192,118 @@ public class Renderer : IDisposable
 
 	private static Rectangle GetBounds(RenderData item)
 	{
-		float w = 0f, h = 0f;
+		var w = 0f;
+		var h = 0f;
+		var originX = 0f;
+		var originY = 0f;
 
 		if (item.Sprite.Id != 0)
 		{
 			var size = item.Sprite.Dimensions;
 			w = size.X * MathF.Abs(item.ScaleX);
 			h = size.Y * MathF.Abs(item.ScaleY);
+			originX = w * 0.5f;
+			originY = h * 0.5f;
 		}
 		else if (!string.IsNullOrWhiteSpace(item.Text))
 		{
 			var font = Assets.Instance.GetFont(item.FontName);
-			var textSize = Raylib.MeasureTextEx(font, item.Text, item.FontSize, 1);
+			var textSize = MeasureMultilineText(font, item.Text, item.FontSize, 1f);
 			w = textSize.X;
 			h = textSize.Y;
+			originX = item.TextHAlign switch
+			{
+				TextHAlign.Left => 0f,
+				TextHAlign.Right => w,
+				_ => w * 0.5f,
+			};
+			originY = item.TextVAlign switch
+			{
+				TextVAlign.Top => 0f,
+				TextVAlign.Bottom => h,
+				_ => h * 0.5f,
+			};
+		}
+		else
+		{
+			originX = w * 0.5f;
+			originY = h * 0.5f;
 		}
 
-		return new Rectangle(item.X - w * 0.5f, item.Y - h * 0.5f, w, h);
+		return new Rectangle(item.X - originX, item.Y - originY, w, h);
+	}
+
+	private static string[] SplitLines(string text)
+	{
+		return text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+	}
+
+	private static Vector2 MeasureMultilineText(Font font, string text, float fontSize, float spacing)
+	{
+		var lines = SplitLines(text);
+		float width = 0f;
+		float lineHeight = fontSize;
+		float totalHeight = 0f;
+
+		for (var i = 0; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			var size = string.IsNullOrEmpty(line)
+				? new Vector2(0f, fontSize)
+				: Raylib.MeasureTextEx(font, line, fontSize, spacing);
+
+			if (size.X > width)
+				width = size.X;
+			if (size.Y > lineHeight)
+				lineHeight = size.Y;
+		}
+
+		totalHeight = lines.Length == 0 ? fontSize : lineHeight * lines.Length;
+		return new Vector2(width, totalHeight);
+	}
+
+	private static void DrawMultilineText(
+		Font font,
+		string text,
+		Vector2 origin,
+		float fontSize,
+		float spacing,
+		Color color,
+		TextHAlign hAlign,
+		TextVAlign vAlign)
+	{
+		var lines = SplitLines(text);
+		if (lines.Length == 0)
+			return;
+
+		var blockSize = MeasureMultilineText(font, text, fontSize, spacing);
+		var lineHeight = lines.Length > 0 ? blockSize.Y / lines.Length : fontSize;
+
+		var startY = vAlign switch
+		{
+			TextVAlign.Top => origin.Y,
+			TextVAlign.Bottom => origin.Y - blockSize.Y,
+			_ => origin.Y - blockSize.Y * 0.5f,
+		};
+
+		for (var i = 0; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			var lineWidth = string.IsNullOrEmpty(line)
+				? 0f
+				: Raylib.MeasureTextEx(font, line, fontSize, spacing).X;
+
+			var lineX = hAlign switch
+			{
+				TextHAlign.Left => origin.X,
+				TextHAlign.Right => origin.X - lineWidth,
+				_ => origin.X - lineWidth * 0.5f,
+			};
+			var lineY = startY + i * lineHeight;
+
+			if (!string.IsNullOrEmpty(line))
+				Raylib.DrawTextEx(font, line, new Vector2(lineX, lineY), fontSize, spacing, color);
+		}
 	}
 
 	public void Draw()
@@ -295,11 +390,22 @@ public class Renderer : IDisposable
 		var font = Assets.Instance.GetFont(i.FontName);
 		var fontSize = i.FontSize;
 		var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
-		var textSize = Raylib.MeasureTextEx(font, i.Text, fontSize, 1);
-		var textX = (int)drawX - (textSize.X / 2);
-		var textY = (int)drawY - (textSize.Y / 2);
-		Raylib.DrawTextEx(font, i.Text, new (textX, textY), fontSize, 1, c2);
+		DrawMultilineText(font, i.Text, new Vector2(drawX, drawY), fontSize, 1f, c2, i.TextHAlign, i.TextVAlign);
 	}
+}
+
+public enum TextHAlign
+{
+	Left = -1,
+	Center = 0,
+	Right = 1,
+}
+
+public enum TextVAlign
+{
+	Top = -1,
+	Middle = 0,
+	Bottom = 1,
 }
 
 public class RenderData : IDisposable
@@ -314,6 +420,8 @@ public class RenderData : IDisposable
 	public float ScaleX = 1;
 	public float ScaleY = 1;
 	public string Text;
+	public TextHAlign TextHAlign = TextHAlign.Center;
+	public TextVAlign TextVAlign = TextVAlign.Middle;
 	public string Group = "";
 	public float Opacity = 1;
 	public Color Tint = Color.White;
