@@ -5,5 +5,6 @@
   "itch": "rateater93/pong:windows",
   "virtualwidth": 640,
   "virtualheight": 360,
-  "pixelart": true
+  "pixelart": true,
+  "defaultfontname": "AlfaqixEllipsoid-SemiBold"
 }

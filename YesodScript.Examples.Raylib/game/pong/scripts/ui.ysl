@@ -6,6 +6,7 @@
     RENDER 320 140 "MENU_TITLE" 20 "POPUP_MENU"
     EDIT [[MENU_TITLE]] "FontSize" 60
     EDIT [[MENU_TITLE]] "Text" "PONG"
+    EDIT [[MENU_TITLE]] "FontName" "xirod"
     
     RENDER 320 250 "MENU_BUTTON1" 20 "POPUP_MENU"
     EDIT [[MENU_BUTTON1]] "FontSize" 15
