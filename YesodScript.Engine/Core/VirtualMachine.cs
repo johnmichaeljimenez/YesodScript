@@ -25,6 +25,8 @@ public sealed class CommandParameterAttribute : Attribute { }
 
 public class VirtualMachine : IDisposable
 {
+	private const string CALL_SHORTHAND = "$";
+
 	public long CurrentTick { get; private set; }
 	public readonly List<Var> Vars = new();
 
@@ -552,7 +554,29 @@ public class VirtualMachine : IDisposable
 					continue;
 				}
 
-				var parts = line.SplitArgumentTokens();
+				List<ArgumentToken> parts;
+				if (line.StartsWith(CALL_SHORTHAND, StringComparison.Ordinal))
+				{
+					var callBody = line.Substring(CALL_SHORTHAND.Length).Trim();
+					if (string.IsNullOrEmpty(callBody))
+						throw new Exception($"CALL shorthand '{CALL_SHORTHAND}' requires a trigger name");
+
+					var bodyTokens = callBody.SplitArgumentTokens();
+					if (bodyTokens.Count == 0)
+						throw new Exception($"CALL shorthand '{CALL_SHORTHAND}' requires a trigger name");
+
+					var callId = BuildCallShorthandId(bodyTokens);
+					parts = new List<ArgumentToken>
+					{
+						new ArgumentToken("CALL", false),
+						new ArgumentToken(callId, true)
+					};
+				}
+				else
+				{
+					parts = line.SplitArgumentTokens();
+				}
+
 				var typeName = parts[0].Value.ToUpper();
 
 				if (!commandTypes.TryGetValue(typeName, out var type))
@@ -580,6 +604,16 @@ public class VirtualMachine : IDisposable
 	{
 		allCommands.Remove(instruction);
 		runningCommands.Remove(instruction);
+	}
+
+	private static string BuildCallShorthandId(List<ArgumentToken> tokens)
+	{
+		return string.Join(" ", tokens.Select(t =>
+		{
+			if (t.Quoted || t.Value.IndexOfAny([' ', '\t']) >= 0)
+				return $"\"{t.Value}\"";
+			return t.Value;
+		}));
 	}
 
 	protected virtual void OnInitialize()

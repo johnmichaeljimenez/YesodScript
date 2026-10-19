@@ -1,0 +1,8 @@
+@GREET <msg> <num>
+PRINT "<msg> I AM FROM SHORTHAND, MY NUMBER IS <num>"
+
+@RESPOND <msg>
+PRINT "MY RESPONSE IS: <msg>"
+
+@SAY <text>
+PRINT "SAID: <text>"

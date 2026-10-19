@@ -65,6 +65,13 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_CallShorthand()
+    {
+        var vm = Utils.Test(out var output, "CallShorthand.ysl", "CallShorthand2.ysl");
+        output.Should().Be("HELLO I AM FROM SHORTHAND, MY NUMBER IS 120\nMY RESPONSE IS: GOOD BYE\nSAID: HELLO WORLD");
+    }
+
+    [Fact]
     public void Test_Concat()
     {
         var vm = Utils.Test(out var output, "Concat.ysl");

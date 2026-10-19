@@ -6,6 +6,7 @@
     { "include": "#comment" },
     { "include": "#trigger" },
     { "include": "#label" },
+    { "include": "#callShorthand" },
     { "include": "#string" },
     { "include": "#interpolation" },
     { "include": "#parameter" },
@@ -34,6 +35,13 @@
         "2": { "name": "entity.name.label.ysl" }
       }
     },
+    "callShorthand": {
+      "match": "^\\s*(\\$)(\\S*)",
+      "captures": {
+        "1": { "name": "keyword.control.command.ysl" },
+        "2": { "name": "entity.name.function.trigger.ysl" }
+      }
+    },
     "string": {
       "name": "string.quoted.double.ysl",
       "begin": "\"",
@@ -59,7 +67,7 @@
       }
     },
     "command": {
-      "match": "^\\s*(?![@#>])([A-Za-z_][A-Za-z0-9_]*)\\b",
+      "match": "^\\s*(?![@#>:])([A-Za-z_][A-Za-z0-9_]*)\\b",
       "captures": {
         "1": { "name": "keyword.control.command.ysl" }
       }
