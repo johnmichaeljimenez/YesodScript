@@ -1,0 +1,47 @@
+@_INIT
+    DEFVAR "GRID_SIZE" 64 int
+    DEFVAR "GRID_SPEED" 0.1 float
+
+    DEFVAR "PLAYER_POS_X" 0 int
+    DEFVAR "PLAYER_POS_Y" 0 int
+    DEFVAR SPR_PLAYER 0 int
+
+@OVERWORLD_INIT
+    PRINT "OVERWORLD INIT"
+    CAM 0 0 0.5
+    CLEAR "overworld*"
+
+    SETVAR "PLAYER_POS_X" 0
+    SETVAR "PLAYER_POS_Y" 0
+
+    RENDER 0 0 SPR_PLAYER 0 "overworld_character"
+    EDIT [[SPR_PLAYER]] "SpriteID" "char000"
+    EDIT [[SPR_PLAYER]] "World" true
+
+@OVERWORLD_END
+    CLEAR "overworld*"
+
+@OVERWORLD_MOVE <x> <y>
+    DEFVAR _prevX [[PLAYER_POS_X]] int
+    DEFVAR _prevY [[PLAYER_POS_Y]] int
+
+    DEFVAR _toX <x> int
+    DEFVAR _toY <y> int
+
+    MUL _toX [[GRID_SIZE]]
+    MUL _toY [[GRID_SIZE]]
+
+    ADD PLAYER_POS_X [[_toX]]
+    ADD PLAYER_POS_Y [[_toY]]
+
+    # EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
+    # EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
+
+    TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "QUAD" "MOVE_X"
+    TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "QUAD" "MOVE_Y"
+
+    TWEEN [[SPR_PLAYER]] "Depth" [[PLAYER_POS_Y]]
+
+    WAIT [[GRID_SPEED]]
+
+    PRINT "MOVING TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"

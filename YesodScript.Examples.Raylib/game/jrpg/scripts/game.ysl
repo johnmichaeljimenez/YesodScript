@@ -1,0 +1,36 @@
+@_INIT
+    
+
+@GAME_INIT
+    $OVERWORLD_INIT
+
+@GAME_TICK
+    >LOOP
+        JUMPKEYPRESS "Escape" END
+        JUMPKEYPRESS "W" MOVE_UP
+        JUMPKEYPRESS "S" MOVE_DOWN
+        JUMPKEYPRESS "A" MOVE_LEFT
+        JUMPKEYPRESS "D" MOVE_RIGHT
+
+        JUMP AFTER
+
+    >MOVE_UP
+        $OVERWORLD_MOVE 0 -1
+        JUMP AFTER
+    >MOVE_DOWN
+        $OVERWORLD_MOVE 0 1
+        JUMP AFTER
+    >MOVE_LEFT
+        $OVERWORLD_MOVE -1 0
+        JUMP AFTER
+    >MOVE_RIGHT
+        $OVERWORLD_MOVE 1 0
+        JUMP AFTER
+
+    >AFTER
+        WAITFRAME
+        JUMP LOOP
+
+    >END
+        $OVERWORLD_END
+        BREAK

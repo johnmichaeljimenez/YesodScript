@@ -1,0 +1,8 @@
+{
+  "id": "jrpg",
+  "title": "JRPG",
+  "virtualwidth": 640,
+  "virtualheight": 360,
+  "pixelart": true,
+  "defaultfontname": "font-default"
+}
