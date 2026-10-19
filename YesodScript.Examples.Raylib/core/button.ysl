@@ -1,0 +1,121 @@
+@BTN_INIT
+	DEFLIST BTN_IDS int
+	DEFLIST BTN_SPRITE_ACTIVE string
+	DEFLIST BTN_SPRITE_HOVER string
+	DEFLIST BTN_CLICK string
+
+	DEFVAR BTN_CURRENT -1 int
+
+	BREAK
+
+@BTN_CREATE <outId> <x> <y> <text> <spriteIDActive> <spriteIDHover> <clickTrigger>
+	DEFVAR _id 0 int
+	DEFVAR <outId> 0 int
+
+	RENDER <x> <y> _id
+	EDIT [[_id]] "Text" <text>
+	EDIT [[_id]] "IsClickable" true
+	EDIT [[_id]] "SpriteID" <spriteIDActive>
+	EDIT [[_id]] "FontSize" 20
+
+	LISTADD BTN_IDS [[_id]]
+	LISTADD BTN_SPRITE_ACTIVE <spriteIDActive>
+	LISTADD BTN_SPRITE_HOVER <spriteIDHover>
+	LISTADD BTN_CLICK <clickTrigger>
+	SETVAR <outId> [[_id]]
+	BREAK
+
+@BTN_DESTROY <id>
+	DEFVAR _idx -1 int
+	LISTFIND BTN_IDS <id> _idx
+	JUMPLE _idx -1 BTN_DESTROY_DONE
+
+	LISTREMOVE BTN_IDS [[_idx]]
+	LISTREMOVE BTN_SPRITE_ACTIVE [[_idx]]
+	LISTREMOVE BTN_SPRITE_HOVER [[_idx]]
+	LISTREMOVE BTN_CLICK [[_idx]]
+	REMOVERENDER <id>
+
+	JUMPEQ BTN_CURRENT <id> BTN_DESTROY_CLEAR
+	JUMP BTN_DESTROY_DONE
+
+	>BTN_DESTROY_CLEAR
+		SETVAR BTN_CURRENT -1
+
+	>BTN_DESTROY_DONE
+		BREAK
+
+@BTN_DESTROY_ALL
+	DEFVAR _n 0 int
+	DEFVAR _i 0 int
+	DEFVAR _id 0 int
+	LISTCOUNT BTN_IDS _n
+
+	>BTN_DESTROY_ALL_LOOP
+		JUMPGE _i [[_n]] BTN_DESTROY_ALL_CLEAR
+		LISTGET BTN_IDS [[_i]] _id
+		REMOVERENDER [[_id]]
+		ADD _i 1
+		JUMP BTN_DESTROY_ALL_LOOP
+
+	>BTN_DESTROY_ALL_CLEAR
+		LISTCLEAR BTN_IDS
+		LISTCLEAR BTN_SPRITE_ACTIVE
+		LISTCLEAR BTN_SPRITE_HOVER
+		LISTCLEAR BTN_CLICK
+		SETVAR BTN_CURRENT -1
+		BREAK
+
+@BTN_TICK
+	DEFVAR _hovered [[SYS:HOVERED]] int
+	DEFVAR _clicked [[SYS:CLICKED]] int
+	DEFVAR _idx -1 int
+	DEFVAR _spr * string
+
+	# only touch sprites when the hovered target changes
+	JUMPEQ _hovered BTN_CURRENT BTN_TICK_CLICK
+
+	# restore previously hovered button
+	JUMPEQ BTN_CURRENT -1 BTN_TICK_APPLY
+	LISTFIND BTN_IDS [[BTN_CURRENT]] _idx
+	JUMPLE _idx -1 BTN_TICK_APPLY
+	LISTGET BTN_SPRITE_ACTIVE [[_idx]] _spr
+	EDIT [[BTN_CURRENT]] "SpriteID" [[_spr]]
+
+	>BTN_TICK_APPLY
+		SETVAR BTN_CURRENT [[_hovered]]
+		JUMPEQ BTN_CURRENT -1 BTN_TICK_CLICK
+
+		LISTFIND BTN_IDS [[BTN_CURRENT]] _idx
+		JUMPLE _idx -1 BTN_TICK_CLEAR
+		LISTGET BTN_SPRITE_HOVER [[_idx]] _spr
+		EDIT [[BTN_CURRENT]] "SpriteID" [[_spr]]
+		JUMP BTN_TICK_CLICK
+
+	>BTN_TICK_CLEAR
+		# hovered something that is not a managed button
+		SETVAR BTN_CURRENT -1
+
+	>BTN_TICK_CLICK
+		JUMPLE _clicked -1 BTN_TICK_END
+		LISTFIND BTN_IDS [[_clicked]] _idx
+		JUMPLE _idx -1 BTN_TICK_END
+
+		DEFVAR _cb * string
+		LISTGET BTN_CLICK [[_idx]] _cb
+		CALL "[[_cb]]"
+
+	>BTN_TICK_END
+		BREAK
+
+@BTN_SET_TEXT <id> <text>
+	EDIT <id> "Text" <text>
+	BREAK
+
+@BTN_SET_CLICKABLE <id> <state>
+	EDIT <id> "IsClickable" <state>
+	BREAK
+
+@BTN_SHOW <state> <group>
+	SHOW <state> <group>
+	BREAK
