@@ -141,13 +141,21 @@ namespace YesodScript.Engine.Commands
 			WriteFloat(outVar, Compute(GetVector(key)));
 		}
 
-		private Vector2 GetVector(string name)
+		private Vector2 GetVector(string nameOrLiteral)
 		{
-			var v = VM.GetVar(name, Instruction)
-				?? throw new InvalidOperationException($"Var '{name}' was not found.");
-			if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
-				throw new NotSupportedException($"Var '{name}' is of type '{v.Type.Name}'; expected vector2.");
-			return vec;
+			var v = VM.GetVar(nameOrLiteral, Instruction);
+			if (v != null)
+			{
+				if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
+					throw new NotSupportedException($"Var '{nameOrLiteral}' is of type '{v.Type.Name}'; expected vector2.");
+				return vec;
+			}
+
+			if (Utils.TryParseVector2(nameOrLiteral, out var parsed))
+				return parsed;
+
+			throw new InvalidOperationException(
+				$"Could not resolve '{nameOrLiteral}' as a vector2 variable or literal (expected 'x,y').");
 		}
 
 		private void WriteFloat(string name, float value)
@@ -225,13 +233,21 @@ namespace YesodScript.Engine.Commands
 			WriteFloat(outVar, Vector2.Dot(GetVector(left), GetVector(right)));
 		}
 
-		private Vector2 GetVector(string name)
+		private Vector2 GetVector(string nameOrLiteral)
 		{
-			var v = VM.GetVar(name, Instruction)
-				?? throw new InvalidOperationException($"Var '{name}' was not found.");
-			if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
-				throw new NotSupportedException($"Var '{name}' is of type '{v.Type.Name}'; expected vector2.");
-			return vec;
+			var v = VM.GetVar(nameOrLiteral, Instruction);
+			if (v != null)
+			{
+				if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
+					throw new NotSupportedException($"Var '{nameOrLiteral}' is of type '{v.Type.Name}'; expected vector2.");
+				return vec;
+			}
+
+			if (Utils.TryParseVector2(nameOrLiteral, out var parsed))
+				return parsed;
+
+			throw new InvalidOperationException(
+				$"Could not resolve '{nameOrLiteral}' as a vector2 variable or literal (expected 'x,y').");
 		}
 
 		private void WriteFloat(string name, float value)
@@ -263,13 +279,21 @@ namespace YesodScript.Engine.Commands
 				Instruction.Jump(labelName);
 		}
 
-		private Vector2 GetVector(string name)
+		private Vector2 GetVector(string nameOrLiteral)
 		{
-			var v = VM.GetVar(name, Instruction)
-				?? throw new InvalidOperationException($"Var '{name}' was not found.");
-			if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
-				throw new NotSupportedException($"Var '{name}' is of type '{v.Type.Name}'; expected vector2.");
-			return vec;
+			var v = VM.GetVar(nameOrLiteral, Instruction);
+			if (v != null)
+			{
+				if (v.Type != typeof(Vector2) || v.Value is not Vector2 vec)
+					throw new NotSupportedException($"Var '{nameOrLiteral}' is of type '{v.Type.Name}'; expected vector2.");
+				return vec;
+			}
+
+			if (Utils.TryParseVector2(nameOrLiteral, out var parsed))
+				return parsed;
+
+			throw new InvalidOperationException(
+				$"Could not resolve '{nameOrLiteral}' as a vector2 variable or literal (expected 'x,y').");
 		}
 	}
 }
