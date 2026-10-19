@@ -29,7 +29,15 @@ public class GameVM : VirtualMachine
 		{
 			var logs = vm.logString.Value.ToString();
 			logs += msg + "\n";
+
+			var lines = logs.Split(['\n'], StringSplitOptions.None);
+			if (lines.Length > 11)
+			{
+				logs = string.Join("\n", lines.TakeLast(11));
+			}
+
 			vm.logString.Value = logs;
+
 			vm.FireTrigger("SYS:LOG_RECEIVED");
 
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
@@ -191,10 +199,10 @@ public class RemoveRender : GameCommand
 	[CommandParameter]
 	private int id;
 
-    public override void OnEnter()
-    {
-	Renderer.Instance.RemoveRenderData(id);
-    }
+	public override void OnEnter()
+	{
+		Renderer.Instance.RemoveRenderData(id);
+	}
 }
 
 public class Edit : EditPropertyCommand<RenderData>
