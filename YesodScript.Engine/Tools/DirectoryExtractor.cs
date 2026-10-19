@@ -2,23 +2,38 @@ namespace YesodScript.Engine.Tools;
 
 public static class DirectoryExtractor
 {
-	public static Dictionary<string, string> GetPaths(string basePath, string ext = "ysl")
+	public static Dictionary<string, string> GetPaths(string basePath, params string[] exts)
 	{
+		if (exts == null || exts.Length == 0)
+			exts = ["ysl"];
+
 		var fileMap = new Dictionary<string, string>();
-		var searchPattern = $"*.{ext}";
 
-		foreach (var fullPath in Directory.GetFiles(basePath, searchPattern, SearchOption.AllDirectories))
+		foreach (var ext in exts)
 		{
-			var relativePath = Path.GetRelativePath(basePath, fullPath).Replace('\\', '/');
+			if (string.IsNullOrWhiteSpace(ext))
+				continue;
 
-			var dir = Path.GetDirectoryName(relativePath);
-			var fileNameWithoutExt = Path.GetFileNameWithoutExtension(relativePath);
+			var normalizedExt = ext.Trim().TrimStart('.');
+			var searchPattern = $"*.{normalizedExt}";
 
-			var key = string.IsNullOrEmpty(dir) || dir == "."
-				? fileNameWithoutExt
-				: $"{dir.Replace('\\', '/')}/{fileNameWithoutExt}";
+			foreach (var fullPath in Directory.GetFiles(basePath, searchPattern, SearchOption.AllDirectories))
+			{
+				var relativePath = Path.GetRelativePath(basePath, fullPath).Replace('\\', '/');
 
-			fileMap[key] = Path.Combine(basePath, relativePath).Replace('\\', '/');
+				var dir = Path.GetDirectoryName(relativePath);
+				var fileNameWithoutExt = Path.GetFileNameWithoutExtension(relativePath);
+
+				var key = string.IsNullOrEmpty(dir) || dir == "."
+					? fileNameWithoutExt
+					: $"{dir.Replace('\\', '/')}/{fileNameWithoutExt}";
+
+				// First extension / first file wins on key collision
+				if (fileMap.ContainsKey(key))
+					continue;
+
+				fileMap[key] = Path.Combine(basePath, relativePath).Replace('\\', '/');
+			}
 		}
 
 		return fileMap;
