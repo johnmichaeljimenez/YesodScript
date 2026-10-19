@@ -89,7 +89,7 @@ public partial class EngineTests
     public void Test_Vector2()
     {
         var vm = Utils.Test(out var output, "Vector2.ysl");
-        output.Should().Be("3,4\n1,2\n2,2\n4,5\n3,4\n5\n25\n4\n0.6,0.8\n5,7.5\n0\nHIT\nOK");
+        output.Should().Be("3,4\n1,2\n2,2\n4,5\n3,4\n5\n25\n4\n0.6,0.8\n5,7.5\n0\n0.6\n0.8\nHIT\nOK");
     }
 
     [Fact]

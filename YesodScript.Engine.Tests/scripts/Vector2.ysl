@@ -42,6 +42,13 @@ DEFVAR D 0 float
 VDOT A B D
 PRINT "[[D]]"
 
+DEFVAR GX 0 float
+DEFVAR GY 0 float
+VGETX N GX
+VGETY N GY
+PRINT "[[GX]]"
+PRINT "[[GY]]"
+
 DEFVAR NEAR 0,0 vector2
 DEFVAR FAR 10,0 vector2
 DEFVAR OTHER 3,4 vector2

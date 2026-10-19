@@ -163,6 +163,16 @@ namespace YesodScript.Engine.Commands
 		}
 	}
 
+	public class VGetX : VectorUnaryOutCommand
+	{
+		protected override float Compute(Vector2 source) => source.X;
+	}
+
+	public class VGetY : VectorUnaryOutCommand
+	{
+		protected override float Compute(Vector2 source) => source.Y;
+	}
+
 	public class VLength : VectorUnaryOutCommand
 	{
 		protected override float Compute(Vector2 source) => source.Length();
