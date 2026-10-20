@@ -10,6 +10,21 @@
     LISTSET TILE_SPRITES [[MAP_TEMP_CURRENT]] <sprite>
     LISTSET TILE_ENTITYSPRITES [[MAP_TEMP_CURRENT]] <entitysprite>
 
-    PRINT "SET TILE AT <x> <y> ([[MAP_TEMP_CURRENT]])"
+    # PRINT "SET TILE AT <x> <y> ([[MAP_TEMP_CURRENT]])"
+    
+    DEFVAR _x <x> int
+    DEFVAR _y <y> int
 
+    MUL _x [[GRID_SIZE]]
+    MUL _y [[GRID_SIZE]]
+
+    JUMPNEQ <type> 1 END
+
+    #TODO: put them in new TILE_RENDER (int)
+    RENDER [[_x]] [[_y]] "MAP_TEMP_CURRENT" -100 "overworld_map_tile"
+    EDIT [[MAP_TEMP_CURRENT]] "SpriteID" "r0_c1"
+    EDIT [[MAP_TEMP_CURRENT]] "World" true
+    PRINT "ADDED BLOCKER [[_x]] [[_y]]"
+
+>END
     BREAK

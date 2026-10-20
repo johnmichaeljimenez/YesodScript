@@ -1,5 +1,5 @@
 @_INIT
-    DEFVAR "GRID_SIZE" 64 int
+    DEFVAR "GRID_SIZE" 16 int
     DEFVAR "GRID_SPEED" 0.1 float
 
     DEFVAR "PLAYER_POS_X" 0 int
@@ -7,17 +7,18 @@
     DEFVAR SPR_PLAYER 0 int
 
 @OVERWORLD_INIT
-    CAM 0 0 0.5
     CLEAR "overworld*"
 
     SETVAR "PLAYER_POS_X" 0
     SETVAR "PLAYER_POS_Y" 0
 
-    $MAP_INIT "test"
+    $MAP_INIT "intro_field"
 
     RENDER [[PLAYER_POS_X]] [[PLAYER_POS_Y]] SPR_PLAYER "-[[PLAYER_POS_Y]]" "overworld_character"
-    EDIT [[SPR_PLAYER]] "SpriteID" "char000"
+    EDIT [[SPR_PLAYER]] "SpriteID" "r0_c3"
     EDIT [[SPR_PLAYER]] "World" true
+
+    CAM [[PLAYER_POS_X]] [[PLAYER_POS_Y]] 2
 
 @OVERWORLD_END
     $MAP_CLEAR

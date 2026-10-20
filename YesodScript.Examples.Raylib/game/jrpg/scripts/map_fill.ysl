@@ -30,8 +30,4 @@
     >END
         PRINT "ADDED [[_i]] TILES"
 
-        $MAP_SET 4 4 0 1
-        $MAP_SET 4 5 0 1
-        $MAP_SET 4 6 0 1
-
         BREAK
