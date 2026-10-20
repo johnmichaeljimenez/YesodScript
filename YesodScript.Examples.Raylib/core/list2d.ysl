@@ -1,0 +1,7 @@
+@LIST_1D <x> <y> <w> <h> <outvar>
+    #(y * w) + x
+    DEFVAR _b <y> int
+    MUL _b <w>
+    ADD _b <x>
+
+    SETVAR <outvar> _b
