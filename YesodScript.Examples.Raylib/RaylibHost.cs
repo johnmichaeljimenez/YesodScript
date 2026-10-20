@@ -6,7 +6,7 @@ namespace YesodScript.Examples;
 public class RaylibHost
 {
 	public static RaylibHost Instance { get; private set; }
-	const float hz = 1.0f / 60.0f;
+	public const float hz = 1.0f / 60.0f;
 	private float accumulator = 0.0f;
 	public float HzAlpha => accumulator / hz;
 	const int screenWidth = 1280;

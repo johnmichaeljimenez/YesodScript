@@ -38,7 +38,13 @@ public class GameVM : VirtualMachine
 
 			vm.logString.Value = logs;
 
-			vm.FireTrigger("SYS:LOG_RECEIVED");
+			var all = vm.FireTrigger("SYS:LOG_RECEIVED");
+			foreach (var ins in all)
+			{
+				if (!ins.IsRunning) continue;
+
+				vm.RunInline(ins, RaylibHost.hz);
+			}
 
 			Raylib.TraceLog(TraceLogLevel.Info, msg);
 		};
