@@ -10,7 +10,7 @@ namespace YesodScript.Engine.Commands
 
 		private CommandType _commandType;
 		private ArgumentToken[] _rawArgs;
-		
+
 		private Dictionary<int, string> _deferredArgs;
 
 		internal void Initialize(VirtualMachine vm, Instruction instruction, CommandType commandType, ArgumentToken[] args)
@@ -93,6 +93,11 @@ namespace YesodScript.Engine.Commands
 		{
 			if (type == typeof(string))
 				return arg;
+				
+			if (string.IsNullOrWhiteSpace(arg))
+			{
+				return type.IsValueType ? Activator.CreateInstance(type) : null;
+			}
 
 			if (type == typeof(bool))
 			{
