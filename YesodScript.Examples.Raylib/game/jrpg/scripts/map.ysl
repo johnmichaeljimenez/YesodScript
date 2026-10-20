@@ -21,19 +21,21 @@
     DEFVAR MAP_SPAWN_Y 32 int
 
     #id reference for targets
-    DEFLIST TILE_IDS int
+    DEFLIST TILE_IDS string
     #see above
     DEFLIST TILE_TYPES int
     #optional value 1 (ex. item "gold" 100)
-    DEFLIST TILE_VALUES1 int
+    DEFLIST TILE_VALUES1 string
     #optional value 2 (ex. item gold "100")
-    DEFLIST TILE_VALUES2 int
+    DEFLIST TILE_VALUES2 string
     #optional target id
-    DEFLIST TILE_TARGETS int
+    DEFLIST TILE_TARGETS string
     #tile state (true = disabled, no interaction happens)
     DEFLIST TILE_STATES bool
-    #tile sprite id
+    #tile sprite id (floor tile)
     DEFLIST TILE_SPRITES string
+    #tile sprite id (entity tile - if any)
+    DEFLIST TILE_ENTITYSPRITES string
 
 @MAP_CLEAR
     LISTCLEAR TILE_IDS
@@ -43,8 +45,10 @@
     LISTCLEAR TILE_TARGETS
     LISTCLEAR TILE_STATES
     LISTCLEAR TILE_SPRITES
+    LISTCLEAR TILE_ENTITYSPRITES
 
     CLEAR "overworld_map*"
+    PRINT "CLEARED MAP"
 
 @MAP_INIT <mapname>
     SETVAR MAP_W 0
@@ -57,19 +61,24 @@
     LISTCLEAR TILE_TARGETS
     LISTCLEAR TILE_STATES
     LISTCLEAR TILE_SPRITES
+    LISTCLEAR TILE_ENTITYSPRITES
 
+    PRINT "LOADING MAP"
     CLEAR "overworld_map*"
-
-    $LOADMAP <mapname>
+    $MAP_FILL 32 32
+    CALL "LOADMAP:<mapname>" INIT_MAP_MISSING
 
     JUMPIF MAP_HAS_SPAWN INIT_END
     SETVAR PLAYER_POS_X [[MAP_SPAWN_X]]
     SETVAR PLAYER_POS_Y [[MAP_SPAWN_Y]]
     SETVAR MAP_HAS_SPAWN false
 
+    >INIT_MAP_MISSING
+        PRINT "Missing map '<mapname>'"
+        BREAK
+
     >INIT_END
-        WAIT 0.1
-        PRINT "Loaded map <mapname> [[MAP_W]]x[[MAP_H]]"
+        PRINT "Loaded map '<mapname>' [[MAP_W]]x[[MAP_H]]"
         BREAK
 
 @MAP_INTERACT <x> <y>
@@ -85,9 +94,8 @@
 
     DEFVAR _i 0 int
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] "MAP_TEMP_CURRENT"
-    DEFVAR _tile
 
-    DEFVAR _test
+    #stub
 
     >INTERACT_END
         SETVAR MAP_TEMP_CURRENT -1

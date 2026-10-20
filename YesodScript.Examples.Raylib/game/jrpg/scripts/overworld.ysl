@@ -20,6 +20,7 @@
     EDIT [[SPR_PLAYER]] "World" true
 
 @OVERWORLD_END
+    $MAP_CLEAR
     CLEAR "overworld*"
 
 @OVERWORLD_MOVE <x> <y>

@@ -4,4 +4,4 @@
     MUL _b <w>
     ADD _b <x>
 
-    SETVAR <outvar> _b
+    SETVAR <outvar> [[_b]]

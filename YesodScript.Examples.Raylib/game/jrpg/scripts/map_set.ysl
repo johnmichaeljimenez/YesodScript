@@ -1,0 +1,15 @@
+@MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite>
+    $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] MAP_TEMP_CURRENT
+    
+    LISTSET TILE_IDS [[MAP_TEMP_CURRENT]] <id>
+    LISTSET TILE_TYPES [[MAP_TEMP_CURRENT]] <type>
+    LISTSET TILE_VALUES1 [[MAP_TEMP_CURRENT]] <v1>
+    LISTSET TILE_VALUES2 [[MAP_TEMP_CURRENT]] <v2>
+    LISTSET TILE_TARGETS [[MAP_TEMP_CURRENT]] <t>
+    LISTSET TILE_STATES [[MAP_TEMP_CURRENT]] <state>
+    LISTSET TILE_SPRITES [[MAP_TEMP_CURRENT]] <sprite>
+    LISTSET TILE_ENTITYSPRITES [[MAP_TEMP_CURRENT]] <entitysprite>
+
+    PRINT "SET TILE AT <x> <y> ([[MAP_TEMP_CURRENT]])"
+
+    BREAK

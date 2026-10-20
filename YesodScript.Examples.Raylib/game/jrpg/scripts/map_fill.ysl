@@ -1,0 +1,37 @@
+@MAP_FILL <w> <h>
+    SETVAR MAP_W <w>
+    SETVAR MAP_H <h>
+    
+    DEFVAR _LAST_X <w> int
+    DEFVAR _LAST_Y <h> int
+    SUB _LAST_X 1
+    SUB _LAST_Y 1
+
+    DEFVAR _size <w> int
+    MUL _size <h>
+
+    PRINT "MAP SIZE [[_size]]"
+    DEFVAR _i 0 int
+
+    >LOOP
+        JUMPGE _i [[_size]] END
+        LISTADD TILE_IDS 0
+        LISTADD TILE_TYPES 0
+        LISTADD TILE_VALUES1 0
+        LISTADD TILE_VALUES2 0
+        LISTADD TILE_TARGETS 0
+        LISTADD TILE_STATES 0
+        LISTADD TILE_SPRITES *
+        LISTADD TILE_ENTITYSPRITES *
+
+        ADD _i 1
+        JUMP LOOP
+
+    >END
+        PRINT "ADDED [[_i]] TILES"
+
+        $MAP_SET 4 4 0 1
+        $MAP_SET 4 5 0 1
+        $MAP_SET 4 6 0 1
+
+        BREAK
