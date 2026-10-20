@@ -1,0 +1,94 @@
+# Tile types
+# 0 - blank
+# 1 - blocker
+# 2 - misc
+# 3 - npc
+# 4 - item
+# 5 - switch
+# 6 - trigger
+
+@_INIT
+    DEFVAR MAP_TEMP_CURRENT -1 int
+
+    #lists are 1d here, but I have function that returns x,y parameter into int 1d index
+
+    #resized depending on map
+    DEFVAR MAP_W 0 int
+    DEFVAR MAP_H 0 int
+
+    DEFVAR MAP_HAS_SPAWN true bool
+    DEFVAR MAP_SPAWN_X 32 int
+    DEFVAR MAP_SPAWN_Y 32 int
+
+    #id reference for targets
+    DEFLIST TILE_IDS int
+    #see above
+    DEFLIST TILE_TYPES int
+    #optional value 1 (ex. item "gold" 100)
+    DEFLIST TILE_VALUES1 int
+    #optional value 2 (ex. item gold "100")
+    DEFLIST TILE_VALUES2 int
+    #optional target id
+    DEFLIST TILE_TARGETS int
+    #tile state (true = disabled, no interaction happens)
+    DEFLIST TILE_STATES bool
+    #tile sprite id
+    DEFLIST TILE_SPRITES string
+
+@MAP_CLEAR
+    LISTCLEAR TILE_IDS
+    LISTCLEAR TILE_TYPES
+    LISTCLEAR TILE_VALUES1
+    LISTCLEAR TILE_VALUES2
+    LISTCLEAR TILE_TARGETS
+    LISTCLEAR TILE_STATES
+    LISTCLEAR TILE_SPRITES
+
+    CLEAR "overworld_map*"
+
+@MAP_INIT <mapname>
+    SETVAR MAP_W 0
+    SETVAR MAP_H 0
+
+    LISTCLEAR TILE_IDS
+    LISTCLEAR TILE_TYPES
+    LISTCLEAR TILE_VALUES1
+    LISTCLEAR TILE_VALUES2
+    LISTCLEAR TILE_TARGETS
+    LISTCLEAR TILE_STATES
+    LISTCLEAR TILE_SPRITES
+
+    CLEAR "overworld_map*"
+
+    $LOADMAP <mapname>
+
+    JUMPIF MAP_HAS_SPAWN INIT_END
+    SETVAR PLAYER_POS_X [[MAP_SPAWN_X]]
+    SETVAR PLAYER_POS_Y [[MAP_SPAWN_Y]]
+    SETVAR MAP_HAS_SPAWN false
+
+    >INIT_END
+        WAIT 0.1
+        PRINT "Loaded map <mapname> [[MAP_W]]x[[MAP_H]]"
+        BREAK
+
+@MAP_INTERACT <x> <y>
+    PRINT "INTERACT <x> <y>"
+
+    JUMPEQ MAP_W 0 INTERACT_END
+    JUMPEQ MAP_H 0 INTERACT_END
+
+    JUMPLT <x> 0 INTERACT_END
+    JUMPLT <y> 0 INTERACT_END
+    JUMPGT <x> [[MAP_W]] INTERACT_END
+    JUMPGT <y> [[MAP_H]] INTERACT_END
+
+    DEFVAR _i 0 int
+    $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] "MAP_TEMP_CURRENT"
+    DEFVAR _tile
+
+    DEFVAR _test
+
+    >INTERACT_END
+        SETVAR MAP_TEMP_CURRENT -1
+        BREAK
