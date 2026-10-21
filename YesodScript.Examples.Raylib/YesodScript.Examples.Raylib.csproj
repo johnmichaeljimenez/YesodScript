@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Tween\Tween.csproj" />
+    <ProjectReference Include="..\..\Tween\src\Tween\Tween.csproj" />
     <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
   </ItemGroup>
 

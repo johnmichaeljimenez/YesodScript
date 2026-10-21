@@ -1,6 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
-using Tween;
+using TweenLib;
 using YesodScript.Engine.Commands;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
@@ -250,8 +250,10 @@ public class Tween : GameCommand
 		var _from = relative ? getter.Invoke() + from : from;
 		var _to = relative ? getter() + to : to;
 
-		var tween = new Tween<float>(getter, setter, _to, duration, _from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
-		tween.SetEasing(TweenUtil.ResolveEasing(easing));
+		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
+					SetFrom(_from).
+					SetEasing(TweenUtil.ResolveEasing(easing)).
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
 
 		data.activeTweens.Add(tween);
 		TweenManager.Add(tween);
@@ -318,8 +320,10 @@ public class TweenCam : GameCommand
 		var _from = relative ? getter() + from : from;
 		var _to = relative ? getter() + to : to;
 
-		var tween = new Tween<float>(getter, setter, _to, duration, _from, id: string.IsNullOrEmpty(tweenId) ? null : tweenId);
-		tween.SetEasing(TweenUtil.ResolveEasing(easing));
+		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
+					SetFrom(_from).
+					SetEasing(TweenUtil.ResolveEasing(easing)).
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
 
 		TweenManager.Add(tween);
 	}
@@ -331,7 +335,8 @@ internal static class TweenUtil
 	{
 		"LINEAR" => Easing.Linear,
 		"QUAD" => Easing.QuadInOut,
-		"SHAKE" => Easing.QuadInOutLoop,
+		"BELL" => Easing.Parabola(1),
+		"SHAKE" => Easing.Shake(0.7f, 1.5f),
 		_ => Easing.Linear
 	};
 }

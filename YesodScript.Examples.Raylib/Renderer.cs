@@ -1,6 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
-using Tween;
+using TweenLib;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
 

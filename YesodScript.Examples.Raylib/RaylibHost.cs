@@ -1,5 +1,5 @@
 ﻿using Raylib_cs;
-using Tween;
+using TweenLib;
 
 namespace YesodScript.Examples;
 
