@@ -84,21 +84,36 @@
         PRINT "Loaded map '<mapname>' [[MAP_W]]x[[MAP_H]]"
         BREAK
 
-@MAP_INTERACT <x> <y>
-    PRINT "INTERACT <x> <y>"
+@MAP_STEP <x> <y> <blocked> <trigger>
+    SETVAR <blocked> false
 
     JUMPEQ MAP_W 0 INTERACT_END
     JUMPEQ MAP_H 0 INTERACT_END
 
     JUMPLT <x> 0 INTERACT_END
     JUMPLT <y> 0 INTERACT_END
-    JUMPGT <x> [[MAP_W]] INTERACT_END
-    JUMPGT <y> [[MAP_H]] INTERACT_END
+    JUMPGE <x> [[MAP_W]] INTERACT_END
+    JUMPGE <y> [[MAP_H]] INTERACT_END
 
-    DEFVAR _i 0 int
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] "MAP_TEMP_CURRENT"
 
-    #stub
+    DEFVAR _tile 0 int
+    DEFVAR _disabled false bool
+    LISTGET TILE_TYPES [[MAP_TEMP_CURRENT]] _tile
+    LISTGET TILE_STATES [[MAP_TEMP_CURRENT]] _disabled
+    JUMPEQ _disabled true INTERACT_END
+    JUMPEQ _tile 0 INTERACT_END
+    JUMPEQ _tile 4 INTERACT_END
+    JUMPEQ _tile 6 INTERACT_TRIGGER
+    SETVAR <blocked> true
+    JUMPEQ _tile 1 INTERACT_END
+    
+    $INTERACT [[MAP_TEMP_CURRENT]]
+    BREAK
+
+    >INTERACT_TRIGGER
+        SETVAR <trigger> [[MAP_TEMP_CURRENT]]
+        JUMP INTERACT_END
 
     >INTERACT_END
         SETVAR MAP_TEMP_CURRENT -1

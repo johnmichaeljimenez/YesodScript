@@ -1,0 +1,14 @@
+@INTERACT <id>
+    DEFVAR _id 0 int
+    DEFVAR _type 0 int
+    DEFVAR _v1 0 int
+    DEFVAR _v2 0 int
+    DEFVAR _target 0 int
+
+    LISTGET TILE_IDS <id> _id
+    LISTGET TILE_TYPES <id> _type
+    LISTGET TILE_VALUES1 <id> _v1
+    LISTGET TILE_VALUES2 <id> _v2
+    LISTGET TILE_TARGETS <id> _target
+
+    PRINT "INTERACT: <id>"
