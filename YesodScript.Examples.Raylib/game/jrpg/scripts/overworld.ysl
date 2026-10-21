@@ -14,7 +14,7 @@
     SETVAR "PLAYER_POS_X" 0
     SETVAR "PLAYER_POS_Y" 0
 
-    $MAP_INIT "intro_field"
+    $MAP_INIT "test"
 
     RENDER [[PLAYER_POS_X]] [[PLAYER_POS_Y]] SPR_PLAYER "-[[PLAYER_POS_Y]]" "overworld_character"
     EDIT [[SPR_PLAYER]] "SpriteID" "r0_c3"

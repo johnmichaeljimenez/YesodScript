@@ -1,30 +1,47 @@
 @MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite>
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] MAP_TEMP_CURRENT
-    
-    LISTSET TILE_IDS [[MAP_TEMP_CURRENT]] <id>
-    LISTSET TILE_TYPES [[MAP_TEMP_CURRENT]] <type>
-    LISTSET TILE_VALUES1 [[MAP_TEMP_CURRENT]] <v1>
-    LISTSET TILE_VALUES2 [[MAP_TEMP_CURRENT]] <v2>
-    LISTSET TILE_TARGETS [[MAP_TEMP_CURRENT]] <t>
-    LISTSET TILE_STATES [[MAP_TEMP_CURRENT]] <state>
-    LISTSET TILE_SPRITES [[MAP_TEMP_CURRENT]] <sprite>
-    LISTSET TILE_ENTITYSPRITES [[MAP_TEMP_CURRENT]] <entitysprite>
+    DEFVAR _tile [[MAP_TEMP_CURRENT]] int
 
-    # PRINT "SET TILE AT <x> <y> ([[MAP_TEMP_CURRENT]])"
-    
+    LISTSET TILE_IDS [[_tile]] <id>
+    LISTSET TILE_TYPES [[_tile]] <type>
+    LISTSET TILE_VALUES1 [[_tile]] <v1>
+    LISTSET TILE_VALUES2 [[_tile]] <v2>
+    LISTSET TILE_TARGETS [[_tile]] <t>
+    LISTSET TILE_STATES [[_tile]] <state>
+    LISTSET TILE_SPRITES [[_tile]] <sprite>
+    LISTSET TILE_ENTITYSPRITES [[_tile]] <entitysprite>
+    LISTSET TILE_RENDER [[_tile]] 0
+
+    # PRINT "SET TILE AT <x> <y> ([[_tile]])"
+
     DEFVAR _x <x> int
     DEFVAR _y <y> int
 
     MUL _x [[GRID_SIZE]]
     MUL _y [[GRID_SIZE]]
 
-    JUMPNEQ <type> 1 END
+    JUMPEQ <type> 0 END
+    JUMPEQ <type> 6 END
 
-    #TODO: put them in new TILE_RENDER (int)
-    RENDER [[_x]] [[_y]] "MAP_TEMP_CURRENT" -100 "overworld_map_tile"
-    EDIT [[MAP_TEMP_CURRENT]] "SpriteID" "r0_c1"
-    EDIT [[MAP_TEMP_CURRENT]] "World" true
-    PRINT "ADDED BLOCKER [[_x]] [[_y]]"
+    DEFVAR _rid 0 int
+    RENDER [[_x]] [[_y]] _rid -100 "overworld_map_tile"
+    EDIT [[_rid]] "SpriteID" "r0_c1"
+    EDIT [[_rid]] "World" true
+    LISTSET TILE_RENDER [[_tile]] [[_rid]]
+    # PRINT "ADDED TILE RENDER [[_x]] [[_y]] rid=[[_rid]]"
 
 >END
     BREAK
+
+@MAP_DISABLE_TILE <tile>
+    LISTSET TILE_STATES <tile> true
+
+    DEFVAR _rid 0 int
+    LISTGET TILE_RENDER <tile> _rid
+    JUMPLE _rid 0 MAP_DISABLE_DONE
+
+    REMOVERENDER [[_rid]]
+    LISTSET TILE_RENDER <tile> 0
+
+    >MAP_DISABLE_DONE
+        BREAK

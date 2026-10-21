@@ -6,6 +6,7 @@
 # 4 - item
 # 5 - switch
 # 6 - trigger
+# 7 - savepoint
 
 @_INIT
     DEFVAR MAP_TEMP_CURRENT -1 int
@@ -36,6 +37,8 @@
     DEFLIST TILE_SPRITES string
     #tile sprite id (entity tile - if any)
     DEFLIST TILE_ENTITYSPRITES string
+    #render data id for this tile (0 = none)
+    DEFLIST TILE_RENDER int
 
 @MAP_CLEAR
     LISTCLEAR TILE_IDS
@@ -46,6 +49,7 @@
     LISTCLEAR TILE_STATES
     LISTCLEAR TILE_SPRITES
     LISTCLEAR TILE_ENTITYSPRITES
+    LISTCLEAR TILE_RENDER
 
     CLEAR "overworld_map*"
     PRINT "CLEARED MAP"
@@ -62,6 +66,7 @@
     LISTCLEAR TILE_STATES
     LISTCLEAR TILE_SPRITES
     LISTCLEAR TILE_ENTITYSPRITES
+    LISTCLEAR TILE_RENDER
 
     PRINT "LOADING MAP"
     CLEAR "overworld_map*"

@@ -1,14 +1,57 @@
 @INTERACT <id>
-    DEFVAR _id 0 int
+    # <id> is the 1D tile index (from MAP_STEP / PLAYER_TRIGGER_ID)
+    DEFVAR _id 0 string
     DEFVAR _type 0 int
-    DEFVAR _v1 0 int
-    DEFVAR _v2 0 int
-    DEFVAR _target 0 int
+    DEFVAR _v1 0 string
+    DEFVAR _v2 0 string
+    DEFVAR _target 0 string
+    DEFVAR _state false bool
+    DEFVAR _index -1 int
 
     LISTGET TILE_IDS <id> _id
     LISTGET TILE_TYPES <id> _type
     LISTGET TILE_VALUES1 <id> _v1
     LISTGET TILE_VALUES2 <id> _v2
     LISTGET TILE_TARGETS <id> _target
+    LISTGET TILE_STATES <id> _state
 
-    PRINT "INTERACT: <id>"
+    # PRINT "INTERACT: <id> -> [[_type]] id=[[_id]] t=[[_target]]"
+
+    # already disabled tiles should never reach here (MAP_STEP filters them)
+    JUMPEQ _state true END
+
+    JUMPEQ _type 2 I_MISC
+    JUMPEQ _type 5 I_SWITCH
+    BREAK
+
+    >I_MISC
+        PRINT "Blocked!"
+        BREAK
+
+    >I_SWITCH
+        #one-shot
+        $MAP_DISABLE_TILE <id>
+
+        JUMPEQ _target 0 I_SWITCH_DONE
+
+        DEFVAR _i 0 int
+        DEFVAR _n 0 int
+        DEFVAR _cur 0 string
+        LISTCOUNT TILE_IDS _n
+
+        >I_SWITCH_LOOP
+            JUMPGE _i [[_n]] I_SWITCH_DONE
+            LISTGET TILE_IDS [[_i]] _cur
+            JUMPNEQ _cur [[_target]] I_SWITCH_NEXT
+            $MAP_DISABLE_TILE [[_i]]
+
+            >I_SWITCH_NEXT
+                ADD _i 1
+                JUMP I_SWITCH_LOOP
+
+        >I_SWITCH_DONE
+            PRINT "Success!"
+            BREAK
+
+    >END
+        BREAK
