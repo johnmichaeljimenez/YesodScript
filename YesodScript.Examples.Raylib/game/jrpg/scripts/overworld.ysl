@@ -4,6 +4,8 @@
 
     DEFVAR "PLAYER_POS_X" 0 int
     DEFVAR "PLAYER_POS_Y" 0 int
+    DEFVAR "PLAYER_DIR_X" 0 int
+    DEFVAR "PLAYER_DIR_Y" 0 int
     DEFVAR "PLAYER_BLOCKED" false bool
     DEFVAR "PLAYER_TRIGGER_ID" -1 int
     DEFVAR SPR_PLAYER 0 int
@@ -34,6 +36,8 @@
     CLEAR "overworld*"
 
 @OVERWORLD_MOVE <x> <y>
+    SETVAR PLAYER_DIR_X <x>
+    SETVAR PLAYER_DIR_Y <y>
     DEFVAR _prevX [[PLAYER_POS_X]] int
     DEFVAR _prevY [[PLAYER_POS_Y]] int
 
@@ -60,10 +64,11 @@
     SETVAR PLAYER_POS_X [[_toX]]
     SETVAR PLAYER_POS_Y [[_toY]]
 
+    #non-tween mode
     # EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
     # EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
-    # CAM [[PLAYER_POS_X]] [[PLAYER_POS_Y]] 2
 
+    #tween mode
     TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "QUAD" "MOVE_X"
     TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "QUAD" "MOVE_Y"
 
@@ -71,10 +76,11 @@
 
     WAIT [[GRID_SPEED]]
 
-    # PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
+    PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
 
     #wait for movement before executing any trigger
     JUMPEQ "PLAYER_TRIGGER_ID" -1 MOVE_END
+
     $INTERACT [[PLAYER_TRIGGER_ID]]
     SETVAR "PLAYER_TRIGGER_ID" -1
 

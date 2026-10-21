@@ -5,3 +5,17 @@
     ADD _b <x>
 
     SETVAR <outvar> [[_b]]
+
+@LIST_XY <index> <w> <outx> <outy>
+    # reverse of LIST_1D: y = index / w, x = index - y * w
+    DEFVAR _y <index> int
+    DIV _y <w>
+
+    DEFVAR _rowstart [[_y]] int
+    MUL _rowstart <w>
+
+    DEFVAR _x <index> int
+    SUB _x [[_rowstart]]
+
+    SETVAR <outx> [[_x]]
+    SETVAR <outy> [[_y]]

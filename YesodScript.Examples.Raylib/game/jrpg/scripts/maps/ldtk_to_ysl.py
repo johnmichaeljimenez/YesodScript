@@ -22,7 +22,12 @@ Field mapping:
   switch/gate/item/npc/savepoint:
     v1 = Value1, v2 = Value2, t = Target iid, state = Disabled
   trigger:
-    v1 = Trigger_Key, v2 = Parameter, t = Target iid, state = Disabled
+    v1 = Trigger_Key
+    v2 = Parameter
+        OR, when Trigger_Key is "exit", the destination level identifier
+        (lowercased) resolved from Target.levelIid
+    t = Target iid
+    state = Disabled
 
 Empty / missing string fields become 0 (same default as MAP_FILL).
 sprite and entitysprite are always * for now.
@@ -97,14 +102,41 @@ def ysl_token(value: Any) -> str:
     return f'"{escaped}"'
 
 
+def target_ref(fields: dict[str, Any]) -> dict[str, Any] | None:
+    """Return the raw EntityRef dict for Target, if present."""
+    target = fields.get("Target")
+    return target if isinstance(target, dict) else None
+
+
 def target_iid(fields: dict[str, Any]) -> str:
     """Resolve EntityRef Target to short iid, or 0 if unset."""
-    target = fields.get("Target")
-    if isinstance(target, dict):
+    target = target_ref(fields)
+    if target is not None:
         return short_iid(target.get("entityIid"))
-    if isinstance(target, str) and target:
-        return short_iid(target)
+    raw = fields.get("Target")
+    if isinstance(raw, str) and raw:
+        return short_iid(raw)
     return "0"
+
+
+def target_level_name(
+    fields: dict[str, Any],
+    levels_by_iid: dict[str, dict[str, Any]],
+) -> str:
+    """
+    Resolve Target.levelIid -> LDtk level identifier (lowercased).
+    Returns "" if unset / unknown.
+    """
+    target = target_ref(fields)
+    if target is None:
+        return ""
+    level_iid = target.get("levelIid")
+    if not level_iid:
+        return ""
+    level = levels_by_iid.get(level_iid)
+    if level is None:
+        return ""
+    return str(level["identifier"]).lower()
 
 
 def make_tile(
@@ -128,7 +160,10 @@ def make_tile(
     }
 
 
-def tile_from_entity(entity: dict[str, Any]) -> dict[str, str | int] | None:
+def tile_from_entity(
+    entity: dict[str, Any],
+    levels_by_iid: dict[str, dict[str, Any]],
+) -> dict[str, str | int] | None:
     """
     Convert one LDtk entity into a MAP_SET payload.
     Returns None for entities that do not become tiles (e.g. PlayerStart).
@@ -142,12 +177,20 @@ def tile_from_entity(entity: dict[str, Any]) -> dict[str, str | int] | None:
         return None
 
     if etype == "Trigger":
-        # trigger = type 6 | v1=Trigger_Key | v2=Parameter | t=target iid
+        # trigger = type 6 | v1=Trigger_Key | v2=Parameter or exit level | t=target iid
+        trigger_key = fields.get("Trigger_Key")
+        parameter = fields.get("Parameter")
+        v2: Any = parameter
+        if isinstance(trigger_key, str) and trigger_key.strip().lower() == "exit":
+            # Exit warps need the destination MAPDATA name; Parameter is unused.
+            level_name = target_level_name(fields, levels_by_iid)
+            v2 = level_name if level_name else parameter
+
         return make_tile(
             entity_iid=iid,
             tile_type=6,
-            v1=fields.get("Trigger_Key"),
-            v2=fields.get("Parameter"),
+            v1=trigger_key,
+            v2=v2,
             t=target_iid(fields),
             disabled=disabled,
         )
@@ -218,6 +261,7 @@ def apply_entities(
     gw: int,
     gh: int,
     tiles: dict[tuple[int, int], dict[str, str | int]],
+    levels_by_iid: dict[str, dict[str, Any]],
 ) -> None:
     """
     Stamp entity tiles on top of blockers.
@@ -228,7 +272,7 @@ def apply_entities(
             continue
 
         for entity in layer["entityInstances"]:
-            payload = tile_from_entity(entity)
+            payload = tile_from_entity(entity, levels_by_iid)
             if payload is None:
                 continue
 
@@ -259,7 +303,10 @@ def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
     return "\t$MAP_SET " + " ".join(args)
 
 
-def generate_mapdata(level: dict[str, Any]) -> str:
+def generate_mapdata(
+    level: dict[str, Any],
+    levels_by_iid: dict[str, dict[str, Any]],
+) -> str:
     name = level["identifier"].lower()
     gw, gh = grid_size(level)
     lines = [
@@ -277,7 +324,7 @@ def generate_mapdata(level: dict[str, Any]) -> str:
         lines.append("\t# no PlayerStart found")
 
     tiles = collect_intgrid_blockers(level, gw, gh)
-    apply_entities(level, gw, gh, tiles)
+    apply_entities(level, gw, gh, tiles, levels_by_iid)
 
     for (x, y), data in sorted(tiles.items()):
         lines.append(format_map_set(x, y, data))
@@ -292,6 +339,7 @@ def export_ldtk(
     only_levels: set[str] | None = None,
 ) -> None:
     data = json.loads(ldtk_path.read_text(encoding="utf-8"))
+    levels_by_iid = {level["iid"]: level for level in data["levels"]}
     sections: list[str] = []
 
     for level in data["levels"]:
@@ -299,7 +347,7 @@ def export_ldtk(
         if only_levels is not None and ident not in only_levels:
             continue
         print(f"exporting level: {ident}")
-        sections.append(generate_mapdata(level))
+        sections.append(generate_mapdata(level, levels_by_iid))
 
     if not sections:
         raise SystemExit("no levels exported (check --only filter)")

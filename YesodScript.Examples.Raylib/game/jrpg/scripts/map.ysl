@@ -10,6 +10,8 @@
 
 @_INIT
     DEFVAR MAP_TEMP_CURRENT -1 int
+    DEFVAR MAP_WARP_X 0 int
+    DEFVAR MAP_WARP_Y 0 int
 
     #lists are 1d here, but I have function that returns x,y parameter into int 1d index
 
@@ -20,6 +22,7 @@
     DEFVAR MAP_HAS_SPAWN true bool
     DEFVAR MAP_SPAWN_X 32 int
     DEFVAR MAP_SPAWN_Y 32 int
+    DEFVAR MAP_NAME * string
 
     #id reference for targets
     DEFLIST TILE_IDS string
@@ -57,6 +60,8 @@
 @MAP_INIT <mapname>
     SETVAR MAP_W 0
     SETVAR MAP_H 0
+    SETVAR MAP_NAME <mapname>
+    SETVAR MAP_HAS_SPAWN false
 
     LISTCLEAR TILE_IDS
     LISTCLEAR TILE_TYPES
