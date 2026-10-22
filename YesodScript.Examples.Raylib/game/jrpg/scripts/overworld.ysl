@@ -63,8 +63,8 @@
     # EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
 
     #tween mode
-    TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "QUAD" "MOVE_X"
-    TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "QUAD" "MOVE_Y"
+    TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "LINEAR" "MOVE_X"
+    TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "LINEAR" "MOVE_Y"
 
     $CAMERA_FOLLOW [[_prevX]] [[_prevY]]
 

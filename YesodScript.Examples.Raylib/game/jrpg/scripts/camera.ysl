@@ -91,12 +91,12 @@
     >CAM_APPLY_X
         JUMPEQ _camFromX [[_camToX]] CAM_APPLY_Y
         SETVAR _movecam true
-        TWEENCAM "X" [[_camFromX]] [[_camToX]] false [[CAM_SPEED]] "QUAD" "CAM_X"
+        TWEENCAM "X" [[_camFromX]] [[_camToX]] false [[CAM_SPEED]] "LINEAR" "CAM_X"
 
     >CAM_APPLY_Y
         JUMPEQ _camFromY [[_camToY]] CAM_WAIT_CHECK
         SETVAR _movecam true
-        TWEENCAM "Y" [[_camFromY]] [[_camToY]] false [[CAM_SPEED]] "QUAD" "CAM_Y"
+        TWEENCAM "Y" [[_camFromY]] [[_camToY]] false [[CAM_SPEED]] "LINEAR" "CAM_Y"
 
     >CAM_WAIT_CHECK
         JUMPEQ _movecam true CAM_DO_WAIT

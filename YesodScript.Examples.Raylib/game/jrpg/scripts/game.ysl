@@ -11,29 +11,43 @@
 	$FADE_OUT
 
 @GAME_TICK
+    DEFVAR _t 0 int
+
     >LOOP
         JUMPKEYPRESS "Escape" END
-        JUMPKEYPRESS "W" MOVE_UP
-        JUMPKEYPRESS "S" MOVE_DOWN
-        JUMPKEYPRESS "A" MOVE_LEFT
-        JUMPKEYPRESS "D" MOVE_RIGHT
+        JUMPKEY "W" MOVE_UP
+        JUMPKEY "S" MOVE_DOWN
+        JUMPKEY "A" MOVE_LEFT
+        JUMPKEY "D" MOVE_RIGHT
 
         JUMP AFTER
 
     >MOVE_UP
+        JUMPGT _t 0 AFTER
+        SETVAR _t 3
         $OVERWORLD_MOVE 0 -1
         JUMP AFTER
     >MOVE_DOWN
+        JUMPGT _t 0 AFTER
+        SETVAR _t 3
         $OVERWORLD_MOVE 0 1
         JUMP AFTER
     >MOVE_LEFT
+        JUMPGT _t 0 AFTER
+        SETVAR _t 3
         $OVERWORLD_MOVE -1 0
         JUMP AFTER
     >MOVE_RIGHT
+        JUMPGT _t 0 AFTER
+        SETVAR _t 3
         $OVERWORLD_MOVE 1 0
         JUMP AFTER
 
     >AFTER
+        JUMPLE _t 0 AFTERWAIT
+        SUB _t 1
+
+    >AFTERWAIT
         WAITFRAME
         JUMP LOOP
 
