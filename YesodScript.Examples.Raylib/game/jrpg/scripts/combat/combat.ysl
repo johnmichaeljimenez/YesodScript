@@ -1,0 +1,73 @@
+@_INIT
+    DEFLIST C_CURRENTACTIONS int
+    DEFLIST C_ACTEDMEMBERS int
+    DEFLIST C_MENU_LABELS string
+    DEFLIST C_ACTIONS string
+
+    #0 = selection, 1 = battle
+    DEFVAR C_PHASE 0 int
+    DEFVAR C_RESULT -1 int
+    DEFVAR C_PCOUNT 0 int
+    DEFVAR C_ECOUNT 0 int
+    DEFVAR C_ACTOR 0 int
+    DEFVAR C_TARGET 0 int
+    # action indices from $MENU "Attack" "Defend" "Pass"
+    DEFVAR C_ACT_ATTACK 0 int
+    DEFVAR C_ACT_DEFEND 1 int
+    DEFVAR C_ACT_PASS 2 int
+
+@COMBAT_BEGIN
+    LISTCLEAR C_CURRENTACTIONS
+    LISTCLEAR C_ACTEDMEMBERS
+    LISTCLEAR C_MENU_LABELS
+    SETVAR C_PHASE 0
+    SETVAR C_ACTOR 0
+    SETVAR C_TARGET 0
+
+    LISTADD C_ACTIONS "Attack"
+    LISTADD C_ACTIONS "Defend"
+    LISTADD C_ACTIONS "Pass"
+
+    #testing only
+    $PARTY_CLEAR "ENEMY"
+    $PARTY_ADD "ENEMY" "wolf"
+
+    PRINT "COMBAT START!"
+    >COMBAT_LOOP
+        $PARTY_REFRESH
+        $PARTY_COUNT_ALIVE "PLAYER" C_PCOUNT
+        $PARTY_COUNT_ALIVE "ENEMY" C_ECOUNT
+        JUMPEQ C_PCOUNT 0 COMBAT_END
+        JUMPEQ C_ECOUNT 0 COMBAT_END
+
+        PRINT "SELECTION PHASE"
+        $WAITPRESS "Space"
+
+        # alive members
+        $PARTY_ALIVE_LABELS "PLAYER" C_MENU_LABELS
+        $MENU C_MENU_LABELS C_RESULT
+        JUMPLT C_RESULT 0 COMBAT_LOOP
+            LISTGET PPLAYER_ALIVE [[C_RESULT]] C_ACTOR
+
+            $MENU C_ACTIONS "C_RESULT"
+                JUMPEQ C_RESULT [[C_ACT_DEFEND]] RESOLVE_ACTIONS
+                JUMPEQ C_RESULT [[C_ACT_PASS]] RESOLVE_ACTIONS
+
+                $PARTY_ALIVE_LABELS "ENEMY" C_MENU_LABELS
+                $MENU C_MENU_LABELS C_RESULT
+                    JUMPLT C_RESULT 0 COMBAT_LOOP
+                        LISTGET PENEMY_ALIVE [[C_RESULT]] C_TARGET
+
+                        >RESOLVE_ACTIONS
+                            PRINT "RESOLVE PHASE"
+                            $WAITPRESS "Space"
+
+                        PRINT "BATTLE PHASE"
+                        $WAITPRESS "Space"
+
+        JUMP COMBAT_LOOP
+        BREAK
+
+    >COMBAT_END
+        PRINT "COMBAT END"
+        BREAK

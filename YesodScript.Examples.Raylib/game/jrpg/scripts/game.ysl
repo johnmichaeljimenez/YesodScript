@@ -15,11 +15,16 @@
 
     >LOOP
         JUMPKEYPRESS "Escape" END
+        JUMPKEY "C" TESTCOMBAT
         JUMPKEY "W" MOVE_UP
         JUMPKEY "S" MOVE_DOWN
         JUMPKEY "A" MOVE_LEFT
         JUMPKEY "D" MOVE_RIGHT
 
+        JUMP AFTER
+    
+    >TESTCOMBAT
+        $COMBAT_BEGIN
         JUMP AFTER
 
     >MOVE_UP
