@@ -23,14 +23,7 @@
     EDIT [[SPR_PLAYER]] "SpriteID" "r0_c3"
     EDIT [[SPR_PLAYER]] "World" true
 
-    DEFVAR _midx [[MAP_W]] int
-    DEFVAR _midy [[MAP_H]] int
-    DIV _midx 2
-    DIV _midy 2
-    MUL _midx [[GRID_SIZE]]
-    MUL _midy [[GRID_SIZE]]
-
-    CAM [[_midx]] [[_midy]] 1.5
+    CAM [[PLAYER_POS_X]] [[PLAYER_POS_Y]] 2
 
 @OVERWORLD_END
     $MAP_CLEAR
@@ -73,9 +66,12 @@
     TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "QUAD" "MOVE_X"
     TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "QUAD" "MOVE_Y"
 
+    TWEENCAM "X" [[_prevX]] [[PLAYER_POS_X]] false 0.15 "QUAD" "CAM_X"
+    TWEENCAM "Y" [[_prevY]] [[PLAYER_POS_Y]] false 0.15 "QUAD" "CAM_Y"
+
     TWEEN [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
 
-    WAIT [[GRID_SPEED]]
+    WAIT 0.15
 
     PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
 

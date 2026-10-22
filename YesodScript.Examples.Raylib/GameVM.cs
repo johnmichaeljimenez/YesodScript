@@ -284,13 +284,9 @@ public class Cam : GameCommand
 
 	public override void OnEnter()
 	{
-		var cam = Renderer.Instance.Camera;
-		cam.Target.X = x;
-		cam.Target.Y = y;
-
-		cam.Zoom = zoom;
-
-		Renderer.Instance.Camera = cam;
+		Renderer.Instance.Camera.X = x;
+		Renderer.Instance.Camera.Y = y;
+		Renderer.Instance.Camera.Zoom = zoom;
 	}
 }
 
@@ -310,12 +306,7 @@ public class TweenCam : GameCommand
 			throw new Exception($"Unknown path '{path}'");
 
 		Func<float> getter = () => (float)member.Get(Renderer.Instance.Camera);
-		Action<float> setter = v =>
-		{
-			object boxed = Renderer.Instance.Camera;
-			member.Set(boxed, v);
-			Renderer.Instance.Camera = (Camera2D)boxed;
-		};
+		Action<float> setter = v => member.Set(Renderer.Instance.Camera, v);
 
 		var _from = relative ? getter() + from : from;
 		var _to = relative ? getter() + to : to;

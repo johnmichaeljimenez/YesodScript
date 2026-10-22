@@ -6,10 +6,34 @@ using YesodScript.Engine.Tools;
 
 namespace YesodScript.Examples;
 
+public class Camera
+{
+	public float X;
+	public float Y;
+	public float Zoom = 1f;
+
+	public Camera() { }
+
+	public Camera(float x, float y, float zoom = 1f)
+	{
+		X = x;
+		Y = y;
+		Zoom = zoom;
+	}
+
+	public Camera2D ToCamera2D(float offsetX, float offsetY) => new()
+	{
+		Offset = new Vector2(offsetX, offsetY),
+		Target = new Vector2(X, Y),
+		Zoom = Zoom,
+		Rotation = 0f
+	};
+}
+
 public class Renderer : IDisposable
 {
 	public static readonly IReadOnlyDictionary<string, PathMember> RenderDataMembers = PathMemberCache.Build<RenderData>();
-	public static readonly IReadOnlyDictionary<string, PathMember> CameraMembers = PathMemberCache.Build<Camera2D>();
+	public static readonly IReadOnlyDictionary<string, PathMember> CameraMembers = PathMemberCache.Build<Camera>();
 	public static Renderer Instance { get; private set; }
 
 	private int renderID = 1;   //0 means stale default data
@@ -22,11 +46,7 @@ public class Renderer : IDisposable
 
 	private RenderTexture2D rt;
 
-	public Camera2D Camera = new()
-	{
-		Offset = new Vector2(GameContent.VirtualResolution.X * 0.5f, GameContent.VirtualResolution.Y * 0.5f),
-		Zoom = 1f
-	};
+	public Camera Camera = new();
 
 	public Renderer()
 	{
@@ -173,11 +193,12 @@ public class Renderer : IDisposable
 
 	private Vector2 ScreenToWorld(Vector2 screen)
 	{
-		var cam = Camera;
-		var zoom = cam.Zoom == 0f ? 1f : cam.Zoom;
+		var zoom = Camera.Zoom == 0f ? 1f : Camera.Zoom;
+		var offsetX = VirtualWidth * 0.5f;
+		var offsetY = VirtualHeight * 0.5f;
 		return new Vector2(
-			(screen.X - cam.Offset.X) / zoom + cam.Target.X,
-			(screen.Y - cam.Offset.Y) / zoom + cam.Target.Y
+			(screen.X - offsetX) / zoom + Camera.X,
+			(screen.Y - offsetY) / zoom + Camera.Y
 		);
 	}
 
@@ -328,7 +349,8 @@ public class Renderer : IDisposable
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();
 
-			Raylib.BeginMode2D(Camera);
+			var cam2d = Camera.ToCamera2D(VirtualWidth * 0.5f, VirtualHeight * 0.5f);
+			Raylib.BeginMode2D(cam2d);
 			foreach (var item in sortedRenderList)
 			{
 				if (item.Disabled || !item.World)
