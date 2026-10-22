@@ -756,10 +756,7 @@
 									"id": "V_String",
 									"params": ["80106c70-bde0-11f1-81f7-efee60b1c064"]
 								}] },
-								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "exit", "__tile": null, "defUid": 25, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["exit"]
-								}] },
+								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [null] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
 								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
@@ -849,10 +846,7 @@
 									"id": "V_String",
 									"params": ["40248840-bde0-11f1-bb9b-ebe7b83f6dad"]
 								}] },
-								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "exit", "__tile": null, "defUid": 25, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["exit"]
-								}] },
+								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [null] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
 								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
@@ -966,10 +960,7 @@
 									"id": "V_String",
 									"params": ["21018de0-bde0-11f1-81f7-e32d33048a41"]
 								}] },
-								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "exit", "__tile": null, "defUid": 25, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["exit"]
-								}] },
+								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [null] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
 								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
@@ -1029,10 +1020,7 @@
 									"id": "V_String",
 									"params": ["3ddeb6f0-bde0-11f1-bb9b-bbc4bf2739ff"]
 								}] },
-								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "exit", "__tile": null, "defUid": 25, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["exit"]
-								}] },
+								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [null] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
 								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }

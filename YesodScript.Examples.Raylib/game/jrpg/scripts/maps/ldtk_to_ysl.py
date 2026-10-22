@@ -23,10 +23,11 @@ Field mapping:
     v1 = Value1, v2 = Value2, t = Target iid, state = State (ActiveType)
     alias = Alias (optional stable name for EV_* handlers)
   trigger:
-    v1 = Trigger_Key
+    v1 = Trigger_Key (optional; unused when Target is set)
     v2 = Parameter
-        OR, when Trigger_Key is "exit", the destination level identifier
-        (lowercased) resolved from Target.levelIid
+        OR, when Target is set, the destination level identifier
+        (lowercased) resolved from Target.levelIid — any Trigger with a
+        Target is treated as an exit warp (no need to set Trigger_Key="exit")
     t = Target iid
     state = State (ActiveType)
     alias = Alias (optional; used by EV_TRIGGER:<map>:<alias>)
@@ -249,10 +250,12 @@ def tile_from_entity(
 
     if etype == "Trigger":
         # trigger = type 6 | v1=Trigger_Key | v2=Parameter or exit level | t=target iid | alias
+        # Any Trigger with a Target is an exit warp (Trigger_Key need not be "exit").
         trigger_key = fields.get("Trigger_Key")
         parameter = fields.get("Parameter")
+        t = target_iid(fields)
         v2: Any = parameter
-        if isinstance(trigger_key, str) and trigger_key.strip().lower() == "exit":
+        if t != "0":
             # Exit warps need the destination MAPDATA name; Parameter is unused.
             level_name = target_level_name(fields, levels_by_iid)
             v2 = level_name if level_name else parameter
@@ -262,7 +265,7 @@ def tile_from_entity(
             tile_type=6,
             v1=trigger_key,
             v2=v2,
-            t=target_iid(fields),
+            t=t,
             state=state,
             alias=resolve_alias(fields),
         )

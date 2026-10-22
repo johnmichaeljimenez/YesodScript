@@ -30,7 +30,7 @@
     BREAK
 
     >I_TRIGGER
-        JUMPEQ [[_v1]] "EXIT" I_TRIGGER_EXIT
+        JUMPNEQ _target 0 I_TRIGGER_EXIT
         CALL "EV_TRIGGER:[[MAP_NAME]]:[[_alias]]" I_TRIGGER_GENERIC
         BREAK
 
@@ -41,7 +41,6 @@
         >I_TRIGGER_EXIT
             $FADE_IN
 
-            JUMPEQ _target 0 I_TRIGGER_EXIT_BAD
             JUMPEQ _v2 0 I_TRIGGER_EXIT_BAD
 
             PRINT "EXIT -> [[_v2]] ([[_target]])"

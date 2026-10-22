@@ -35,7 +35,7 @@
 	$MAP_SET 2 8 0 1 0 0 0 0 * * *
 	$MAP_SET 2 9 0 1 0 0 0 0 * * *
 	$MAP_SET 2 10 0 1 0 0 0 0 * * *
-	$MAP_SET 2 15 "21018de0" 6 "exit" "intro_field_main" "80106c70" 0 * * *
+	$MAP_SET 2 15 "21018de0" 6 0 "intro_field_main" "80106c70" 0 * * *
 	$MAP_SET 3 0 0 1 0 0 0 0 * * *
 	$MAP_SET 3 1 0 1 0 0 0 0 * * *
 	$MAP_SET 3 2 0 1 0 0 0 0 * * *
@@ -44,7 +44,7 @@
 	$MAP_SET 3 9 0 1 0 0 0 0 * * *
 	$MAP_SET 3 10 0 1 0 0 0 0 * * *
 	$MAP_SET 3 11 0 1 0 0 0 0 * * *
-	$MAP_SET 3 15 "21018de0" 6 "exit" "intro_field_main" "80106c70" 0 * * *
+	$MAP_SET 3 15 "21018de0" 6 0 "intro_field_main" "80106c70" 0 * * *
 	$MAP_SET 4 0 0 1 0 0 0 0 * * *
 	$MAP_SET 4 1 0 1 0 0 0 0 * * *
 	$MAP_SET 4 8 0 1 0 0 0 0 * * *
@@ -109,7 +109,7 @@
 	$MAP_SET 13 4 0 1 0 0 0 0 * * *
 	$MAP_SET 13 5 0 1 0 0 0 0 * * *
 	$MAP_SET 13 9 "89df7080" 2 0 0 0 0 * * *
-	$MAP_SET 13 15 "3ddeb6f0" 6 "exit" "intro_field_main" 40248840 0 * * *
+	$MAP_SET 13 15 "3ddeb6f0" 6 0 "intro_field_main" 40248840 0 * * *
 	$MAP_SET 14 0 0 1 0 0 0 0 * * *
 	$MAP_SET 14 1 0 1 0 0 0 0 * * *
 	$MAP_SET 14 2 0 1 0 0 0 0 * * *
@@ -118,7 +118,7 @@
 	$MAP_SET 14 5 0 1 0 0 0 0 * * *
 	$MAP_SET 14 9 0 1 0 0 0 0 * * *
 	$MAP_SET 14 10 "8f9896a0" 5 0 0 "89df7080" 0 * * *
-	$MAP_SET 14 15 "3ddeb6f0" 6 "exit" "intro_field_main" 40248840 0 * * *
+	$MAP_SET 14 15 "3ddeb6f0" 6 0 "intro_field_main" 40248840 0 * * *
 	$MAP_SET 15 0 0 1 0 0 0 0 * * *
 	$MAP_SET 15 1 0 1 0 0 0 0 * * *
 	$MAP_SET 15 2 0 1 0 0 0 0 * * *
@@ -158,9 +158,9 @@
 	$MAP_SET 1 5 0 1 0 0 0 0 * * *
 	$MAP_SET 1 6 0 1 0 0 0 0 * * *
 	$MAP_SET 1 9 0 1 0 0 0 0 * * *
-	$MAP_SET 2 0 "80106c70" 6 "exit" "intro_field" "21018de0" 0 * * *
+	$MAP_SET 2 0 "80106c70" 6 0 "intro_field" "21018de0" 0 * * *
 	$MAP_SET 2 9 0 1 0 0 0 0 * * *
-	$MAP_SET 3 0 "80106c70" 6 "exit" "intro_field" "21018de0" 0 * * *
+	$MAP_SET 3 0 "80106c70" 6 0 "intro_field" "21018de0" 0 * * *
 	$MAP_SET 3 8 0 1 0 0 0 0 * * *
 	$MAP_SET 3 9 0 1 0 0 0 0 * * *
 	$MAP_SET 4 0 0 1 0 0 0 0 * * *
@@ -219,9 +219,9 @@
 	$MAP_SET 11 9 0 1 0 0 0 0 * * *
 	$MAP_SET 12 0 0 1 0 0 0 0 * * *
 	$MAP_SET 12 9 0 1 0 0 0 0 * * *
-	$MAP_SET 13 0 40248840 6 "exit" "intro_field" "3ddeb6f0" 0 * * *
+	$MAP_SET 13 0 40248840 6 0 "intro_field" "3ddeb6f0" 0 * * *
 	$MAP_SET 13 9 0 1 0 0 0 0 * * *
-	$MAP_SET 14 0 40248840 6 "exit" "intro_field" "3ddeb6f0" 0 * * *
+	$MAP_SET 14 0 40248840 6 0 "intro_field" "3ddeb6f0" 0 * * *
 	$MAP_SET 14 3 0 1 0 0 0 0 * * *
 	$MAP_SET 14 5 0 1 0 0 0 0 * * *
 	$MAP_SET 14 9 0 1 0 0 0 0 * * *
@@ -229,7 +229,7 @@
 	$MAP_SET 15 1 0 1 0 0 0 0 * * *
 	$MAP_SET 15 2 0 1 0 0 0 0 * * *
 	$MAP_SET 15 3 0 1 0 0 0 0 * * *
-	$MAP_SET 15 4 "584c24b0" 6 0 0 "56c78080" 0 * * *
+	$MAP_SET 15 4 "584c24b0" 6 0 "intro_village" "56c78080" 0 * * *
 	$MAP_SET 15 5 0 1 0 0 0 0 * * *
 	$MAP_SET 15 6 0 1 0 0 0 0 * * *
 	$MAP_SET 15 7 0 1 0 0 0 0 * * *
@@ -244,7 +244,7 @@
 	$MAP_SET 0 1 0 1 0 0 0 0 * * *
 	$MAP_SET 0 2 0 1 0 0 0 0 * * *
 	$MAP_SET 0 3 0 1 0 0 0 0 * * *
-	$MAP_SET 0 4 "56c78080" 6 0 0 "584c24b0" 0 * * *
+	$MAP_SET 0 4 "56c78080" 6 0 "intro_field_main" "584c24b0" 0 * * *
 	$MAP_SET 0 5 0 1 0 0 0 0 * * *
 	$MAP_SET 0 6 0 1 0 0 0 0 * * *
 	$MAP_SET 0 7 0 1 0 0 0 0 * * *
@@ -422,7 +422,7 @@
 	$MAP_SET 18 5 0 1 0 0 0 0 * * *
 	$MAP_SET 18 6 0 1 0 0 0 0 * * *
 	$MAP_SET 18 7 0 1 0 0 0 0 * * *
-	$MAP_SET 18 15 "24d50ca0" 6 0 0 "27e49690" 0 * * *
+	$MAP_SET 18 15 "24d50ca0" 6 0 "intro_road" "27e49690" 0 * * *
 	$MAP_SET 19 0 0 1 0 0 0 0 * * *
 	$MAP_SET 19 1 0 1 0 0 0 0 * * *
 	$MAP_SET 19 2 0 1 0 0 0 0 * * *
@@ -432,7 +432,7 @@
 	$MAP_SET 19 6 0 1 0 0 0 0 * * *
 	$MAP_SET 19 7 0 1 0 0 0 0 * * *
 	$MAP_SET 19 8 0 1 0 0 0 0 * * *
-	$MAP_SET 19 15 "24d50ca0" 6 0 0 "27e49690" 0 * * *
+	$MAP_SET 19 15 "24d50ca0" 6 0 "intro_road" "27e49690" 0 * * *
 	$MAP_SET 20 0 0 1 0 0 0 0 * * *
 	$MAP_SET 20 1 0 1 0 0 0 0 * * *
 	$MAP_SET 20 2 0 1 0 0 0 0 * * *
@@ -501,7 +501,7 @@
 	$MAP_SET 27 2 0 1 0 0 0 0 * * *
 	$MAP_SET 27 4 0 1 0 0 0 0 * * *
 	$MAP_SET 27 5 0 1 0 0 0 0 * * *
-	$MAP_SET 27 6 86574710 6 0 0 "899dbf80" 0 * * *
+	$MAP_SET 27 6 86574710 6 0 "intro_house" "899dbf80" 0 * * *
 	$MAP_SET 27 9 0 1 0 0 0 0 * * *
 	$MAP_SET 27 10 0 1 0 0 0 0 * * *
 	$MAP_SET 27 11 0 1 0 0 0 0 * * *
@@ -641,7 +641,7 @@
 	$MAP_SET 7 2 0 1 0 0 0 0 * * *
 	$MAP_SET 7 3 0 1 0 0 0 0 * * *
 	$MAP_SET 7 8 0 1 0 0 0 0 * * *
-	$MAP_SET 7 15 "899dbf80" 6 0 0 86574710 0 * * *
+	$MAP_SET 7 15 "899dbf80" 6 0 "intro_village" 86574710 0 * * *
 	$MAP_SET 8 0 0 1 0 0 0 0 * * *
 	$MAP_SET 8 1 0 1 0 0 0 0 * * *
 	$MAP_SET 8 2 0 1 0 0 0 0 * * *
@@ -752,9 +752,9 @@
 	$MAP_SET 5 7 0 1 0 0 0 0 * * *
 	$MAP_SET 6 0 0 1 0 0 0 0 * * *
 	$MAP_SET 6 7 0 1 0 0 0 0 * * *
-	$MAP_SET 7 0 "27e49690" 6 0 0 "24d50ca0" 0 * * *
+	$MAP_SET 7 0 "27e49690" 6 0 "intro_village" "24d50ca0" 0 * * *
 	$MAP_SET 7 7 0 1 0 0 0 0 * * *
-	$MAP_SET 8 0 "27e49690" 6 0 0 "24d50ca0" 0 * * *
+	$MAP_SET 8 0 "27e49690" 6 0 "intro_village" "24d50ca0" 0 * * *
 	$MAP_SET 8 7 0 1 0 0 0 0 * * *
 	$MAP_SET 9 0 0 1 0 0 0 0 * * *
 	$MAP_SET 9 7 0 1 0 0 0 0 * * *
