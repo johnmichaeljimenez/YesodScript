@@ -823,7 +823,7 @@
 	$MAP_SET 7 2 "1fea21e0" 4 "gold" 5 0 false * *
 	$MAP_SET 7 4 0 1 0 0 0 false * *
 	$MAP_SET 7 5 0 1 0 0 0 false * *
-	$MAP_SET 7 7 "09fd4a50" 3 0 0 0 false * *
+	$MAP_SET 7 7 "09fd4a50" 3 "Prisoner" 0 0 false * *
 	$MAP_SET 7 9 0 1 0 0 0 false * *
 	$MAP_SET 8 0 0 1 0 0 0 false * *
 	$MAP_SET 8 4 0 1 0 0 0 false * *

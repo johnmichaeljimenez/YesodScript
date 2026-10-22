@@ -46,7 +46,7 @@ public class GameVM : VirtualMachine
 				vm.RunInline(ins, RaylibHost.hz);
 			}
 
-			Raylib.TraceLog(TraceLogLevel.Info, msg);
+			Raylib.TraceLog(TraceLogLevel.Info, $"[{vm.CurrentTick}] {msg}");
 		};
 
 		vm.CompileDirectory(GameContent.CorePath);

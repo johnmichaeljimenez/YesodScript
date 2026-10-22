@@ -1630,7 +1630,10 @@
 									"id": "V_String",
 									"params": ["NPC"]
 								}] },
-								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
+								{ "__identifier": "Value1", "__type": "String", "__value": "Prisoner", "__tile": null, "defUid": 23, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Prisoner"]
+								}] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "Disabled", "__type": "Bool", "__value": false, "__tile": null, "defUid": 19, "realEditorValues": [] }

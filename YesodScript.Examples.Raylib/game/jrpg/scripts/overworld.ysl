@@ -85,4 +85,7 @@
     SETVAR "PLAYER_TRIGGER_ID" -1
 
     >MOVE_END
+        EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
+        EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
+        EDIT [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
         BREAK

@@ -21,17 +21,22 @@
     JUMPEQ _state true END
 
     JUMPEQ _type 6 I_TRIGGER
+    JUMPEQ _type 3 I_NPC
     JUMPEQ _type 2 I_MISC
     JUMPEQ _type 5 I_SWITCH
     BREAK
 
     >I_TRIGGER
         JUMPEQ [[_v1]] "EXIT" I_TRIGGER_EXIT
+        CALL "EV_TRIGGER [[MAP_NAME]] [[_id]]" I_TRIGGER_GENERIC
         BREAK
 
+        >I_TRIGGER_GENERIC
+            CALL "EV_TRIGGER_GENERIC"
+            BREAK
+
         >I_TRIGGER_EXIT
-            #dirty hack, cleanup next time
-            WAIT 1
+            $FADE_IN
 
             JUMPEQ _target 0 I_TRIGGER_EXIT_BAD
             JUMPEQ _v2 0 I_TRIGGER_EXIT_BAD
@@ -53,10 +58,6 @@
             MUL PLAYER_POS_X [[GRID_SIZE]]
             MUL PLAYER_POS_Y [[GRID_SIZE]]
 
-            EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
-            EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
-            EDIT [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
-
             DEFVAR _midx [[MAP_W]] int
             DEFVAR _midy [[MAP_H]] int
             DIV _midx 2
@@ -65,7 +66,13 @@
             MUL _midy [[GRID_SIZE]]
             CAM [[_midx]] [[_midy]] 1.5
 
-            PRINT "WARPED to [[_v2]] @ [[MAP_WARP_X]],[[MAP_WARP_Y]] -> [[PLAYER_POS_X]],[[PLAYER_POS_Y]] (id=[[_target]])"
+            EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
+            EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
+            EDIT [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
+
+            $FADE_OUT
+
+            # PRINT "WARPED to [[_v2]] @ [[MAP_WARP_X]],[[MAP_WARP_Y]] -> [[PLAYER_POS_X]],[[PLAYER_POS_Y]] (id=[[_target]])"
             BREAK
 
             >I_TRIGGER_EXIT_MISSING
@@ -76,15 +83,37 @@
                 PRINT "EXIT missing target/level (t=[[_target]] v2=[[_v2]])"
                 BREAK
 
-    >I_MISC
-        PRINT "Blocked!"
+    >I_ITEM
+        #add item here
+        CALL "EV_ITEM [[MAP_NAME]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
         BREAK
+
+        >I_ITEM_GENERIC
+            CALL "EV_ITEM_GENERIC [[_v1]] [[_v2]]"
+            BREAK
+
+    >I_NPC
+        CALL "EV_NPC [[MAP_NAME]] [[_v1]]" I_NPC_GENERIC
+        BREAK
+
+        >I_NPC_GENERIC
+            $TALK [[_v1]] "..."
+            CALL "EV_NPC_GENERIC [[_v1]]"
+            BREAK
+
+    >I_MISC
+        CALL "EV_MISC [[MAP_NAME]] [[_id]]" I_MISC_GENERIC
+        BREAK
+
+        >I_MISC_GENERIC
+            CALL "EV_MISC_GENERIC"
+            BREAK
 
     >I_SWITCH
         #one-shot
         $MAP_DISABLE_TILE <id>
 
-        JUMPEQ _target 0 I_SWITCH_DONE
+        JUMPEQ _target 0 I_SWITCH_GENERIC
 
         DEFVAR _i 0 int
         DEFVAR _n 0 int
@@ -102,7 +131,11 @@
                 JUMP I_SWITCH_LOOP
 
         >I_SWITCH_DONE
-            PRINT "Success!"
+            CALL "EV_SWITCH [[MAP_NAME]] [[_target]]" I_SWITCH_GENERIC
+            BREAK
+
+        >I_SWITCH_GENERIC
+            CALL "EV_SWITCH_GENERIC"
             BREAK
 
     >END
