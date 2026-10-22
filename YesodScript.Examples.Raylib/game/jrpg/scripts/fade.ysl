@@ -1,0 +1,20 @@
+@_INIT
+    DEFVAR FADE_SPEED 0.2 float
+    DEFVAR SYS:FADE 0 int
+    RENDER 0 0 SYS:FADE 999 "FADE"
+    EDIT [[SYS:FADE]] "SpriteID" "fill"
+    EDIT [[SYS:FADE]] "OriginX" 0
+    EDIT [[SYS:FADE]] "OriginY" 0
+    EDIT [[SYS:FADE]] "ScaleX" 10
+    EDIT [[SYS:FADE]] "ScaleY" 10
+    EDIT [[SYS:FADE]] "Opacity" 0
+
+@FADE_IN
+    TWEEN [[SYS:FADE]] "Opacity" 0 1 false [[FADE_SPEED]] "QUAD"
+    WAIT [[FADE_SPEED]]
+    BREAK
+
+@FADE_OUT
+    TWEEN [[SYS:FADE]] "Opacity" 1 0 false [[FADE_SPEED]] "QUAD"
+    WAIT [[FADE_SPEED]]
+    BREAK

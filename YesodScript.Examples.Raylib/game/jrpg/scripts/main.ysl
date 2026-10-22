@@ -14,6 +14,7 @@ DEFVAR MENU_RESULT -1 int
 
 >PLAY
 	PRINT "Selected: Play"
+	$FADE_IN
 	$GAME_INIT
 	$GAME_TICK
 

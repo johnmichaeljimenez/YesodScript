@@ -3,6 +3,7 @@
 
 @GAME_INIT
     $OVERWORLD_INIT
+	$FADE_OUT
 
 @GAME_TICK
     >LOOP

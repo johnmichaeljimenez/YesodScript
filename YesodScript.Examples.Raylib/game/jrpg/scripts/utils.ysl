@@ -1,6 +1,6 @@
 @_INIT
     DEFVAR log 0 int
-    RENDER 4 4 log 999 "SYSTEM_UI"
+    RENDER 4 4 log 1000 "SYSTEM_UI"
     EDIT [[log]] "Text" [[SYS:LOG]]
     EDIT [[log]] "TextHAlign" -1
     EDIT [[log]] "TextVAlign" -1
