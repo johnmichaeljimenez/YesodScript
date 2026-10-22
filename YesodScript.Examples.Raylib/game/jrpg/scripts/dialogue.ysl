@@ -1,0 +1,25 @@
+@_INIT
+    DEFVAR TXT_DIALOGUE_CHAR 0 int
+    DEFVAR TXT_DIALOGUE_MSG 0 int
+
+    RENDER 4 300 TXT_DIALOGUE_CHAR 9999 "DIALOGUE"
+    EDIT [[TXT_DIALOGUE_CHAR]] "Text" "Character Name Here"
+    EDIT [[TXT_DIALOGUE_CHAR]] "TextHAlign" -1
+    EDIT [[TXT_DIALOGUE_CHAR]] "TextVAlign" -1
+    EDIT [[TXT_DIALOGUE_CHAR]] "FontSize" 12
+
+    RENDER 10 314 TXT_DIALOGUE_MSG 9999 "DIALOGUE"
+    EDIT [[TXT_DIALOGUE_MSG]] "Text" "Message Here"
+    EDIT [[TXT_DIALOGUE_MSG]] "TextHAlign" -1
+    EDIT [[TXT_DIALOGUE_MSG]] "TextVAlign" -1
+    
+    SHOW false "DIALOGUE*"
+
+@TALK <char> <msg>
+    EDIT [[TXT_DIALOGUE_CHAR]] "Text" <char>
+    EDIT [[TXT_DIALOGUE_MSG]] "Text" <msg>
+
+    SHOW true "DIALOGUE*"
+    $WAITPRESS "Space"
+    SHOW false "DIALOGUE*"
+    BREAK
