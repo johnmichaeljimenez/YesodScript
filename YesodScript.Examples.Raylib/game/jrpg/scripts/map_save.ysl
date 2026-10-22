@@ -5,17 +5,16 @@
     LISTCLEAR MAP_SAVE_VALUE
     BREAK
 
+# Persist tile state by object id (works across maps).
+# Prefer $MAP_SET_TILE_STATE when you also want live apply on the current map.
 @MAP_SAVE_STATE <id> <state>
     JUMPEQ <id> 0 MAP_SAVE_STATE_END
 
-    DEFVAR _key * string
     DEFVAR _idx -1 int
-    SETVAR _key "[[MAP_NAME]]:<id>"
-
-    LISTFIND MAP_SAVE_ID [[_key]] _idx
+    LISTFIND MAP_SAVE_ID <id> _idx
     JUMPGE _idx 0 MAP_SAVE_STATE_UPDATE
 
-    LISTADD MAP_SAVE_ID [[_key]]
+    LISTADD MAP_SAVE_ID <id>
     LISTADD MAP_SAVE_VALUE <state>
     BREAK
 
@@ -30,7 +29,6 @@
     DEFVAR _i 0 int
     DEFVAR _n 0 int
     DEFVAR _tid 0 string
-    DEFVAR _key * string
     DEFVAR _idx -1 int
     DEFVAR _state 0 int
     DEFVAR _rid 0 int
@@ -43,8 +41,7 @@
         LISTGET TILE_IDS [[_i]] _tid
         JUMPEQ _tid 0 MAP_APPLY_NEXT
 
-        SETVAR _key "[[MAP_NAME]]:[[_tid]]"
-        LISTFIND MAP_SAVE_ID [[_key]] _idx
+        LISTFIND MAP_SAVE_ID [[_tid]] _idx
         JUMPLT _idx 0 MAP_APPLY_NEXT
 
         LISTGET MAP_SAVE_VALUE [[_idx]] _state
@@ -52,7 +49,7 @@
 
         LISTSET TILE_STATES [[_i]] [[_state]]
 
-        # Invisible: drop render if present (opened gates, etc.)
+        # Invisible: drop render if present (opened gates, picked items, etc.)
         JUMPNEQ _state 2 MAP_APPLY_NEXT
 
         LISTGET TILE_RENDER [[_i]] _rid

@@ -36,20 +36,8 @@
     BREAK
 
 @MAP_DISABLE_TILE <tile>
-    # set Invisible (2): hidden + non-interactable + walkthrough
-    LISTSET TILE_STATES <tile> 2
-
-    DEFVAR _rid 0 int
-    LISTGET TILE_RENDER <tile> _rid
-    JUMPLE _rid 0 MAP_DISABLE_SAVE
-
-    REMOVERENDER [[_rid]]
-    LISTSET TILE_RENDER <tile> 0
-
-    >MAP_DISABLE_SAVE
-        DEFVAR _sid 0 string
-        LISTGET TILE_IDS <tile> _sid
-        $MAP_SAVE_STATE [[_sid]] 2
-
-    >MAP_DISABLE_DONE
-        BREAK
+    # set Invisible (2) by current-map tile index (save + live apply)
+    DEFVAR _sid 0 string
+    LISTGET TILE_IDS <tile> _sid
+    $MAP_SET_TILE_STATE [[_sid]] 2
+    BREAK

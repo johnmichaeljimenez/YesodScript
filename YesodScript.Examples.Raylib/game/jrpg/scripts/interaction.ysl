@@ -21,6 +21,7 @@
     JUMPNEQ _state 0 END
 
     JUMPEQ _type 6 I_TRIGGER
+    JUMPEQ _type 4 I_ITEM
     JUMPEQ _type 3 I_NPC
     JUMPEQ _type 2 I_MISC
     JUMPEQ _type 5 I_SWITCH
@@ -84,7 +85,9 @@
                 BREAK
 
     >I_ITEM
-        #add item here
+        # one-shot pickup: hide + persist by object id (survives map reloads)
+        $MAP_SET_TILE_STATE [[_id]] 2
+
         CALL "EV_ITEM [[MAP_NAME]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
         BREAK
 
@@ -110,30 +113,17 @@
             BREAK
 
     >I_SWITCH
-        #one-shot
-        LISTSET TILE_STATES <id> 1
-        $MAP_SAVE_STATE [[_id]] 1
+        # one-shot switch: stay visible/blocking, but no longer interactable
+        $MAP_SET_TILE_STATE [[_id]] 1
 
         JUMPEQ _target 0 I_SWITCH_GENERIC
 
-        DEFVAR _i 0 int
-        DEFVAR _n 0 int
-        DEFVAR _cur 0 string
-        LISTCOUNT TILE_IDS _n
+        # target id is global — works on this map now, and on other maps via save restore
+        # (level_6 switch -> test gate e94b4120, and vice versa)
+        $MAP_SET_TILE_STATE [[_target]] 2
 
-        >I_SWITCH_LOOP
-            JUMPGE _i [[_n]] I_SWITCH_DONE
-            LISTGET TILE_IDS [[_i]] _cur
-            JUMPNEQ _cur [[_target]] I_SWITCH_NEXT
-            $MAP_DISABLE_TILE [[_i]] true
-
-            >I_SWITCH_NEXT
-                ADD _i 1
-                JUMP I_SWITCH_LOOP
-
-        >I_SWITCH_DONE
-            CALL "EV_SWITCH [[MAP_NAME]] [[_target]]" I_SWITCH_GENERIC
-            BREAK
+        CALL "EV_SWITCH [[MAP_NAME]] [[_target]]" I_SWITCH_GENERIC
+        BREAK
 
         >I_SWITCH_GENERIC
             CALL "EV_SWITCH_GENERIC"
