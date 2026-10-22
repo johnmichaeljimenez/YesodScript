@@ -20,14 +20,19 @@ so they stay unique across the whole project (no level-name prefix).
 
 Field mapping:
   switch/gate/item/npc/savepoint:
-    v1 = Value1, v2 = Value2, t = Target iid, state = Disabled
+    v1 = Value1, v2 = Value2, t = Target iid, state = State (ActiveType)
   trigger:
     v1 = Trigger_Key
     v2 = Parameter
         OR, when Trigger_Key is "exit", the destination level identifier
         (lowercased) resolved from Target.levelIid
     t = Target iid
-    state = Disabled
+    state = State (ActiveType)
+
+Tile states (LDtk ActiveType -> int):
+  0 Active            visible + interactable
+  1 Non_Interactable  visible, no interaction
+  2 Invisible         hidden, no interaction
 
 Empty / missing string fields become 0 (same default as MAP_FILL).
 sprite and entitysprite are always * for now.
@@ -52,13 +57,24 @@ INTERACT_TYPE_TO_TILE = {
     "Savepoint": 7,
 }
 
+# LDtk ActiveType enum -> TILE_STATES int
+STATE_ACTIVE = 0
+STATE_NON_INTERACTABLE = 1
+STATE_INVISIBLE = 2
+
+STATE_TO_INT = {
+    "Active": STATE_ACTIVE,
+    "Non_Interactable": STATE_NON_INTERACTABLE,
+    "Invisible": STATE_INVISIBLE,
+}
+
 DEFAULT_TILE = {
     "id": "0",
     "type": 0,
     "v1": "0",
     "v2": "0",
     "t": "0",
-    "state": "false",
+    "state": STATE_ACTIVE,
     "sprite": "*",
     "entitysprite": "*",
 }
@@ -139,6 +155,36 @@ def target_level_name(
     return str(level["identifier"]).lower()
 
 
+def resolve_state(fields: dict[str, Any]) -> int:
+    """
+    Map LDtk State (ActiveType) to TILE_STATES int.
+    Falls back to legacy bool Disabled if State is absent.
+    """
+    raw = fields.get("State")
+    if raw is None:
+        # legacy bool field from older LDtk defs
+        return STATE_INVISIBLE if bool(fields.get("Disabled", False)) else STATE_ACTIVE
+
+    if isinstance(raw, str):
+        mapped = STATE_TO_INT.get(raw)
+        if mapped is not None:
+            return mapped
+        print(f"  warning: unknown ActiveType '{raw}', using Active(0)")
+        return STATE_ACTIVE
+
+    if isinstance(raw, bool):
+        return STATE_INVISIBLE if raw else STATE_ACTIVE
+
+    if isinstance(raw, int):
+        if raw in (STATE_ACTIVE, STATE_NON_INTERACTABLE, STATE_INVISIBLE):
+            return raw
+        print(f"  warning: out-of-range State int {raw}, using Active(0)")
+        return STATE_ACTIVE
+
+    print(f"  warning: unexpected State value {raw!r}, using Active(0)")
+    return STATE_ACTIVE
+
+
 def make_tile(
     *,
     entity_iid: str,
@@ -146,7 +192,7 @@ def make_tile(
     v1: Any = "0",
     v2: Any = "0",
     t: Any = "0",
-    disabled: Any = False,
+    state: int = STATE_ACTIVE,
 ) -> dict[str, str | int]:
     return {
         "id": short_iid(entity_iid),
@@ -154,7 +200,7 @@ def make_tile(
         "v1": "0" if v1 in (None, "") else str(v1).strip(),
         "v2": "0" if v2 in (None, "") else str(v2).strip(),
         "t": "0" if t in (None, "") else str(t).strip(),
-        "state": "true" if disabled else "false",
+        "state": int(state),
         "sprite": "*",
         "entitysprite": "*",
     }
@@ -171,7 +217,7 @@ def tile_from_entity(
     etype = entity["__identifier"]
     fields = field_map(entity)
     iid = entity["iid"]
-    disabled = bool(fields.get("Disabled", False))
+    state = resolve_state(fields)
 
     if etype == "PlayerStart":
         return None
@@ -192,7 +238,7 @@ def tile_from_entity(
             v1=trigger_key,
             v2=v2,
             t=target_iid(fields),
-            disabled=disabled,
+            state=state,
         )
 
     if etype == "Interactable":
@@ -203,14 +249,14 @@ def tile_from_entity(
             tile_type = 2
 
         # switch / gate / gold / npc / savepoint all share this shape:
-        # id type | v1=Value1 | v2=Value2 | t=target iid | Disabled
+        # id type | v1=Value1 | v2=Value2 | t=target iid | State
         return make_tile(
             entity_iid=iid,
             tile_type=tile_type,
             v1=fields.get("Value1"),
             v2=fields.get("Value2"),
             t=target_iid(fields),
-            disabled=disabled,
+            state=state,
         )
 
     print(f"  warning: skipping unsupported entity '{etype}' ({short_iid(iid)})")

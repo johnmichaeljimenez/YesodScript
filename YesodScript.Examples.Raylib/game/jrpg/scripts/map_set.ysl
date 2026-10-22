@@ -22,6 +22,8 @@
 
     JUMPEQ <type> 0 END
     JUMPEQ <type> 6 END
+    #2 Invisible = no render
+    JUMPEQ <state> 2 END
 
     DEFVAR _rid 0 int
     RENDER [[_x]] [[_y]] _rid -100 "overworld_map_tile"
@@ -34,7 +36,8 @@
     BREAK
 
 @MAP_DISABLE_TILE <tile>
-    LISTSET TILE_STATES <tile> true
+    # set Invisible (2): hidden + non-interactable + walkthrough
+    LISTSET TILE_STATES <tile> 2
 
     DEFVAR _rid 0 int
     LISTGET TILE_RENDER <tile> _rid

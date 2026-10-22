@@ -5,7 +5,7 @@
     DEFVAR _v1 0 string
     DEFVAR _v2 0 string
     DEFVAR _target 0 string
-    DEFVAR _state false bool
+    DEFVAR _state 0 int
     DEFVAR _index -1 int
 
     LISTGET TILE_IDS <id> _id
@@ -17,8 +17,8 @@
 
     # PRINT "INTERACT: <id> -> [[_type]] id=[[_id]] t=[[_target]]"
 
-    # already disabled tiles should never reach here (MAP_STEP filters them)
-    JUMPEQ _state true END
+    # only Active (0) is interactable (MAP_STEP should already filter this)
+    JUMPNEQ _state 0 END
 
     JUMPEQ _type 6 I_TRIGGER
     JUMPEQ _type 3 I_NPC
@@ -111,7 +111,7 @@
 
     >I_SWITCH
         #one-shot
-        $MAP_DISABLE_TILE <id>
+        LISTSET TILE_STATES <id> 1
 
         JUMPEQ _target 0 I_SWITCH_GENERIC
 

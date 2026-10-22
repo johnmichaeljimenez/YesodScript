@@ -34,8 +34,8 @@
     DEFLIST TILE_VALUES2 string
     #optional target id
     DEFLIST TILE_TARGETS string
-    #tile state (true = disabled, no interaction happens)
-    DEFLIST TILE_STATES bool
+    #tile state (ActiveType): 0 Active, 1 Non_Interactable, 2 Invisible
+    DEFLIST TILE_STATES int
     #tile sprite id (floor tile)
     DEFLIST TILE_SPRITES string
     #tile sprite id (entity tile - if any)
@@ -108,20 +108,28 @@
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] "MAP_TEMP_CURRENT"
 
     DEFVAR _tile 0 int
-    DEFVAR _disabled false bool
+    DEFVAR _state 0 int
     LISTGET TILE_TYPES [[MAP_TEMP_CURRENT]] _tile
-    LISTGET TILE_STATES [[MAP_TEMP_CURRENT]] _disabled
-    JUMPEQ _disabled true INTERACT_END
+    LISTGET TILE_STATES [[MAP_TEMP_CURRENT]] _state
+
+    # 2 Invisible = hidden + no collision/interaction (opened gates, etc.)
+    JUMPEQ _state 2 INTERACT_END
+
     JUMPEQ _tile 0 INTERACT_END
     JUMPEQ _tile 4 INTERACT_END
     JUMPEQ _tile 6 INTERACT_TRIGGER
     SETVAR <blocked> true
     JUMPEQ _tile 1 INTERACT_END
-    
+
+    # 1 Non_Interactable = still blocks, but no interaction
+    JUMPEQ _state 1 INTERACT_END
+
     $INTERACT [[MAP_TEMP_CURRENT]]
     BREAK
 
     >INTERACT_TRIGGER
+        # only Active triggers fire
+        JUMPNEQ _state 0 INTERACT_END
         SETVAR <trigger> [[MAP_TEMP_CURRENT]]
         JUMP INTERACT_END
 
