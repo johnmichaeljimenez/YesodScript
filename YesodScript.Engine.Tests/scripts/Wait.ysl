@@ -1,0 +1,3 @@
+@_INIT
+WAIT 0.25
+PRINT "DONE"

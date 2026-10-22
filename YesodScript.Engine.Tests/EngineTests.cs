@@ -189,6 +189,48 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_Wait()
+    {
+        AssertWaitDuration("Wait.ysl");
+    }
+
+    [Fact]
+    public void Test_Wait_UnderSyncCall()
+    {
+        AssertWaitDuration("WaitNested.ysl", "WaitNestedChild.ysl");
+    }
+
+    private static void AssertWaitDuration(float waitSeconds = 0.25f, float toleranceSeconds = 0.05f, params string[] scriptFiles)
+    {
+        var vm = new VirtualMachine();
+        foreach (var scriptFile in scriptFiles)
+            vm.CompileFile($"scripts/{scriptFile}");
+
+        var output = "";
+        vm.OnOutput += str => output += $"{str}\n";
+        vm.Initialize();
+
+        const float fixedDt = 1f / 60f;
+        var ticks = 0;
+        var elapsed = 0f;
+
+        while (vm.IsRunning)
+        {
+            vm.Tick(fixedDt);
+            elapsed += fixedDt;
+            ticks++;
+            if (ticks > 10_000)
+                throw new InvalidOperationException("Wait test ran too long.");
+        }
+
+        output.Trim().Should().Be("DONE");
+        elapsed.Should().BeApproximately(waitSeconds, toleranceSeconds);
+    }
+
+    private static void AssertWaitDuration(params string[] scriptFiles)
+        => AssertWaitDuration(0.25f, 0.05f, scriptFiles);
+
+    [Fact]
     public void Test_Clone()
     {
         var vm = Utils.Test(out var output, "CloneTest.ysl", "CloneMe.ysl");

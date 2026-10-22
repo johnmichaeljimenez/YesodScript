@@ -196,6 +196,18 @@ public class VirtualMachine : IDisposable
 			runningCommands.Add(instruction);
 	}
 
+	public void DetachFromScheduler(IEnumerable<Instruction> instructions)
+	{
+		if (instructions == null)
+			return;
+
+		foreach (var instruction in instructions)
+		{
+			if (instruction != null)
+				runningCommands.Remove(instruction);
+		}
+	}
+
 	public void Stop(string id)
 	{
 		Stop(allCommands.FirstOrDefault(i => string.Equals(i.ID, id, StringComparison.OrdinalIgnoreCase)));

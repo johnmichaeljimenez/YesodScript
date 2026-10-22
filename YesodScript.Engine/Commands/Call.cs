@@ -19,7 +19,13 @@ namespace YesodScript.Engine.Commands
 		{
 			_fired = VM.FireTrigger(id);
 			if (_fired.Count == 0 && !string.IsNullOrEmpty(labelWhenEmpty))
+			{
 				Instruction.Jump(labelWhenEmpty);
+				return;
+			}
+
+			if (!fireAndForget)
+				VM.DetachFromScheduler(_fired);
 		}
 
 		public override bool OnTick(float deltaTime)
