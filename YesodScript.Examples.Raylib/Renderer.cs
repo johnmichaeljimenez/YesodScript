@@ -378,7 +378,7 @@ public class Renderer : IDisposable
 			var destW = size.X * MathF.Abs(scaleX);
 			var destH = size.Y * MathF.Abs(scaleY);
 			var dest = new Rectangle(drawX, drawY, destW, destH);
-			var origin = new Vector2(destW * 0.5f, destH * 0.5f);
+			var origin = new Vector2(destW * i.OriginX, destH * i.OriginY);
 
 			var c1 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
 			Raylib.DrawTexturePro(i.Sprite, source, dest, origin, 0f, c1);
@@ -431,6 +431,9 @@ public class RenderData : IDisposable
 	public Texture2D Sprite { get; private set; }
 	public int FontSize = 14;
 	public string FontName = "";
+
+	public float OriginX = 0.5f;
+	public float OriginY = 0.5f;
 
 	private int _depth;
 	public int Depth
