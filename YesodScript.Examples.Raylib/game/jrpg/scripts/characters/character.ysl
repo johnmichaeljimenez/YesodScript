@@ -1,0 +1,87 @@
+@_INIT
+    #infos (base templates)
+    DEFLIST CHI_IDS string
+    DEFLIST CHI_NAMES string
+    DEFLIST CHI_MAX_HP int
+    DEFLIST CHI_MAX_MP int
+    DEFLIST CHI_ATK int
+    DEFLIST CHI_SPD int
+    DEFLIST CHI_DEF int
+
+    #instances
+    #reference from character info above (character uses base data from character info)
+    DEFLIST CH_REFS string
+    #unique autogen id
+    DEFLIST CH_IDS int
+    DEFLIST CH_HP int
+    DEFLIST CH_MP int
+
+    DEFVAR CH_TEMP_ID 0 int
+    DEFVAR CH_NEXT_ID 1 int
+    BREAK
+
+@CHARACTERINFO_CREATE <id> <name> <hp> <mp> <atk> <spd> <def>
+    DEFVAR _idx -1 int
+    LISTFIND CHI_IDS <id> _idx
+    JUMPGE _idx 0 CHARACTERINFO_CREATE_END
+
+    LISTADD CHI_IDS <id>
+    LISTADD CHI_NAMES <name>
+    LISTADD CHI_MAX_HP <hp>
+    LISTADD CHI_MAX_MP <mp>
+    LISTADD CHI_ATK <atk>
+    LISTADD CHI_SPD <spd>
+    LISTADD CHI_DEF <def>
+
+    PRINT "CREATED CHARACTER INFO [<id>] <name> HP=<hp> MP=<mp> ATK=<atk> SPD=<spd> DEF=<def>"
+
+    >CHARACTERINFO_CREATE_END
+        BREAK
+
+@CHARACTER_CREATE <infoname> <outvar>
+    DEFVAR _infoIdx -1 int
+    DEFVAR _id 0 int
+    DEFVAR _hp 0 int
+    DEFVAR _mp 0 int
+
+    LISTFIND CHI_IDS <infoname> _infoIdx
+    JUMPLT _infoIdx 0 CHARACTER_CREATE_END
+
+    LISTGET CHI_MAX_HP [[_infoIdx]] _hp
+    LISTGET CHI_MAX_MP [[_infoIdx]] _mp
+
+    SETVAR _id [[CH_NEXT_ID]]
+    ADD CH_NEXT_ID 1
+
+    LISTADD CH_REFS <infoname>
+    LISTADD CH_IDS [[_id]]
+    LISTADD CH_HP [[_hp]]
+    LISTADD CH_MP [[_mp]]
+
+    SETVAR <outvar> [[_id]]
+
+    >CHARACTER_CREATE_END
+        BREAK
+
+@CHARACTER_STATS <id> <stat> <amt>
+    DEFVAR _index -1 int
+    LISTFIND CH_IDS <id> _index
+    JUMPLT _index 0 CHARACTER_STATS_END
+
+    LISTSET "CH_[[stat]]" [[_index]] <amt>
+
+    >CHARACTER_STATS_END
+        BREAK
+
+@CHARACTER_REMOVE <id>
+    DEFVAR _index -1 int
+    LISTFIND CH_IDS <id> _index
+    JUMPLT _index 0 CHARACTER_REMOVE_END
+
+    LISTREMOVE CH_REFS [[_index]]
+    LISTREMOVE CH_IDS [[_index]]
+    LISTREMOVE CH_HP [[_index]]
+    LISTREMOVE CH_MP [[_index]]
+
+    >CHARACTER_REMOVE_END
+        BREAK

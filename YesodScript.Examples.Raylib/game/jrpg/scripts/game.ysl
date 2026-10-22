@@ -2,6 +2,11 @@
     
 
 @GAME_INIT
+    $PARTY_CLEAR "PLAYER"
+    $PARTY_CLEAR "ENEMY"
+
+    $PARTY_ADD "PLAYER" "david"
+
     $OVERWORLD_INIT
 	$FADE_OUT
 
