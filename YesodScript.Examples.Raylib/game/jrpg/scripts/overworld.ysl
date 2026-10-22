@@ -16,6 +16,7 @@
     SETVAR "PLAYER_POS_X" 0
     SETVAR "PLAYER_POS_Y" 0
 
+    $MAP_CLEAR_SAVED_STATES
     $MAP_INIT "test"
 
     RENDER [[PLAYER_POS_X]] [[PLAYER_POS_Y]] SPR_PLAYER "-[[PLAYER_POS_Y]]" "overworld_character"

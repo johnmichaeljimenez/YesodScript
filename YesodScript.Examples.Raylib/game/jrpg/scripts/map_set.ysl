@@ -41,10 +41,15 @@
 
     DEFVAR _rid 0 int
     LISTGET TILE_RENDER <tile> _rid
-    JUMPLE _rid 0 MAP_DISABLE_DONE
+    JUMPLE _rid 0 MAP_DISABLE_SAVE
 
     REMOVERENDER [[_rid]]
     LISTSET TILE_RENDER <tile> 0
+
+    >MAP_DISABLE_SAVE
+        DEFVAR _sid 0 string
+        LISTGET TILE_IDS <tile> _sid
+        $MAP_SAVE_STATE [[_sid]] 2
 
     >MAP_DISABLE_DONE
         BREAK

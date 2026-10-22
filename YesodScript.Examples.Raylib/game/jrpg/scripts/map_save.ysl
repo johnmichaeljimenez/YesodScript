@@ -1,0 +1,68 @@
+# clear runtime progress (new game from main menu)
+# real disk save/load can replace this later
+@MAP_CLEAR_SAVED_STATES
+    LISTCLEAR MAP_SAVE_ID
+    LISTCLEAR MAP_SAVE_VALUE
+    BREAK
+
+@MAP_SAVE_STATE <id> <state>
+    JUMPEQ <id> 0 MAP_SAVE_STATE_END
+
+    DEFVAR _key * string
+    DEFVAR _idx -1 int
+    SETVAR _key "[[MAP_NAME]]:<id>"
+
+    LISTFIND MAP_SAVE_ID [[_key]] _idx
+    JUMPGE _idx 0 MAP_SAVE_STATE_UPDATE
+
+    LISTADD MAP_SAVE_ID [[_key]]
+    LISTADD MAP_SAVE_VALUE <state>
+    BREAK
+
+    >MAP_SAVE_STATE_UPDATE
+        LISTSET MAP_SAVE_VALUE [[_idx]] <state>
+        BREAK
+
+    >MAP_SAVE_STATE_END
+        BREAK
+
+@MAP_APPLY_SAVED_STATES
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _tid 0 string
+    DEFVAR _key * string
+    DEFVAR _idx -1 int
+    DEFVAR _state 0 int
+    DEFVAR _rid 0 int
+
+    LISTCOUNT TILE_IDS _n
+
+    >MAP_APPLY_LOOP
+        JUMPGE _i [[_n]] MAP_APPLY_DONE
+
+        LISTGET TILE_IDS [[_i]] _tid
+        JUMPEQ _tid 0 MAP_APPLY_NEXT
+
+        SETVAR _key "[[MAP_NAME]]:[[_tid]]"
+        LISTFIND MAP_SAVE_ID [[_key]] _idx
+        JUMPLT _idx 0 MAP_APPLY_NEXT
+
+        LISTGET MAP_SAVE_VALUE [[_idx]] _state
+        JUMPEQ _state 0 MAP_APPLY_NEXT
+
+        LISTSET TILE_STATES [[_i]] [[_state]]
+
+        # Invisible: drop render if present (opened gates, etc.)
+        JUMPNEQ _state 2 MAP_APPLY_NEXT
+
+        LISTGET TILE_RENDER [[_i]] _rid
+        JUMPLE _rid 0 MAP_APPLY_NEXT
+        REMOVERENDER [[_rid]]
+        LISTSET TILE_RENDER [[_i]] 0
+
+        >MAP_APPLY_NEXT
+            ADD _i 1
+            JUMP MAP_APPLY_LOOP
+
+    >MAP_APPLY_DONE
+        BREAK

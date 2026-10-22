@@ -13,6 +13,12 @@
     DEFVAR MAP_WARP_X 0 int
     DEFVAR MAP_WARP_Y 0 int
 
+    # key-value pair for tracking object states across map loads
+    # key format: "<mapname>:<tileId>"  value: TILE_STATES (0 Active, 1 Non_Interactable, 2 Invisible)
+    DEFLIST MAP_SAVE_ID string
+    DEFLIST MAP_SAVE_VALUE int
+
+
     #lists are 1d here, but I have function that returns x,y parameter into int 1d index
 
     #resized depending on map
@@ -76,6 +82,9 @@
     PRINT "LOADING MAP"
     CLEAR "overworld_map*"
     CALL "MAPDATA:<mapname>" INIT_MAP_MISSING
+
+    # restore switch/gate/etc. progress for this map
+    $MAP_APPLY_SAVED_STATES
 
     JUMPEQ MAP_HAS_SPAWN false INIT_END
     SETVAR PLAYER_POS_X [[MAP_SPAWN_X]]

@@ -112,6 +112,7 @@
     >I_SWITCH
         #one-shot
         LISTSET TILE_STATES <id> 1
+        $MAP_SAVE_STATE [[_id]] 1
 
         JUMPEQ _target 0 I_SWITCH_GENERIC
 
@@ -124,7 +125,7 @@
             JUMPGE _i [[_n]] I_SWITCH_DONE
             LISTGET TILE_IDS [[_i]] _cur
             JUMPNEQ _cur [[_target]] I_SWITCH_NEXT
-            $MAP_DISABLE_TILE [[_i]]
+            $MAP_DISABLE_TILE [[_i]] true
 
             >I_SWITCH_NEXT
                 ADD _i 1
