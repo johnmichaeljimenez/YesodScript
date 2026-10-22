@@ -811,7 +811,7 @@
 	$MAP_SET 4 5 0 1 0 0 0 0 * * *
 	$MAP_SET 4 9 0 1 0 0 0 0 * * *
 	$MAP_SET 5 0 0 1 0 0 0 0 * * *
-	$MAP_SET 5 4 "4a8a4620" 6 "test_room_trigger" "dialogue_gold" 0 0 * * *
+	$MAP_SET 5 4 "4a8a4620" 6 "test_room_trigger" "dialogue_gold" 0 0 * * "test_room_trigger"
 	$MAP_SET 5 5 "e94b4120" 2 0 0 0 0 * * "gate"
 	$MAP_SET 5 9 0 1 0 0 0 0 * * *
 	$MAP_SET 6 0 0 1 0 0 0 0 * * *

@@ -18,6 +18,11 @@
     $TALK "David" "The gate is locked!"
     BREAK
 
+@EV_TRIGGER:TEST:test_room_trigger <id>
+    $MAP_SET_TILE_STATE <id> 2
+    $TALK "Prisoner" "Hey!"
+    BREAK
+
 @EV_NPC:TEST:PRISONER
     $TALK "Prisoner" "Thank you for unlocking my cell!"
     BREAK

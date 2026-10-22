@@ -31,7 +31,7 @@
 
     >I_TRIGGER
         JUMPNEQ _target 0 I_TRIGGER_EXIT
-        CALL "EV_TRIGGER:[[MAP_NAME]]:[[_alias]]" I_TRIGGER_GENERIC
+        CALL "EV_TRIGGER:[[MAP_NAME]]:[[_alias]] [[_id]]" I_TRIGGER_GENERIC
         BREAK
 
         >I_TRIGGER_GENERIC

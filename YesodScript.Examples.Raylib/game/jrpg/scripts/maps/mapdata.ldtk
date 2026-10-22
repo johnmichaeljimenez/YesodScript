@@ -1637,7 +1637,10 @@
 									"params": ["dialogue_gold"]
 								}] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "test_room_trigger", "__tile": null, "defUid": 33, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["test_room_trigger"]
+								}] }
 							],
 							"__worldX": 80,
 							"__worldY": -192
