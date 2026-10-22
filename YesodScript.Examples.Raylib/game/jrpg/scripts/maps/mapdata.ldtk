@@ -11,7 +11,7 @@
 	"iid": "90256290-bde0-11f1-81f7-6fb9e3ed245b",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 32,
+	"nextUid": 34,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -331,6 +331,43 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "Alias",
+					"doc": null,
+					"__type": "String",
+					"uid": 33,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -558,6 +595,43 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "Alias",
+					"doc": null,
+					"__type": "String",
+					"uid": 32,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		}
@@ -684,7 +758,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 32,
 							"__worldY": 240
@@ -706,7 +781,8 @@
 								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 192,
 							"__worldY": 208
@@ -728,7 +804,8 @@
 								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 192,
 							"__worldY": 208
@@ -753,7 +830,8 @@
 								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 208,
 							"__worldY": 144
@@ -786,7 +864,8 @@
 									"id": "V_String",
 									"params": ["89df7080-bde0-11f1-bb9b-673228911d17"]
 								}] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 224,
 							"__worldY": 160
@@ -815,7 +894,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 208,
 							"__worldY": 240
@@ -928,7 +1008,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 32,
 							"__worldY": 256
@@ -957,7 +1038,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 240,
 							"__worldY": 320
@@ -986,7 +1068,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 208,
 							"__worldY": 256
@@ -1096,7 +1179,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 256,
 							"__worldY": 320
@@ -1125,7 +1209,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 688,
 							"__worldY": 352
@@ -1154,7 +1239,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 544,
 							"__worldY": 496
@@ -1274,7 +1360,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 688,
 							"__worldY": 240
@@ -1299,7 +1386,8 @@
 								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 752,
 							"__worldY": 144
@@ -1412,7 +1500,8 @@
 								}] },
 								{ "__identifier": "Trigger_Key", "__type": "String", "__value": "", "__tile": null, "defUid": 25, "realEditorValues": [] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 544,
 							"__worldY": 512
@@ -1536,7 +1625,8 @@
 									"params": ["5"]
 								}] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
 							"__worldX": 112,
 							"__worldY": -224
@@ -1561,43 +1651,14 @@
 								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "gate", "__tile": null, "defUid": 32, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["gate"]
+								}] }
 							],
 							"__worldX": 80,
 							"__worldY": -176
-						},
-						{
-							"__identifier": "Interactable",
-							"__grid": [3,6],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 },
-							"__smartColor": "#D77643",
-							"iid": "efe24420-bde0-11f1-ada7-112fd28c41ab",
-							"width": 16,
-							"height": 16,
-							"defUid": 12,
-							"px": [48,96],
-							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Switch", "__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Switch"]
-								}] },
-								{ "__identifier": "Value1", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] },
-								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
-								{ "__identifier": "Target", "__type": "EntityRef", "__value": {
-									"entityIid": "e94b4120-bde0-11f1-ada7-f7bf4b71b387",
-									"layerIid": "83ca7491-bde0-11f1-b5dc-f14bdff2eafc",
-									"levelIid": "83ca7490-bde0-11f1-b5dc-1741e0f1a6a7",
-									"worldIid": "90256291-bde0-11f1-81f7-81ece5d0b9e4"
-								}, "__tile": null, "defUid": 22, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["e94b4120-bde0-11f1-ada7-f7bf4b71b387"]
-								}] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
-							],
-							"__worldX": 48,
-							"__worldY": -160
 						},
 						{
 							"__identifier": "Trigger",
@@ -1621,14 +1682,15 @@
 									"id": "V_String",
 									"params": ["dialogue_gold"]
 								}] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 80,
 							"__worldY": -192
 						},
 						{
 							"__identifier": "Interactable",
-							"__grid": [7,7],
+							"__grid": [2,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 4, "x": 160, "y": 16, "w": 16, "h": 16 },
@@ -1637,7 +1699,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 12,
-							"px": [112,112],
+							"px": [32,32],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "NPC", "__tile": { "tilesetUid": 4, "x": 160, "y": 16, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
@@ -1649,10 +1711,11 @@
 								}] },
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
 							],
-							"__worldX": 112,
-							"__worldY": -144
+							"__worldX": 32,
+							"__worldY": -224
 						},
 						{
 							"__identifier": "Trigger",
@@ -1681,7 +1744,8 @@
 									"params": ["exit"]
 								}] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": 0,
 							"__worldY": -144
@@ -1792,7 +1856,8 @@
 									"params": ["exit"]
 								}] },
 								{ "__identifier": "Parameter", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 31, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 33, "realEditorValues": [] }
 							],
 							"__worldX": -16,
 							"__worldY": -144
@@ -1825,7 +1890,11 @@
 									"id": "V_String",
 									"params": ["e94b4120-bde0-11f1-ada7-f7bf4b71b387"]
 								}] },
-								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] }
+								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
+								{ "__identifier": "Alias", "__type": "String", "__value": "lever", "__tile": null, "defUid": 32, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["lever"]
+								}] }
 							],
 							"__worldX": -64,
 							"__worldY": -160

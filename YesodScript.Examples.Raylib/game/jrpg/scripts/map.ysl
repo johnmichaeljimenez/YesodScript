@@ -50,6 +50,8 @@
     DEFLIST TILE_ENTITYSPRITES string
     #render data id for this tile (0 = none)
     DEFLIST TILE_RENDER int
+    #optional alias for tiles (instead of referencing ids, useful for making custom events)
+    DEFLIST TILE_ALIASES string
 
 @MAP_CLEAR
     LISTCLEAR TILE_IDS
@@ -61,6 +63,7 @@
     LISTCLEAR TILE_SPRITES
     LISTCLEAR TILE_ENTITYSPRITES
     LISTCLEAR TILE_RENDER
+    LISTCLEAR TILE_ALIASES
 
     CLEAR "overworld_map*"
     PRINT "CLEARED MAP"
@@ -80,6 +83,7 @@
     LISTCLEAR TILE_SPRITES
     LISTCLEAR TILE_ENTITYSPRITES
     LISTCLEAR TILE_RENDER
+    LISTCLEAR TILE_ALIASES
 
     PRINT "LOADING MAP"
     CLEAR "overworld_map*"

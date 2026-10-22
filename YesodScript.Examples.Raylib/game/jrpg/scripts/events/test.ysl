@@ -1,0 +1,27 @@
+@EV_ITEM_GENERIC <itemname> <amt>
+    $TALK "David" "I got <amt> <itemname>!"
+    BREAK
+
+@EV_NPC_GENERIC <charactername>
+    $TALK <charactername> "..."
+    BREAK
+
+@EV_SWITCH:level_6:lever
+    $TALK "David" "Gate unlocked!"
+    BREAK
+
+@EV_SWITCH_GENERIC
+    $TALK "David" "Success!"
+    BREAK
+
+@EV_MISC:TEST:Gate
+    $TALK "David" "The gate is locked!"
+    BREAK
+
+@EV_NPC:TEST:PRISONER
+    $TALK "Prisoner" "Thank you for unlocking my cell!"
+    BREAK
+
+@EV_MISC_GENERIC
+    PRINT "..."
+    BREAK

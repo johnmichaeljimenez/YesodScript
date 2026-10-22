@@ -7,6 +7,7 @@
     DEFVAR _target 0 string
     DEFVAR _state 0 int
     DEFVAR _index -1 int
+    DEFVAR _alias * string
 
     LISTGET TILE_IDS <id> _id
     LISTGET TILE_TYPES <id> _type
@@ -14,8 +15,9 @@
     LISTGET TILE_VALUES2 <id> _v2
     LISTGET TILE_TARGETS <id> _target
     LISTGET TILE_STATES <id> _state
+    LISTGET TILE_ALIASES <id> _alias
 
-    # PRINT "INTERACT: <id> -> [[_type]] id=[[_id]] t=[[_target]]"
+    # PRINT "INTERACT: <id> -> [[_type]] id=[[_id]] alias=[[_alias]] t=[[_target]]"
 
     # only Active (0) is interactable (MAP_STEP should already filter this)
     JUMPNEQ _state 0 END
@@ -29,7 +31,7 @@
 
     >I_TRIGGER
         JUMPEQ [[_v1]] "EXIT" I_TRIGGER_EXIT
-        CALL "EV_TRIGGER [[MAP_NAME]] [[_id]]" I_TRIGGER_GENERIC
+        CALL "EV_TRIGGER:[[MAP_NAME]]:[[_alias]]" I_TRIGGER_GENERIC
         BREAK
 
         >I_TRIGGER_GENERIC
@@ -59,13 +61,7 @@
             MUL PLAYER_POS_X [[GRID_SIZE]]
             MUL PLAYER_POS_Y [[GRID_SIZE]]
 
-            DEFVAR _midx [[MAP_W]] int
-            DEFVAR _midy [[MAP_H]] int
-            DIV _midx 2
-            DIV _midy 2
-            MUL _midx [[GRID_SIZE]]
-            MUL _midy [[GRID_SIZE]]
-            CAM [[_midx]] [[_midy]] 1.5
+            CAM [[PLAYER_POS_X]] [[PLAYER_POS_Y]] 2
 
             EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]
             EDIT [[SPR_PLAYER]] "Y" [[PLAYER_POS_Y]]
@@ -88,7 +84,7 @@
         # one-shot pickup: hide + persist by object id (survives map reloads)
         $MAP_SET_TILE_STATE [[_id]] 2
 
-        CALL "EV_ITEM [[MAP_NAME]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
+        CALL "EV_ITEM:[[MAP_NAME]]:[[_alias]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
         BREAK
 
         >I_ITEM_GENERIC
@@ -96,16 +92,15 @@
             BREAK
 
     >I_NPC
-        CALL "EV_NPC [[MAP_NAME]] [[_v1]]" I_NPC_GENERIC
+        CALL "EV_NPC:[[MAP_NAME]]:[[_v1]]" I_NPC_GENERIC
         BREAK
 
         >I_NPC_GENERIC
-            $TALK [[_v1]] "..."
             CALL "EV_NPC_GENERIC [[_v1]]"
             BREAK
 
     >I_MISC
-        CALL "EV_MISC [[MAP_NAME]] [[_id]]" I_MISC_GENERIC
+        CALL "EV_MISC:[[MAP_NAME]]:[[_alias]]" I_MISC_GENERIC
         BREAK
 
         >I_MISC_GENERIC
@@ -116,14 +111,15 @@
         # one-shot switch: stay visible/blocking, but no longer interactable
         $MAP_SET_TILE_STATE [[_id]] 1
 
-        JUMPEQ _target 0 I_SWITCH_GENERIC
+        JUMPEQ _target 0 I_SWITCH_EVENT
 
         # target id is global — works on this map now, and on other maps via save restore
         # (level_6 switch -> test gate e94b4120, and vice versa)
         $MAP_SET_TILE_STATE [[_target]] 2
 
-        CALL "EV_SWITCH [[MAP_NAME]] [[_target]]" I_SWITCH_GENERIC
-        BREAK
+        >I_SWITCH_EVENT
+            CALL "EV_SWITCH:[[MAP_NAME]]:[[_alias]] [[_target]]" I_SWITCH_GENERIC
+            BREAK
 
         >I_SWITCH_GENERIC
             CALL "EV_SWITCH_GENERIC"

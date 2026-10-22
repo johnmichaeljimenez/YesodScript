@@ -3,7 +3,7 @@
 Export LDtk mapdata.ldtk -> mapdata.ysl MAPDATA sections.
 
 MAP_SET layout (see map.ysl / map_set.ysl):
-  $MAP_SET x y id type v1 v2 t state sprite entitysprite
+  $MAP_SET x y id type v1 v2 t state sprite entitysprite alias
 
 Tile types:
   0 blank
@@ -21,6 +21,7 @@ so they stay unique across the whole project (no level-name prefix).
 Field mapping:
   switch/gate/item/npc/savepoint:
     v1 = Value1, v2 = Value2, t = Target iid, state = State (ActiveType)
+    alias = Alias (optional stable name for EV_* handlers)
   trigger:
     v1 = Trigger_Key
     v2 = Parameter
@@ -28,13 +29,21 @@ Field mapping:
         (lowercased) resolved from Target.levelIid
     t = Target iid
     state = State (ActiveType)
+    alias = Alias (optional; used by EV_TRIGGER:<map>:<alias>)
+
+Aliases:
+  - LDtk Alias field on Trigger / Interactable entities
+  - exported as the final MAP_SET arg into TILE_ALIASES
+  - empty / missing Alias becomes * (no custom event)
+  - interaction.ysl dispatches EV_<KIND>:<MAP_NAME>:<alias>
 
 Tile states (LDtk ActiveType -> int):
   0 Active            visible + interactable
   1 Non_Interactable  visible, no interaction
   2 Invisible         hidden, no interaction
 
-Empty / missing string fields become 0 (same default as MAP_FILL).
+Empty / missing string fields become 0 (same default as MAP_FILL),
+except alias which defaults to *.
 sprite and entitysprite are always * for now.
 """
 
@@ -77,6 +86,7 @@ DEFAULT_TILE = {
     "state": STATE_ACTIVE,
     "sprite": "*",
     "entitysprite": "*",
+    "alias": "*",
 }
 
 
@@ -185,6 +195,18 @@ def resolve_state(fields: dict[str, Any]) -> int:
     return STATE_ACTIVE
 
 
+def resolve_alias(fields: dict[str, Any]) -> str:
+    """
+    Optional LDtk Alias string used by EV_* event labels.
+    Empty / missing -> * (no custom handler; interaction falls back to generic).
+    """
+    raw = fields.get("Alias")
+    if raw is None:
+        return "*"
+    text = str(raw).strip()
+    return text if text else "*"
+
+
 def make_tile(
     *,
     entity_iid: str,
@@ -193,7 +215,9 @@ def make_tile(
     v2: Any = "0",
     t: Any = "0",
     state: int = STATE_ACTIVE,
+    alias: Any = "*",
 ) -> dict[str, str | int]:
+    alias_text = "*" if alias in (None, "") else str(alias).strip() or "*"
     return {
         "id": short_iid(entity_iid),
         "type": tile_type,
@@ -203,6 +227,7 @@ def make_tile(
         "state": int(state),
         "sprite": "*",
         "entitysprite": "*",
+        "alias": alias_text,
     }
 
 
@@ -223,7 +248,7 @@ def tile_from_entity(
         return None
 
     if etype == "Trigger":
-        # trigger = type 6 | v1=Trigger_Key | v2=Parameter or exit level | t=target iid
+        # trigger = type 6 | v1=Trigger_Key | v2=Parameter or exit level | t=target iid | alias
         trigger_key = fields.get("Trigger_Key")
         parameter = fields.get("Parameter")
         v2: Any = parameter
@@ -239,6 +264,7 @@ def tile_from_entity(
             v2=v2,
             t=target_iid(fields),
             state=state,
+            alias=resolve_alias(fields),
         )
 
     if etype == "Interactable":
@@ -249,7 +275,7 @@ def tile_from_entity(
             tile_type = 2
 
         # switch / gate / gold / npc / savepoint all share this shape:
-        # id type | v1=Value1 | v2=Value2 | t=target iid | State
+        # id type | v1=Value1 | v2=Value2 | t=target iid | State | alias
         return make_tile(
             entity_iid=iid,
             tile_type=tile_type,
@@ -257,6 +283,7 @@ def tile_from_entity(
             v2=fields.get("Value2"),
             t=target_iid(fields),
             state=state,
+            alias=resolve_alias(fields),
         )
 
     print(f"  warning: skipping unsupported entity '{etype}' ({short_iid(iid)})")
@@ -333,6 +360,14 @@ def apply_entities(
                         tiles[(tx, ty)] = dict(payload)
 
 
+def format_alias_token(alias: Any) -> str:
+    """Alias defaults to bare * (no custom event); named aliases are quoted strings."""
+    text = "*" if alias in (None, "") else str(alias).strip() or "*"
+    if text == "*":
+        return "*"
+    return ysl_token(text)
+
+
 def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
     args = [
         str(x),
@@ -345,6 +380,7 @@ def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
         str(data["state"]),
         str(data["sprite"]),
         str(data["entitysprite"]),
+        format_alias_token(data.get("alias", "*")),
     ]
     return "\t$MAP_SET " + " ".join(args)
 

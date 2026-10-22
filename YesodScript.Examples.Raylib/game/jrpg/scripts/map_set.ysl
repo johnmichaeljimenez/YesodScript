@@ -1,4 +1,4 @@
-@MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite>
+@MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] MAP_TEMP_CURRENT
     DEFVAR _tile [[MAP_TEMP_CURRENT]] int
 
@@ -11,6 +11,7 @@
     LISTSET TILE_SPRITES [[_tile]] <sprite>
     LISTSET TILE_ENTITYSPRITES [[_tile]] <entitysprite>
     LISTSET TILE_RENDER [[_tile]] 0
+    LISTSET TILE_ALIASES [[_tile]] <alias>
 
     # PRINT "SET TILE AT <x> <y> ([[_tile]])"
 
