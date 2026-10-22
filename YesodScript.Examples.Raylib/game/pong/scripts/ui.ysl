@@ -87,7 +87,6 @@
     SHOW false "HELP*"
 
 @MENU_SHOW
-    WAIT 0.5
     SHOW true "POPUP_MENU"
     
     TWEEN [[MENU_TITLE]] "Y" -25 0 true 0.4 "QUAD"
@@ -123,7 +122,6 @@
         JUMP MENU_CLOSE
 
     >MENU_CLOSE
-        WAIT 1
         SHOW false "POPUP_MENU"
         BREAK
 
