@@ -17,13 +17,13 @@
     SETVAR "PLAYER_POS_Y" 0
 
     $MAP_CLEAR_SAVED_STATES
-    $MAP_INIT "test"
+    $MAP_INIT "Intro_Field"
 
     RENDER [[PLAYER_POS_X]] [[PLAYER_POS_Y]] SPR_PLAYER "-[[PLAYER_POS_Y]]" "overworld_character"
     EDIT [[SPR_PLAYER]] "SpriteID" "r0_c3"
     EDIT [[SPR_PLAYER]] "World" true
 
-    CAM [[PLAYER_POS_X]] [[PLAYER_POS_Y]] 2
+    $CAMERA_RESET
 
 @OVERWORLD_END
     $MAP_CLEAR
@@ -66,20 +66,17 @@
     TWEEN [[SPR_PLAYER]] "X" [[_prevX]] [[PLAYER_POS_X]] false [[GRID_SPEED]] "QUAD" "MOVE_X"
     TWEEN [[SPR_PLAYER]] "Y" [[_prevY]] [[PLAYER_POS_Y]] false [[GRID_SPEED]] "QUAD" "MOVE_Y"
 
-    TWEENCAM "X" [[_prevX]] [[PLAYER_POS_X]] false 0.15 "QUAD" "CAM_X"
-    TWEENCAM "Y" [[_prevY]] [[PLAYER_POS_Y]] false 0.15 "QUAD" "CAM_Y"
+    $CAMERA_FOLLOW [[_prevX]] [[_prevY]]
 
-    TWEEN [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
+    >MOVE_FINALIZE
+        TWEEN [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
+        PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
 
-    WAIT 0.15
+        #wait for movement before executing any trigger
+        JUMPEQ "PLAYER_TRIGGER_ID" -1 MOVE_END
 
-    PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
-
-    #wait for movement before executing any trigger
-    JUMPEQ "PLAYER_TRIGGER_ID" -1 MOVE_END
-
-    $INTERACT [[PLAYER_TRIGGER_ID]]
-    SETVAR "PLAYER_TRIGGER_ID" -1
+        $INTERACT [[PLAYER_TRIGGER_ID]]
+        SETVAR "PLAYER_TRIGGER_ID" -1
 
     >MOVE_END
         EDIT [[SPR_PLAYER]] "X" [[PLAYER_POS_X]]

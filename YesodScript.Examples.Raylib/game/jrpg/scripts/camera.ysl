@@ -1,0 +1,107 @@
+@_INIT
+    DEFVAR "CAM_ZOOM" 3 float
+    DEFVAR "CAM_SPEED" 0.12 float
+    DEFVAR "CAM_MARGIN" 4 int
+
+
+@CAMERA_RESET
+    # clamp initial camera into follow bounds
+    DEFVAR _initCamX [[PLAYER_POS_X]] int
+    DEFVAR _initCamY [[PLAYER_POS_Y]] int
+    DEFVAR _initMinX [[CAM_MARGIN]] int
+    DEFVAR _initMinY [[CAM_MARGIN]] int
+    DEFVAR _initMaxX [[MAP_W]] int
+    DEFVAR _initMaxY [[MAP_H]] int
+    SUB _initMaxX 1
+    SUB _initMaxY 1
+    SUB _initMaxX [[CAM_MARGIN]]
+    SUB _initMaxY [[CAM_MARGIN]]
+    MUL _initMinX [[GRID_SIZE]]
+    MUL _initMinY [[GRID_SIZE]]
+    MUL _initMaxX [[GRID_SIZE]]
+    MUL _initMaxY [[GRID_SIZE]]
+
+    JUMPGE _initCamX [[_initMinX]] INIT_CAM_X_MAX
+    SETVAR _initCamX [[_initMinX]]
+    >INIT_CAM_X_MAX
+        JUMPLE _initCamX [[_initMaxX]] INIT_CAM_Y_MIN
+        SETVAR _initCamX [[_initMaxX]]
+    >INIT_CAM_Y_MIN
+        JUMPGE _initCamY [[_initMinY]] INIT_CAM_Y_MAX
+        SETVAR _initCamY [[_initMinY]]
+    >INIT_CAM_Y_MAX
+        JUMPLE _initCamY [[_initMaxY]] INIT_CAM_SET
+        SETVAR _initCamY [[_initMaxY]]
+    >INIT_CAM_SET
+        CAM [[_initCamX]] [[_initCamY]] [[CAM_ZOOM]]
+
+@CAMERA_FOLLOW <prevX> <prevY>
+    # camera follow with map-edge dead zone (CAM_MARGIN tiles)
+    DEFVAR _movecam false bool
+    DEFVAR _cam_minx [[CAM_MARGIN]] int
+    DEFVAR _cam_miny [[CAM_MARGIN]] int
+    DEFVAR _cam_maxx [[MAP_W]] int
+    DEFVAR _cam_maxy [[MAP_H]] int
+
+    SUB _cam_maxx 1
+    SUB _cam_maxy 1
+    SUB _cam_maxx [[CAM_MARGIN]]
+    SUB _cam_maxy [[CAM_MARGIN]]
+    MUL _cam_minx [[GRID_SIZE]]
+    MUL _cam_miny [[GRID_SIZE]]
+    MUL _cam_maxx [[GRID_SIZE]]
+    MUL _cam_maxy [[GRID_SIZE]]
+
+    DEFVAR _camFromX <prevX> int
+    DEFVAR _camFromY <prevY> int
+    DEFVAR _camToX [[PLAYER_POS_X]] int
+    DEFVAR _camToY [[PLAYER_POS_Y]] int
+
+    # clamp previous camera target (X)
+    JUMPGE _camFromX [[_cam_minx]] CAM_FROM_X_MAX
+    SETVAR _camFromX [[_cam_minx]]
+    >CAM_FROM_X_MAX
+        JUMPLE _camFromX [[_cam_maxx]] CAM_FROM_Y_MIN
+        SETVAR _camFromX [[_cam_maxx]]
+
+    # clamp previous camera target (Y)
+    >CAM_FROM_Y_MIN
+        JUMPGE _camFromY [[_cam_miny]] CAM_FROM_Y_MAX
+        SETVAR _camFromY [[_cam_miny]]
+    >CAM_FROM_Y_MAX
+        JUMPLE _camFromY [[_cam_maxy]] CAM_TO_X_MIN
+        SETVAR _camFromY [[_cam_maxy]]
+
+    # clamp new camera target (X)
+    >CAM_TO_X_MIN
+        JUMPGE _camToX [[_cam_minx]] CAM_TO_X_MAX
+        SETVAR _camToX [[_cam_minx]]
+    >CAM_TO_X_MAX
+        JUMPLE _camToX [[_cam_maxx]] CAM_TO_Y_MIN
+        SETVAR _camToX [[_cam_maxx]]
+
+    # clamp new camera target (Y)
+    >CAM_TO_Y_MIN
+        JUMPGE _camToY [[_cam_miny]] CAM_TO_Y_MAX
+        SETVAR _camToY [[_cam_miny]]
+    >CAM_TO_Y_MAX
+        JUMPLE _camToY [[_cam_maxy]] CAM_APPLY_X
+        SETVAR _camToY [[_cam_maxy]]
+
+    >CAM_APPLY_X
+        JUMPEQ _camFromX [[_camToX]] CAM_APPLY_Y
+        SETVAR _movecam true
+        TWEENCAM "X" [[_camFromX]] [[_camToX]] false [[CAM_SPEED]] "QUAD" "CAM_X"
+
+    >CAM_APPLY_Y
+        JUMPEQ _camFromY [[_camToY]] CAM_WAIT_CHECK
+        SETVAR _movecam true
+        TWEENCAM "Y" [[_camFromY]] [[_camToY]] false [[CAM_SPEED]] "QUAD" "CAM_Y"
+
+    >CAM_WAIT_CHECK
+        JUMPEQ _movecam true CAM_DO_WAIT
+        WAIT [[GRID_SPEED]]
+        BREAK
+
+    >CAM_DO_WAIT
+        WAIT [[CAM_SPEED]]
