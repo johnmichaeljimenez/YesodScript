@@ -1,0 +1,4 @@
+@INFO_INIT
+    $ACTIONINFO_CREATE "attack" "Attack" 0
+    $ACTIONINFO_CREATE "defend" "Defend" 1
+    $ACTIONINFO_CREATE "pass" "Pass" 1

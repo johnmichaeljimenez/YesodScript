@@ -1,0 +1,115 @@
+﻿@_INIT
+    DEFLIST ACTIONINFOS_ID string
+    DEFLIST ACTIONINFOS_NAME string
+    #0 = enemy, 1 = self (automatic, no targeting menu)
+    DEFLIST ACTIONINFOS_TARGETTYPE int
+
+    DEFLIST ACTIONS_ID int
+    DEFLIST ACTIONS_INFOID string
+    DEFLIST ACTIONS_NAME string
+    DEFLIST ACTIONS_SOURCE int
+    DEFLIST ACTIONS_TARGET int
+
+    # parallel ability ids for the last ACTION_CHARACTER_LABELS menu
+    DEFLIST ACTION_C_IDS string
+
+    DEFVAR ACTION_C_FROM 0 int
+    DEFVAR ACTION_C_INFOID * string
+    DEFVAR ACTION_C_TARGET 0 int
+
+    DEFVAR ACTION_C_VALID false bool
+    DEFVAR ACTION_NEXT_ID 1 int
+
+@ACTIONINFO_CREATE <id> <name> <targettype>
+    LISTADD ACTIONINFOS_ID <id>
+    LISTADD ACTIONINFOS_NAME <name>
+    LISTADD ACTIONINFOS_TARGETTYPE <targettype>
+
+@ACTION_CLEAR
+    LISTCLEAR ACTIONS_ID
+    LISTCLEAR ACTIONS_INFOID
+    LISTCLEAR ACTIONS_NAME
+    LISTCLEAR ACTIONS_SOURCE
+    LISTCLEAR ACTIONS_TARGET
+    LISTCLEAR ACTION_C_IDS
+
+    SETVAR ACTION_C_FROM 0
+    SETVAR ACTION_C_INFOID *
+    SETVAR ACTION_C_TARGET 0
+    SETVAR ACTION_C_VALID false
+    BREAK
+
+@ACTION_CHARACTER_LABELS <from> <outlist>
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _idx -1 int
+    DEFVAR _infoIdx -1 int
+    DEFVAR _ref * string
+    DEFVAR _cid * string
+    DEFVAR _aid * string
+    DEFVAR _name * string
+
+    LISTCLEAR <outlist>
+    LISTCLEAR ACTION_C_IDS
+
+    LISTFIND CH_IDS <from> _idx
+    JUMPLT _idx 0 ACTION_CHARACTER_LABELS_DONE
+
+    LISTGET CH_REFS [[_idx]] _ref
+    LISTCOUNT CHI_ABILITY_CID _n
+
+    >ACTION_CHARACTER_LABELS_LOOP
+        JUMPGE _i [[_n]] ACTION_CHARACTER_LABELS_DONE
+
+        LISTGET CHI_ABILITY_CID [[_i]] _cid
+        JUMPNEQ _cid [[_ref]] ACTION_CHARACTER_LABELS_NEXT
+
+        LISTGET CHI_ABILITY_AID [[_i]] _aid
+        LISTADD ACTION_C_IDS [[_aid]]
+
+        SETVAR _name [[_aid]]
+        LISTFIND ACTIONINFOS_ID [[_aid]] _infoIdx
+        JUMPLT _infoIdx 0 ACTION_CHARACTER_LABELS_ADD
+        LISTGET ACTIONINFOS_NAME [[_infoIdx]] _name
+
+        >ACTION_CHARACTER_LABELS_ADD
+            LISTADD <outlist> [[_name]]
+
+        >ACTION_CHARACTER_LABELS_NEXT
+            ADD _i 1
+            JUMP ACTION_CHARACTER_LABELS_LOOP
+
+    >ACTION_CHARACTER_LABELS_DONE
+        BREAK
+
+#will be used for mana or cooldown checks (always true for now)
+@ACTION_PREVALIDATE <from> <action>
+    SETVAR ACTION_C_VALID true
+    #stub for now, will have something to call to next time
+    CALL "COMBAT:PREVALIDATE:<action>"
+    BREAK
+
+@ACTION_SUBMIT <name> <from> <target>
+    DEFVAR _id 0 int
+    DEFVAR _idx -1 int
+    DEFVAR _disp * string
+
+    SETVAR ACTION_C_INFOID <name>
+    SETVAR ACTION_C_FROM <from>
+    SETVAR ACTION_C_TARGET <target>
+
+    SETVAR _id [[ACTION_NEXT_ID]]
+    ADD ACTION_NEXT_ID 1
+
+    SETVAR _disp <name>
+    LISTFIND ACTIONINFOS_ID <name> _idx
+    JUMPLT _idx 0 ACTION_SUBMIT_ADD
+    LISTGET ACTIONINFOS_NAME [[_idx]] _disp
+
+    >ACTION_SUBMIT_ADD
+        LISTADD ACTIONS_ID [[_id]]
+        LISTADD ACTIONS_INFOID <name>
+        LISTADD ACTIONS_NAME [[_disp]]
+        LISTADD ACTIONS_SOURCE <from>
+        LISTADD ACTIONS_TARGET <target>
+        BREAK

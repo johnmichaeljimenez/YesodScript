@@ -41,8 +41,7 @@
     LISTCOUNT "<from>_PARTY" <outvar>
     BREAK
 
-# fills a global string list with display names of alive members (same order as P<from>_ALIVE)
-@PARTY_ALIVE_LABELS <from> <outlist>
+@PARTY_LABELS <type> <from> <outlist>
     DEFVAR _i 0 int
     DEFVAR _n 0 int
     DEFVAR _cid 0 int
@@ -52,29 +51,29 @@
     DEFVAR _name "?" string
 
     LISTCLEAR <outlist>
-    LISTCOUNT "P<from>_ALIVE" _n
+    LISTCOUNT "P<from>_<type>" _n
 
-    >PARTY_ALIVE_LABELS_LOOP
-        JUMPGE _i [[_n]] PARTY_ALIVE_LABELS_DONE
+    >PARTY_LABELS_LOOP
+        JUMPGE _i [[_n]] PARTY_LABELS_DONE
 
-        LISTGET "P<from>_ALIVE" [[_i]] _cid
+        LISTGET "P<from>_<type>" [[_i]] _cid
         SETVAR _name "?"
 
         LISTFIND CH_IDS [[_cid]] _idx
-        JUMPLT _idx 0 PARTY_ALIVE_LABELS_ADD
+        JUMPLT _idx 0 PARTY_LABELS_ADD
 
         LISTGET CH_REFS [[_idx]] _ref
         LISTFIND CHI_IDS [[_ref]] _infoIdx
-        JUMPLT _infoIdx 0 PARTY_ALIVE_LABELS_ADD
+        JUMPLT _infoIdx 0 PARTY_LABELS_ADD
 
         LISTGET CHI_NAMES [[_infoIdx]] _name
 
-        >PARTY_ALIVE_LABELS_ADD
+        >PARTY_LABELS_ADD
             LISTADD <outlist> [[_name]]
             ADD _i 1
-            JUMP PARTY_ALIVE_LABELS_LOOP
+            JUMP PARTY_LABELS_LOOP
 
-    >PARTY_ALIVE_LABELS_DONE
+    >PARTY_LABELS_DONE
         BREAK
 
 #will be used outside during combat or any character-altering events

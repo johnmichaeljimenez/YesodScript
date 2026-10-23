@@ -8,6 +8,11 @@
     DEFLIST CHI_SPD int
     DEFLIST CHI_DEF int
 
+    #character info id
+    DEFLIST CHI_ABILITY_CID string
+    #ability string id
+    DEFLIST CHI_ABILITY_AID string
+
     #instances
     #reference from character info above (character uses base data from character info)
     DEFLIST CH_REFS string
@@ -37,6 +42,10 @@
 
     >CHARACTERINFO_CREATE_END
         BREAK
+
+@CHARACTERINFO_ADD_ABILITY <cid> <aid>
+    LISTADD CHI_ABILITY_CID <cid>
+    LISTADD CHI_ABILITY_AID <aid>
 
 @CHARACTER_CREATE <infoname> <outvar>
     DEFVAR _infoIdx -1 int

@@ -1,3 +1,8 @@
 @INFO_INIT
     $CHARACTERINFO_CREATE "david" "David" 25 6 4 8 2
+        $CHARACTERINFO_ADD_ABILITY "david" "attack"
+        $CHARACTERINFO_ADD_ABILITY "david" "defend"
+        $CHARACTERINFO_ADD_ABILITY "david" "pass"
+
     $CHARACTERINFO_CREATE "wolf" "Wolf" 8 6 4 8 1
+        $CHARACTERINFO_ADD_ABILITY "wolf" "attack"

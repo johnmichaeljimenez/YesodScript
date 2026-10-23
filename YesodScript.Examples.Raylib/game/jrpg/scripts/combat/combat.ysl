@@ -1,7 +1,8 @@
-@_INIT
+﻿@_INIT
     DEFLIST C_CURRENTACTIONS int
     DEFLIST C_ACTEDMEMBERS int
     DEFLIST C_MENU_LABELS string
+    DEFLIST C_MENU_IDS int
     DEFLIST C_ACTIONS string
 
     #0 = selection, 1 = battle
@@ -11,22 +12,27 @@
     DEFVAR C_ECOUNT 0 int
     DEFVAR C_ACTOR 0 int
     DEFVAR C_TARGET 0 int
-    # action indices from $MENU "Attack" "Defend" "Pass"
-    DEFVAR C_ACT_ATTACK 0 int
-    DEFVAR C_ACT_DEFEND 1 int
-    DEFVAR C_ACT_PASS 2 int
+    DEFVAR C_ACTION_ID * string
+    DEFVAR C_TARGETTYPE 0 int
 
 @COMBAT_BEGIN
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _cid 0 int
+    DEFVAR _idx -1 int
+    DEFVAR _infoIdx -1 int
+    DEFVAR _ref * string
+    DEFVAR _name "?" string
+
     LISTCLEAR C_CURRENTACTIONS
     LISTCLEAR C_ACTEDMEMBERS
     LISTCLEAR C_MENU_LABELS
+    LISTCLEAR C_MENU_IDS
     SETVAR C_PHASE 0
     SETVAR C_ACTOR 0
     SETVAR C_TARGET 0
-
-    LISTADD C_ACTIONS "Attack"
-    LISTADD C_ACTIONS "Defend"
-    LISTADD C_ACTIONS "Pass"
+    SETVAR C_ACTION_ID *
+    SETVAR C_TARGETTYPE 0
 
     #testing only
     $PARTY_CLEAR "ENEMY"
@@ -34,36 +40,113 @@
 
     PRINT "COMBAT START!"
     >COMBAT_LOOP
+        $ACTION_CLEAR
+        LISTCLEAR C_ACTEDMEMBERS
+        LISTCLEAR C_CURRENTACTIONS
         $PARTY_REFRESH
         $PARTY_COUNT_ALIVE "PLAYER" C_PCOUNT
         $PARTY_COUNT_ALIVE "ENEMY" C_ECOUNT
         JUMPEQ C_PCOUNT 0 COMBAT_END
         JUMPEQ C_ECOUNT 0 COMBAT_END
 
-        PRINT "SELECTION PHASE"
-        $WAITPRESS "Space"
+        >PHASE_START
+            # acting players that have not already chosen an action this round
+            SETVAR C_PCOUNT 0
+            SETVAR _i 0
+            LISTCOUNT PPLAYER_ACTING _n
 
-        # alive members
-        $PARTY_ALIVE_LABELS "PLAYER" C_MENU_LABELS
-        $MENU C_MENU_LABELS C_RESULT
-        JUMPLT C_RESULT 0 COMBAT_LOOP
-            LISTGET PPLAYER_ALIVE [[C_RESULT]] C_ACTOR
+            >COUNT_AVAILABLE_LOOP
+                JUMPGE _i [[_n]] COUNT_AVAILABLE_DONE
+                LISTGET PPLAYER_ACTING [[_i]] _cid
+                LISTFIND C_ACTEDMEMBERS [[_cid]] _idx
+                JUMPGE _idx 0 COUNT_AVAILABLE_NEXT
+                ADD C_PCOUNT 1
 
-            $MENU C_ACTIONS "C_RESULT"
-                JUMPEQ C_RESULT [[C_ACT_DEFEND]] RESOLVE_ACTIONS
-                JUMPEQ C_RESULT [[C_ACT_PASS]] RESOLVE_ACTIONS
+                >COUNT_AVAILABLE_NEXT
+                    ADD _i 1
+                    JUMP COUNT_AVAILABLE_LOOP
 
-                $PARTY_ALIVE_LABELS "ENEMY" C_MENU_LABELS
+            >COUNT_AVAILABLE_DONE
+                JUMPEQ C_PCOUNT 0 PHASE_RESOLVE
+
+            PRINT "SELECTION PHASE"
+            $WAITPRESS "Space"
+
+            >SELECT_PLAYER
+                LISTCLEAR C_MENU_LABELS
+                LISTCLEAR C_MENU_IDS
+                SETVAR _i 0
+                LISTCOUNT PPLAYER_ACTING _n
+
+                >BUILD_PLAYER_MENU_LOOP
+                    JUMPGE _i [[_n]] BUILD_PLAYER_MENU_DONE
+                    LISTGET PPLAYER_ACTING [[_i]] _cid
+                    LISTFIND C_ACTEDMEMBERS [[_cid]] _idx
+                    JUMPGE _idx 0 BUILD_PLAYER_MENU_NEXT
+
+                    LISTADD C_MENU_IDS [[_cid]]
+                    SETVAR _name "?"
+                    LISTFIND CH_IDS [[_cid]] _idx
+                    JUMPLT _idx 0 BUILD_PLAYER_MENU_ADD
+                    LISTGET CH_REFS [[_idx]] _ref
+                    LISTFIND CHI_IDS [[_ref]] _infoIdx
+                    JUMPLT _infoIdx 0 BUILD_PLAYER_MENU_ADD
+                    LISTGET CHI_NAMES [[_infoIdx]] _name
+
+                    >BUILD_PLAYER_MENU_ADD
+                        LISTADD C_MENU_LABELS [[_name]]
+
+                    >BUILD_PLAYER_MENU_NEXT
+                        ADD _i 1
+                        JUMP BUILD_PLAYER_MENU_LOOP
+
+                >BUILD_PLAYER_MENU_DONE
+                    $MENU C_MENU_LABELS C_RESULT
+                    JUMPLT C_RESULT 0 PHASE_START
+                    LISTGET C_MENU_IDS [[C_RESULT]] C_ACTOR
+
+            >SELECT_ACTION
+                $ACTION_CHARACTER_LABELS [[C_ACTOR]] C_ACTIONS
+                $MENU C_ACTIONS C_RESULT
+                JUMPLT C_RESULT 0 SELECT_PLAYER
+                LISTGET ACTION_C_IDS [[C_RESULT]] C_ACTION_ID
+                $ACTION_PREVALIDATE [[C_ACTOR]] [[C_ACTION_ID]]
+                JUMPEQ ACTION_C_VALID false SELECT_ACTION
+
+                SETVAR C_TARGETTYPE 0
+                LISTFIND ACTIONINFOS_ID [[C_ACTION_ID]] _infoIdx
+                JUMPLT _infoIdx 0 SELECT_TARGET
+                LISTGET ACTIONINFOS_TARGETTYPE [[_infoIdx]] C_TARGETTYPE
+                # targettype 0 = enemy menu, anything else = self / no targeting menu
+                JUMPNEQ C_TARGETTYPE 0 SELECT_SELF_TARGET
+
+            >SELECT_TARGET
+                $PARTY_LABELS "ALIVE" "ENEMY" C_MENU_LABELS
                 $MENU C_MENU_LABELS C_RESULT
-                    JUMPLT C_RESULT 0 COMBAT_LOOP
-                        LISTGET PENEMY_ALIVE [[C_RESULT]] C_TARGET
+                JUMPLT C_RESULT 0 PHASE_START
+                LISTGET PENEMY_ALIVE [[C_RESULT]] C_TARGET
+                JUMP SELECT_END
 
-                        >RESOLVE_ACTIONS
-                            PRINT "RESOLVE PHASE"
-                            $WAITPRESS "Space"
+            >SELECT_SELF_TARGET
+                SETVAR C_TARGET [[C_ACTOR]]
+                JUMP SELECT_END
 
-                        PRINT "BATTLE PHASE"
-                        $WAITPRESS "Space"
+            >SELECT_END
+                LISTADD C_ACTEDMEMBERS [[C_ACTOR]]
+                $ACTION_SUBMIT [[C_ACTION_ID]] [[C_ACTOR]] [[C_TARGET]]
+                LISTCOUNT ACTIONS_ID _n
+                SUB _n 1
+                LISTADD C_CURRENTACTIONS [[_n]]
+                JUMP PHASE_START
+
+        >PHASE_RESOLVE
+            $PARTY_REFRESH
+            PRINT "RESOLVE PHASE"
+            $WAITPRESS "Space"
+
+        >BATTLE_PHASE
+            PRINT "BATTLE PHASE"
+            $WAITPRESS "Space"
 
         JUMP COMBAT_LOOP
         BREAK
