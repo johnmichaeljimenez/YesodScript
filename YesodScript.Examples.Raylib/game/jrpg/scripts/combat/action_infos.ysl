@@ -4,7 +4,9 @@
     $ACTIONINFO_CREATE "pass" "Pass" 1
 
 @COMBAT:ACTION:ATTACK <from> <to>
-    PRINT "<from> attacks <to>"
+    DEFVAR _dmg 0 int
+    $CHARACTER_INFO <from> "ATK" _dmg
+    $COMBAT_APPLY_DAMAGE <from> <to> [[_dmg]]
     
 @COMBAT:ACTION:DEFEND <from>
     PRINT "<from> defends"

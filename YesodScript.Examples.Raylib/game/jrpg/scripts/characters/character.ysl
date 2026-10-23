@@ -72,12 +72,32 @@
     >CHARACTER_CREATE_END
         BREAK
 
+@CHARACTER_INFO <id> <stat> <outvar>
+    # SET <outvar> to id (instance)'s info as CHI_<stat>
+    # ex. $CHARACTER_INFO 2 DEF _def
+    DEFVAR _idx -1 int
+    DEFVAR _infoIdx -1 int
+    DEFVAR _ref * string
+
+    SETVAR <outvar> 0
+    LISTFIND CH_IDS <id> _idx
+    JUMPLT _idx 0 CHARACTER_INFO_END
+
+    LISTGET CH_REFS [[_idx]] _ref
+    LISTFIND CHI_IDS [[_ref]] _infoIdx
+    JUMPLT _infoIdx 0 CHARACTER_INFO_END
+
+    LISTGET "CHI_<stat>" [[_infoIdx]] <outvar>
+
+    >CHARACTER_INFO_END
+        BREAK
+
 @CHARACTER_STATS <id> <stat> <amt>
     DEFVAR _index -1 int
     LISTFIND CH_IDS <id> _index
     JUMPLT _index 0 CHARACTER_STATS_END
 
-    LISTSET "CH_[[stat]]" [[_index]] <amt>
+    LISTSET "CH_<stat>" [[_index]] <amt>
 
     >CHARACTER_STATS_END
         BREAK
