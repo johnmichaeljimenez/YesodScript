@@ -13,9 +13,7 @@
     BREAK
 
 @PARTY_CLEAR <from>
-    LISTCLEAR "<from>_PARTY"
-    LISTCLEAR "P<from>_ALIVE"
-    LISTCLEAR "P<from>_ACTING"
+    $LIST_CLEAR3 "<from>_PARTY" "P<from>_ALIVE" "P<from>_ACTING"
     BREAK
 
 @PARTY_ADD <from> <characterinfo>
@@ -45,9 +43,6 @@
     DEFVAR _i 0 int
     DEFVAR _n 0 int
     DEFVAR _cid 0 int
-    DEFVAR _idx -1 int
-    DEFVAR _infoIdx -1 int
-    DEFVAR _ref * string
     DEFVAR _name "?" string
 
     LISTCLEAR <outlist>
@@ -57,21 +52,10 @@
         JUMPGE _i [[_n]] PARTY_LABELS_DONE
 
         LISTGET "P<from>_<type>" [[_i]] _cid
-        SETVAR _name "?"
-
-        LISTFIND CH_IDS [[_cid]] _idx
-        JUMPLT _idx 0 PARTY_LABELS_ADD
-
-        LISTGET CH_REFS [[_idx]] _ref
-        LISTFIND CHI_IDS [[_ref]] _infoIdx
-        JUMPLT _infoIdx 0 PARTY_LABELS_ADD
-
-        LISTGET CHI_NAMES [[_infoIdx]] _name
-
-        >PARTY_LABELS_ADD
-            LISTADD <outlist> [[_name]]
-            ADD _i 1
-            JUMP PARTY_LABELS_LOOP
+        $CHARACTER_NAME [[_cid]] _name
+        LISTADD <outlist> [[_name]]
+        ADD _i 1
+        JUMP PARTY_LABELS_LOOP
 
     >PARTY_LABELS_DONE
         BREAK
@@ -82,59 +66,6 @@
 
     #label is used for real calculation to avoid doing CALL on self (same instruction is already running)
     >ON_REFRESH
-        DEFVAR _i 0 int
-        DEFVAR _n 0 int
-        DEFVAR _cid 0 int
-        DEFVAR _idx -1 int
-        DEFVAR _hp 0 int
-
-        LISTCLEAR PPLAYER_ALIVE
-        LISTCLEAR PPLAYER_ACTING
-        LISTCLEAR PENEMY_ALIVE
-        LISTCLEAR PENEMY_ACTING
-
-        #player party
-        SETVAR _i 0
-        LISTCOUNT PLAYER_PARTY _n
-
-        >PARTY_REFRESH_PLAYER_LOOP
-            JUMPGE _i [[_n]] PARTY_REFRESH_ENEMY
-
-            LISTGET PLAYER_PARTY [[_i]] _cid
-            LISTFIND CH_IDS [[_cid]] _idx
-            JUMPLT _idx 0 PARTY_REFRESH_PLAYER_NEXT
-
-            LISTGET CH_HP [[_idx]] _hp
-            JUMPLE _hp 0 PARTY_REFRESH_PLAYER_NEXT
-
-            LISTADD PPLAYER_ALIVE [[_cid]]
-            LISTADD PPLAYER_ACTING [[_cid]]
-
-            >PARTY_REFRESH_PLAYER_NEXT
-                ADD _i 1
-                JUMP PARTY_REFRESH_PLAYER_LOOP
-
-        #enemy party
-        >PARTY_REFRESH_ENEMY
-            SETVAR _i 0
-            LISTCOUNT ENEMY_PARTY _n
-
-        >PARTY_REFRESH_ENEMY_LOOP
-            JUMPGE _i [[_n]] PARTY_REFRESH_DONE
-
-            LISTGET ENEMY_PARTY [[_i]] _cid
-            LISTFIND CH_IDS [[_cid]] _idx
-            JUMPLT _idx 0 PARTY_REFRESH_ENEMY_NEXT
-
-            LISTGET CH_HP [[_idx]] _hp
-            JUMPLE _hp 0 PARTY_REFRESH_ENEMY_NEXT
-
-            LISTADD PENEMY_ALIVE [[_cid]]
-            LISTADD PENEMY_ACTING [[_cid]]
-
-            >PARTY_REFRESH_ENEMY_NEXT
-                ADD _i 1
-                JUMP PARTY_REFRESH_ENEMY_LOOP
-
-        >PARTY_REFRESH_DONE
-            BREAK
+        $PARTY_REFRESH_SIDE "PLAYER"
+        $PARTY_REFRESH_SIDE "ENEMY"
+        BREAK

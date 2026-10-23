@@ -1,26 +1,14 @@
 # clear runtime progress (new game from main menu)
 # real disk save/load can replace this later
 @MAP_CLEAR_SAVED_STATES
-    LISTCLEAR MAP_SAVE_ID
-    LISTCLEAR MAP_SAVE_VALUE
+    $LIST_CLEAR2 MAP_SAVE_ID MAP_SAVE_VALUE
     BREAK
 
 # Persist tile state by object id (works across maps).
 # Prefer $MAP_SET_TILE_STATE when you also want live apply on the current map.
 @MAP_SAVE_STATE <id> <state>
     JUMPEQ <id> 0 MAP_SAVE_STATE_END
-
-    DEFVAR _idx -1 int
-    LISTFIND MAP_SAVE_ID <id> _idx
-    JUMPGE _idx 0 MAP_SAVE_STATE_UPDATE
-
-    LISTADD MAP_SAVE_ID <id>
-    LISTADD MAP_SAVE_VALUE <state>
-    BREAK
-
-    >MAP_SAVE_STATE_UPDATE
-        LISTSET MAP_SAVE_VALUE [[_idx]] <state>
-        BREAK
+    $KV_SET MAP_SAVE_ID MAP_SAVE_VALUE <id> <state>
 
     >MAP_SAVE_STATE_END
         BREAK
@@ -31,7 +19,6 @@
     DEFVAR _tid 0 string
     DEFVAR _idx -1 int
     DEFVAR _state 0 int
-    DEFVAR _rid 0 int
 
     LISTCOUNT TILE_IDS _n
 
@@ -51,11 +38,7 @@
 
         # Invisible: drop render if present (opened gates, picked items, etc.)
         JUMPNEQ _state 2 MAP_APPLY_NEXT
-
-        LISTGET TILE_RENDER [[_i]] _rid
-        JUMPLE _rid 0 MAP_APPLY_NEXT
-        REMOVERENDER [[_rid]]
-        LISTSET TILE_RENDER [[_i]] 0
+        $TILE_CLEAR_RENDER [[_i]]
 
         >MAP_APPLY_NEXT
             ADD _i 1

@@ -1,0 +1,184 @@
+# Generic SoA / list helpers (stdlib).
+
+@LIST_CONTAINS <list> <value> <outBool>
+    DEFVAR _idx -1 int
+    LISTFIND <list> <value> _idx
+    JUMPGE _idx 0 LIST_CONTAINS_YES
+    SETVAR <outBool> false
+    BREAK
+
+    >LIST_CONTAINS_YES
+        SETVAR <outBool> true
+        BREAK
+
+@LIST_ADD_UNIQUE <list> <value> <outIdx>
+    DEFVAR _idx -1 int
+    DEFVAR _n 0 int
+    LISTFIND <list> <value> _idx
+    JUMPGE _idx 0 LIST_ADD_UNIQUE_EXISTS
+
+    LISTADD <list> <value>
+    LISTCOUNT <list> _n
+    SUB _n 1
+    SETVAR <outIdx> [[_n]]
+    BREAK
+
+    >LIST_ADD_UNIQUE_EXISTS
+        SETVAR <outIdx> [[_idx]]
+        BREAK
+
+@LIST_REMOVE_VALUE <list> <value>
+    DEFVAR _idx -1 int
+    LISTFIND <list> <value> _idx
+    JUMPLT _idx 0 LIST_REMOVE_VALUE_END
+    LISTREMOVE <list> [[_idx]]
+
+    >LIST_REMOVE_VALUE_END
+        BREAK
+
+@LIST_LAST_INDEX <list> <out>
+    DEFVAR _n 0 int
+    LISTCOUNT <list> _n
+    SUB _n 1
+    SETVAR <out> [[_n]]
+    BREAK
+
+@LIST_FILL <list> <count> <value>
+    DEFVAR _i 0 int
+    DEFVAR _n <count> int
+
+    >LIST_FILL_LOOP
+        JUMPGE _i [[_n]] LIST_FILL_DONE
+        LISTADD <list> <value>
+        ADD _i 1
+        JUMP LIST_FILL_LOOP
+
+    >LIST_FILL_DONE
+        BREAK
+
+# Count items in <src> whose value is not present in <exclude>.
+@LIST_COUNT_NOT_IN <src> <exclude> <out>
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _c 0 int
+    DEFVAR _v * string
+    DEFVAR _idx -1 int
+
+    LISTCOUNT <src> _n
+
+    >LIST_COUNT_NOT_IN_LOOP
+        JUMPGE _i [[_n]] LIST_COUNT_NOT_IN_DONE
+        LISTGET <src> [[_i]] _v
+        LISTFIND <exclude> [[_v]] _idx
+        JUMPGE _idx 0 LIST_COUNT_NOT_IN_NEXT
+        ADD _c 1
+
+        >LIST_COUNT_NOT_IN_NEXT
+            ADD _i 1
+            JUMP LIST_COUNT_NOT_IN_LOOP
+
+    >LIST_COUNT_NOT_IN_DONE
+        SETVAR <out> [[_c]]
+        BREAK
+
+# Parallel key/value columns (dictionary-style SoA pair).
+@KV_SET <keys> <values> <key> <value>
+    DEFVAR _idx -1 int
+    LISTFIND <keys> <key> _idx
+    JUMPGE _idx 0 KV_SET_UPDATE
+
+    LISTADD <keys> <key>
+    LISTADD <values> <value>
+    BREAK
+
+    >KV_SET_UPDATE
+        LISTSET <values> [[_idx]] <value>
+        BREAK
+
+@KV_GET <keys> <values> <key> <out> <default>
+    DEFVAR _idx -1 int
+    LISTFIND <keys> <key> _idx
+    JUMPLT _idx 0 KV_GET_DEFAULT
+    LISTGET <values> [[_idx]] <out>
+    BREAK
+
+    >KV_GET_DEFAULT
+        SETVAR <out> <default>
+        BREAK
+
+@LIST_CLEAR2 <a> <b>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    BREAK
+
+@LIST_CLEAR3 <a> <b> <c>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    BREAK
+
+@LIST_CLEAR4 <a> <b> <c> <d>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    BREAK
+
+@LIST_CLEAR5 <a> <b> <c> <d> <e>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    LISTCLEAR <e>
+    BREAK
+
+@LIST_CLEAR6 <a> <b> <c> <d> <e> <f>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    LISTCLEAR <e>
+    LISTCLEAR <f>
+    BREAK
+
+@LIST_CLEAR8 <a> <b> <c> <d> <e> <f> <g> <h>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    LISTCLEAR <e>
+    LISTCLEAR <f>
+    LISTCLEAR <g>
+    LISTCLEAR <h>
+    BREAK
+
+@LIST_CLEAR10 <a> <b> <c> <d> <e> <f> <g> <h> <i> <j>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    LISTCLEAR <e>
+    LISTCLEAR <f>
+    LISTCLEAR <g>
+    LISTCLEAR <h>
+    LISTCLEAR <i>
+    LISTCLEAR <j>
+    BREAK
+
+@LIST_REMOVE_AT2 <index> <a> <b>
+    LISTREMOVE <a> <index>
+    LISTREMOVE <b> <index>
+    BREAK
+
+@LIST_REMOVE_AT3 <index> <a> <b> <c>
+    LISTREMOVE <a> <index>
+    LISTREMOVE <b> <index>
+    LISTREMOVE <c> <index>
+    BREAK
+
+@LIST_REMOVE_AT4 <index> <a> <b> <c> <d>
+    LISTREMOVE <a> <index>
+    LISTREMOVE <b> <index>
+    LISTREMOVE <c> <index>
+    LISTREMOVE <d> <index>
+    BREAK

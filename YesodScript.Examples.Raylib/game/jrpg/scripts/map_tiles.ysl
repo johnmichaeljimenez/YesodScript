@@ -1,0 +1,49 @@
+@TILE_CLEAR_ALL
+    $LIST_CLEAR10 TILE_IDS TILE_TYPES TILE_VALUES1 TILE_VALUES2 TILE_TARGETS TILE_STATES TILE_SPRITES TILE_ENTITYSPRITES TILE_RENDER TILE_ALIASES
+    BREAK
+
+@TILE_FILL <count>
+    $LIST_FILL TILE_IDS <count> 0
+    $LIST_FILL TILE_TYPES <count> 0
+    $LIST_FILL TILE_VALUES1 <count> 0
+    $LIST_FILL TILE_VALUES2 <count> 0
+    $LIST_FILL TILE_TARGETS <count> 0
+    $LIST_FILL TILE_STATES <count> 0
+    $LIST_FILL TILE_SPRITES <count> *
+    $LIST_FILL TILE_ENTITYSPRITES <count> *
+    $LIST_FILL TILE_RENDER <count> 0
+    $LIST_FILL TILE_ALIASES <count> *
+    BREAK
+
+@TILE_SET_ROW <index> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
+    LISTSET TILE_IDS <index> <id>
+    LISTSET TILE_TYPES <index> <type>
+    LISTSET TILE_VALUES1 <index> <v1>
+    LISTSET TILE_VALUES2 <index> <v2>
+    LISTSET TILE_TARGETS <index> <t>
+    LISTSET TILE_STATES <index> <state>
+    LISTSET TILE_SPRITES <index> <sprite>
+    LISTSET TILE_ENTITYSPRITES <index> <entitysprite>
+    LISTSET TILE_RENDER <index> 0
+    LISTSET TILE_ALIASES <index> <alias>
+    BREAK
+
+@TILE_GET_ROW <index> <outId> <outType> <outV1> <outV2> <outTarget> <outState> <outAlias>
+    LISTGET TILE_IDS <index> <outId>
+    LISTGET TILE_TYPES <index> <outType>
+    LISTGET TILE_VALUES1 <index> <outV1>
+    LISTGET TILE_VALUES2 <index> <outV2>
+    LISTGET TILE_TARGETS <index> <outTarget>
+    LISTGET TILE_STATES <index> <outState>
+    LISTGET TILE_ALIASES <index> <outAlias>
+    BREAK
+
+@TILE_CLEAR_RENDER <index>
+    DEFVAR _rid 0 int
+    LISTGET TILE_RENDER <index> _rid
+    JUMPLE _rid 0 TILE_CLEAR_RENDER_END
+    REMOVERENDER [[_rid]]
+    LISTSET TILE_RENDER <index> 0
+
+    >TILE_CLEAR_RENDER_END
+        BREAK

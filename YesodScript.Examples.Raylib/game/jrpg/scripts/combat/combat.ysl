@@ -1,4 +1,4 @@
-﻿@_INIT
+@_INIT
     DEFLIST C_CURRENTACTIONS int
     DEFLIST C_ACTEDMEMBERS int
     DEFLIST C_MENU_LABELS string
@@ -19,15 +19,11 @@
     DEFVAR _i 0 int
     DEFVAR _n 0 int
     DEFVAR _cid 0 int
-    DEFVAR _idx -1 int
-    DEFVAR _infoIdx -1 int
-    DEFVAR _ref * string
     DEFVAR _name "?" string
+    DEFVAR _last -1 int
+    DEFVAR _acted false bool
 
-    LISTCLEAR C_CURRENTACTIONS
-    LISTCLEAR C_ACTEDMEMBERS
-    LISTCLEAR C_MENU_LABELS
-    LISTCLEAR C_MENU_IDS
+    $LIST_CLEAR4 C_CURRENTACTIONS C_ACTEDMEMBERS C_MENU_LABELS C_MENU_IDS
     SETVAR C_PHASE 0
     SETVAR C_ACTOR 0
     SETVAR C_TARGET 0
@@ -41,8 +37,7 @@
     PRINT "COMBAT START!"
     >COMBAT_LOOP
         $ACTION_CLEAR
-        LISTCLEAR C_ACTEDMEMBERS
-        LISTCLEAR C_CURRENTACTIONS
+        $LIST_CLEAR2 C_ACTEDMEMBERS C_CURRENTACTIONS
         $PARTY_REFRESH
         $PARTY_COUNT_ALIVE "PLAYER" C_PCOUNT
         $PARTY_COUNT_ALIVE "ENEMY" C_ECOUNT
@@ -50,51 +45,26 @@
         JUMPEQ C_ECOUNT 0 COMBAT_END
 
         >PHASE_START
-            # acting players that have not already chosen an action this round
-            SETVAR C_PCOUNT 0
-            SETVAR _i 0
-            LISTCOUNT PPLAYER_ACTING _n
-
-            >COUNT_AVAILABLE_LOOP
-                JUMPGE _i [[_n]] COUNT_AVAILABLE_DONE
-                LISTGET PPLAYER_ACTING [[_i]] _cid
-                LISTFIND C_ACTEDMEMBERS [[_cid]] _idx
-                JUMPGE _idx 0 COUNT_AVAILABLE_NEXT
-                ADD C_PCOUNT 1
-
-                >COUNT_AVAILABLE_NEXT
-                    ADD _i 1
-                    JUMP COUNT_AVAILABLE_LOOP
-
-            >COUNT_AVAILABLE_DONE
-                JUMPEQ C_PCOUNT 0 PHASE_RESOLVE
+            $LIST_COUNT_NOT_IN PPLAYER_ACTING C_ACTEDMEMBERS C_PCOUNT
+            JUMPEQ C_PCOUNT 0 PHASE_RESOLVE
 
             PRINT "SELECTION PHASE"
             $WAITPRESS "Space"
 
             >SELECT_PLAYER
-                LISTCLEAR C_MENU_LABELS
-                LISTCLEAR C_MENU_IDS
+                $LIST_CLEAR2 C_MENU_LABELS C_MENU_IDS
                 SETVAR _i 0
                 LISTCOUNT PPLAYER_ACTING _n
 
                 >BUILD_PLAYER_MENU_LOOP
                     JUMPGE _i [[_n]] BUILD_PLAYER_MENU_DONE
                     LISTGET PPLAYER_ACTING [[_i]] _cid
-                    LISTFIND C_ACTEDMEMBERS [[_cid]] _idx
-                    JUMPGE _idx 0 BUILD_PLAYER_MENU_NEXT
+                    $LIST_CONTAINS C_ACTEDMEMBERS [[_cid]] _acted
+                    JUMPEQ _acted true BUILD_PLAYER_MENU_NEXT
 
                     LISTADD C_MENU_IDS [[_cid]]
-                    SETVAR _name "?"
-                    LISTFIND CH_IDS [[_cid]] _idx
-                    JUMPLT _idx 0 BUILD_PLAYER_MENU_ADD
-                    LISTGET CH_REFS [[_idx]] _ref
-                    LISTFIND CHI_IDS [[_ref]] _infoIdx
-                    JUMPLT _infoIdx 0 BUILD_PLAYER_MENU_ADD
-                    LISTGET CHI_NAMES [[_infoIdx]] _name
-
-                    >BUILD_PLAYER_MENU_ADD
-                        LISTADD C_MENU_LABELS [[_name]]
+                    $CHARACTER_NAME [[_cid]] _name
+                    LISTADD C_MENU_LABELS [[_name]]
 
                     >BUILD_PLAYER_MENU_NEXT
                         ADD _i 1
@@ -113,10 +83,7 @@
                 $ACTION_PREVALIDATE [[C_ACTOR]] [[C_ACTION_ID]]
                 JUMPEQ ACTION_C_VALID false SELECT_ACTION
 
-                SETVAR C_TARGETTYPE 0
-                LISTFIND ACTIONINFOS_ID [[C_ACTION_ID]] _infoIdx
-                JUMPLT _infoIdx 0 SELECT_TARGET
-                LISTGET ACTIONINFOS_TARGETTYPE [[_infoIdx]] C_TARGETTYPE
+                $ACTIONINFO_GET_TARGETTYPE [[C_ACTION_ID]] C_TARGETTYPE
                 # targettype 0 = enemy menu, anything else = self / no targeting menu
                 JUMPNEQ C_TARGETTYPE 0 SELECT_SELF_TARGET
 
@@ -134,9 +101,8 @@
             >SELECT_END
                 LISTADD C_ACTEDMEMBERS [[C_ACTOR]]
                 $ACTION_SUBMIT [[C_ACTION_ID]] [[C_ACTOR]] [[C_TARGET]]
-                LISTCOUNT ACTIONS_ID _n
-                SUB _n 1
-                LISTADD C_CURRENTACTIONS [[_n]]
+                $LIST_LAST_INDEX ACTIONS_ID _last
+                LISTADD C_CURRENTACTIONS [[_last]]
                 JUMP PHASE_START
 
         >PHASE_RESOLVE

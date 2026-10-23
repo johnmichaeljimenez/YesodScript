@@ -5,17 +5,13 @@
     $MAP_SAVE_STATE <id> <state>
 
     DEFVAR _idx -1 int
-    DEFVAR _rid 0 int
     LISTFIND TILE_IDS <id> _idx
     JUMPLT _idx 0 MAP_SET_TILE_STATE_END
 
     LISTSET TILE_STATES [[_idx]] <state>
 
     JUMPNEQ <state> 2 MAP_SET_TILE_STATE_END
-        LISTGET TILE_RENDER [[_idx]] _rid
-        JUMPLE _rid 0 MAP_SET_TILE_STATE_END
-        REMOVERENDER [[_rid]]
-        LISTSET TILE_RENDER [[_idx]] 0
+    $TILE_CLEAR_RENDER [[_idx]]
 
     >MAP_SET_TILE_STATE_END
         BREAK

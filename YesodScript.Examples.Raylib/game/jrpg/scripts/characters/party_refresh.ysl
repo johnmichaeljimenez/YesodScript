@@ -1,0 +1,26 @@
+@PARTY_REFRESH_SIDE <from>
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _cid 0 int
+    DEFVAR _hp 0 int
+
+    LISTCLEAR "P<from>_ALIVE"
+    LISTCLEAR "P<from>_ACTING"
+    LISTCOUNT "<from>_PARTY" _n
+
+    >PARTY_REFRESH_SIDE_LOOP
+        JUMPGE _i [[_n]] PARTY_REFRESH_SIDE_DONE
+
+        LISTGET "<from>_PARTY" [[_i]] _cid
+        $CHARACTER_GET_HP [[_cid]] _hp
+        JUMPLE _hp 0 PARTY_REFRESH_SIDE_NEXT
+
+        LISTADD "P<from>_ALIVE" [[_cid]]
+        LISTADD "P<from>_ACTING" [[_cid]]
+
+        >PARTY_REFRESH_SIDE_NEXT
+            ADD _i 1
+            JUMP PARTY_REFRESH_SIDE_LOOP
+
+    >PARTY_REFRESH_SIDE_DONE
+        BREAK

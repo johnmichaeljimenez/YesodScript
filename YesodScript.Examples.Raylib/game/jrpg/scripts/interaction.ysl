@@ -9,13 +9,7 @@
     DEFVAR _index -1 int
     DEFVAR _alias * string
 
-    LISTGET TILE_IDS <id> _id
-    LISTGET TILE_TYPES <id> _type
-    LISTGET TILE_VALUES1 <id> _v1
-    LISTGET TILE_VALUES2 <id> _v2
-    LISTGET TILE_TARGETS <id> _target
-    LISTGET TILE_STATES <id> _state
-    LISTGET TILE_ALIASES <id> _alias
+    $TILE_GET_ROW <id> _id _type _v1 _v2 _target _state _alias
 
     # PRINT "INTERACT: <id> -> [[_type]] id=[[_id]] alias=[[_alias]] t=[[_target]]"
 

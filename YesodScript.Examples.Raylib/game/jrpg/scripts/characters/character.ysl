@@ -87,10 +87,51 @@
     LISTFIND CH_IDS <id> _index
     JUMPLT _index 0 CHARACTER_REMOVE_END
 
-    LISTREMOVE CH_REFS [[_index]]
-    LISTREMOVE CH_IDS [[_index]]
-    LISTREMOVE CH_HP [[_index]]
-    LISTREMOVE CH_MP [[_index]]
+    $LIST_REMOVE_AT4 [[_index]] CH_REFS CH_IDS CH_HP CH_MP
 
     >CHARACTER_REMOVE_END
+        BREAK
+
+# Lookup helpers for other files (SoA readability).
+@CHARACTER_FIND <id> <outIdx>
+    LISTFIND CH_IDS <id> <outIdx>
+    BREAK
+
+@CHARACTER_GET_HP <id> <outHp>
+    DEFVAR _idx -1 int
+    LISTFIND CH_IDS <id> _idx
+    JUMPLT _idx 0 CHARACTER_GET_HP_MISS
+    LISTGET CH_HP [[_idx]] <outHp>
+    BREAK
+
+    >CHARACTER_GET_HP_MISS
+        SETVAR <outHp> 0
+        BREAK
+
+@CHARACTER_GET_REF <id> <outRef>
+    DEFVAR _idx -1 int
+    LISTFIND CH_IDS <id> _idx
+    JUMPLT _idx 0 CHARACTER_GET_REF_MISS
+    LISTGET CH_REFS [[_idx]] <outRef>
+    BREAK
+
+    >CHARACTER_GET_REF_MISS
+        SETVAR <outRef> *
+        BREAK
+
+@CHARACTER_NAME <id> <outName>
+    DEFVAR _idx -1 int
+    DEFVAR _infoIdx -1 int
+    DEFVAR _ref * string
+
+    SETVAR <outName> "?"
+    LISTFIND CH_IDS <id> _idx
+    JUMPLT _idx 0 CHARACTER_NAME_END
+
+    LISTGET CH_REFS [[_idx]] _ref
+    LISTFIND CHI_IDS [[_ref]] _infoIdx
+    JUMPLT _infoIdx 0 CHARACTER_NAME_END
+    LISTGET CHI_NAMES [[_infoIdx]] <outName>
+
+    >CHARACTER_NAME_END
         BREAK

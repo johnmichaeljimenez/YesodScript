@@ -2,18 +2,9 @@
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] MAP_TEMP_CURRENT
     DEFVAR _tile [[MAP_TEMP_CURRENT]] int
 
-    LISTSET TILE_IDS [[_tile]] <id>
-    LISTSET TILE_TYPES [[_tile]] <type>
-    LISTSET TILE_VALUES1 [[_tile]] <v1>
-    LISTSET TILE_VALUES2 [[_tile]] <v2>
-    LISTSET TILE_TARGETS [[_tile]] <t>
-    LISTSET TILE_STATES [[_tile]] <state>
-    LISTSET TILE_SPRITES [[_tile]] <sprite>
-    LISTSET TILE_ENTITYSPRITES [[_tile]] <entitysprite>
-    LISTSET TILE_RENDER [[_tile]] 0
-    LISTSET TILE_ALIASES [[_tile]] <alias>
+    $TILE_SET_ROW [[_tile]] <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
 
-    # PRINT "SET TILE AT <x> <y> ([[_tile]])"
+    # PRINT "SET TILE DATA <x> <y> ([[_tile]])"
 
     DEFVAR _x <x> int
     DEFVAR _y <y> int
