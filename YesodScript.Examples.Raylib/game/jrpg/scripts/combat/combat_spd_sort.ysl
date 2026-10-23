@@ -1,0 +1,83 @@
+@COMBAT_SPD_SORT
+    # Sort queued actions by actor SPD (higher SPD acts first).
+    # Keeps parallel ACTIONS_* SoA columns aligned.
+    DEFVAR _i 0 int
+    DEFVAR _j 0 int
+    DEFVAR _j1 0 int
+    DEFVAR _n 0 int
+    DEFVAR _lim 0 int
+    DEFVAR _srcA 0 int
+    DEFVAR _srcB 0 int
+    DEFVAR _spdA 0 int
+    DEFVAR _spdB 0 int
+
+    DEFVAR _tmpId 0 int
+    DEFVAR _tmpInfo * string
+    DEFVAR _tmpName * string
+    DEFVAR _tmpSrc 0 int
+    DEFVAR _tmpTgt 0 int
+    DEFVAR _tmpId2 0 int
+    DEFVAR _tmpInfo2 * string
+    DEFVAR _tmpName2 * string
+    DEFVAR _tmpSrc2 0 int
+    DEFVAR _tmpTgt2 0 int
+
+    LISTCOUNT ACTIONS_ID _n
+    JUMPLE _n 1 COMBAT_SPD_SORT_END
+
+    SETVAR _i 0
+    >COMBAT_SPD_SORT_OUTER
+        SETVAR _lim [[_n]]
+        SUB _lim 1
+        SUB _lim [[_i]]
+        JUMPLE _lim 0 COMBAT_SPD_SORT_END
+
+        SETVAR _j 0
+        >COMBAT_SPD_SORT_INNER
+            JUMPGE _j [[_lim]] COMBAT_SPD_SORT_OUTER_NEXT
+
+            SETVAR _j1 [[_j]]
+            ADD _j1 1
+
+            LISTGET ACTIONS_SOURCE [[_j]] _srcA
+            LISTGET ACTIONS_SOURCE [[_j1]] _srcB
+            $CHARACTER_INFO [[_srcA]] "SPD" _spdA
+            $CHARACTER_INFO [[_srcB]] "SPD" _spdB
+
+            # higher SPD first; equal SPD keeps current relative order
+            JUMPGE _spdA [[_spdB]] COMBAT_SPD_SORT_INNER_NEXT
+
+            LISTGET ACTIONS_ID [[_j]] _tmpId
+            LISTGET ACTIONS_INFOID [[_j]] _tmpInfo
+            LISTGET ACTIONS_NAME [[_j]] _tmpName
+            LISTGET ACTIONS_SOURCE [[_j]] _tmpSrc
+            LISTGET ACTIONS_TARGET [[_j]] _tmpTgt
+
+            LISTGET ACTIONS_ID [[_j1]] _tmpId2
+            LISTGET ACTIONS_INFOID [[_j1]] _tmpInfo2
+            LISTGET ACTIONS_NAME [[_j1]] _tmpName2
+            LISTGET ACTIONS_SOURCE [[_j1]] _tmpSrc2
+            LISTGET ACTIONS_TARGET [[_j1]] _tmpTgt2
+
+            LISTSET ACTIONS_ID [[_j]] [[_tmpId2]]
+            LISTSET ACTIONS_INFOID [[_j]] [[_tmpInfo2]]
+            LISTSET ACTIONS_NAME [[_j]] [[_tmpName2]]
+            LISTSET ACTIONS_SOURCE [[_j]] [[_tmpSrc2]]
+            LISTSET ACTIONS_TARGET [[_j]] [[_tmpTgt2]]
+
+            LISTSET ACTIONS_ID [[_j1]] [[_tmpId]]
+            LISTSET ACTIONS_INFOID [[_j1]] [[_tmpInfo]]
+            LISTSET ACTIONS_NAME [[_j1]] [[_tmpName]]
+            LISTSET ACTIONS_SOURCE [[_j1]] [[_tmpSrc]]
+            LISTSET ACTIONS_TARGET [[_j1]] [[_tmpTgt]]
+
+            >COMBAT_SPD_SORT_INNER_NEXT
+                ADD _j 1
+                JUMP COMBAT_SPD_SORT_INNER
+
+        >COMBAT_SPD_SORT_OUTER_NEXT
+            ADD _i 1
+            JUMP COMBAT_SPD_SORT_OUTER
+
+    >COMBAT_SPD_SORT_END
+        BREAK

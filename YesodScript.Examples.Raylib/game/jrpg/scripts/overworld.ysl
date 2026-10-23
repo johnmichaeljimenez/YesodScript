@@ -70,7 +70,7 @@
 
     >MOVE_FINALIZE
         TWEEN [[SPR_PLAYER]] "Depth" "-[[PLAYER_POS_Y]]"
-        PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
+        # PRINT "MOVED TO [[PLAYER_POS_X]], [[PLAYER_POS_Y]]"
 
         #wait for movement before executing any trigger
         JUMPEQ "PLAYER_TRIGGER_ID" -1 MOVE_END

@@ -1,0 +1,34 @@
+@COMBAT_AI_ACTIONS
+    # Give every acting enemy a basic attack against a living player.
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _en 0 int
+    DEFVAR _tmax 0 int
+    DEFVAR _tidx 0 int
+    DEFVAR _cid 0 int
+    DEFVAR _target 0 int
+
+    LISTCOUNT PPLAYER_ALIVE _n
+    JUMPLE _n 0 COMBAT_AI_END
+
+    LISTCOUNT PENEMY_ACTING _en
+    SETVAR _i 0
+
+    >COMBAT_AI_LOOP
+        JUMPGE _i [[_en]] COMBAT_AI_END
+
+        LISTGET PENEMY_ACTING [[_i]] _cid
+
+        # pick a random living player target
+        SETVAR _tmax [[_n]]
+        SUB _tmax 1
+        RANDVAR _tidx 0 [[_tmax]]
+        LISTGET PPLAYER_ALIVE [[_tidx]] _target
+
+        $ACTION_SUBMIT "attack" [[_cid]] [[_target]]
+
+        ADD _i 1
+        JUMP COMBAT_AI_LOOP
+
+    >COMBAT_AI_END
+        BREAK

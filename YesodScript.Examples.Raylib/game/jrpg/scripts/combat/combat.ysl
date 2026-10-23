@@ -36,7 +36,9 @@
     $PARTY_CLEAR "ENEMY"
     $PARTY_ADD "ENEMY" "wolf"
 
+    $FADE_IN
     PRINT "COMBAT START!"
+    $WAITPRESS "Space"
     >COMBAT_LOOP
         $ACTION_CLEAR
         $LIST_CLEAR2 C_ACTEDMEMBERS C_CURRENTACTIONS
@@ -112,6 +114,9 @@
             PRINT "RESOLVE PHASE"
             $WAITPRESS "Space"
 
+            $COMBAT_AI_ACTIONS
+            $COMBAT_SPD_SORT
+
         >BATTLE_PHASE
             PRINT "BATTLE PHASE"
             $WAITPRESS "Space"
@@ -162,4 +167,5 @@
 
     >COMBAT_END_DONE
         PRINT "COMBAT END"
+        $FADE_OUT
         BREAK
