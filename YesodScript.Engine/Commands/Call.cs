@@ -17,7 +17,7 @@ namespace YesodScript.Engine.Commands
 
 		public override void OnEnter()
 		{
-			_fired = VM.FireTrigger(id);
+			_fired = VM.FireTrigger(id, Instruction);
 			if (_fired.Count == 0 && !string.IsNullOrEmpty(labelWhenEmpty))
 			{
 				Instruction.Jump(labelWhenEmpty);

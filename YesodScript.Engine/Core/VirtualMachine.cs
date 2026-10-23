@@ -125,7 +125,7 @@ public class VirtualMachine : IDisposable
 		allCommands.Clear();
 	}
 
-	public List<Instruction> FireTrigger(string triggerName)
+	public List<Instruction> FireTrigger(string triggerName, Instruction caller = null)
 	{
 		var fired = new List<Instruction>();
 
@@ -138,6 +138,34 @@ public class VirtualMachine : IDisposable
 			parts = Utils.SplitArguments(triggerName);
 			triggerName = parts[0];
 			parts.RemoveAt(0);
+		}
+
+		var injectMap = new Dictionary<string, Var>(StringComparer.OrdinalIgnoreCase);
+		if (caller != null)
+		{
+			var callerPrefix = string.IsNullOrEmpty(caller.ID) ? "caller" : caller.ID;
+			callerPrefix = Regex.Replace(callerPrefix, @"[^A-Za-z0-9_]", "_"); //TODO: optimize
+
+			for (int p = 0; p < parts.Count; p++)
+			{
+				var part = parts[p];
+				if (part.Length > 0 && part[0] == '_')
+				{
+					var v = GetVar(part, caller);
+					if (v != null)
+					{
+						var mangled = $"_inj_{callerPrefix}_{part.TrimStart('_')}";
+						
+						var unique = mangled;
+						int n = 1;
+						while (injectMap.ContainsKey(unique))
+							unique = $"{mangled}_{n++}";
+
+						injectMap[unique] = v;
+						parts[p] = unique;
+					}
+				}
+			}
 		}
 
 		foreach (var i in allCommands.ToArray())
@@ -160,7 +188,7 @@ public class VirtualMachine : IDisposable
 						i.TriggerParameters[kvp.Key] = kvp.Value;
 					}
 
-					Run(i, trigger.StartIndex);
+					Run(i, trigger.StartIndex, injectMap);
 					fired.Add(i);
 					break;
 				}
@@ -179,7 +207,7 @@ public class VirtualMachine : IDisposable
 		Run(instruction);
 	}
 
-	public void Run(Instruction instruction, int startIndex = 0)
+	public void Run(Instruction instruction, int startIndex = 0, Dictionary<string, Var> injectMap = null)
 	{
 		if (instruction.IsRunning)
 			return;
@@ -190,6 +218,16 @@ public class VirtualMachine : IDisposable
 		instruction.IsRunning = true;
 		instruction.IsPaused = false;
 		instruction.ClearLocalVars();
+
+		if (injectMap != null)
+		{
+			foreach (var kvp in injectMap)
+			{
+				if (kvp.Value != null)
+					instruction.InjectedLocals[kvp.Key] = kvp.Value;
+			}
+		}
+
 		instruction.SetIndex(startIndex);
 
 		if (!runningCommands.Contains(instruction))
@@ -680,6 +718,10 @@ public class VirtualMachine : IDisposable
 	{
 		if (string.IsNullOrEmpty(name))
 			return null;
+
+		// Injected out-params (mangled names) take priority so callee locals of the original name do not collide
+		if (scope != null && scope.InjectedLocals.TryGetValue(name, out var injected))
+			return injected;
 
 		if (scope != null && name[0] == '_')
 			return scope.Vars.FirstOrDefault(v =>

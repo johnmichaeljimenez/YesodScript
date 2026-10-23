@@ -28,6 +28,7 @@ namespace YesodScript.Engine.Core
 		public readonly Dictionary<Command, int> LineReference = new();
 
 		public readonly List<Var> Vars = new();
+		public readonly Dictionary<string, Var> InjectedLocals = new();
 
 		public void SetIndex(int index)
 		{
@@ -61,6 +62,7 @@ namespace YesodScript.Engine.Core
 		internal void ClearLocalVars()
 		{
 			Vars.Clear();
+			InjectedLocals.Clear();
 		}
 
 		public static Exception LineError(Instruction ins, Command cmd, string msg)
