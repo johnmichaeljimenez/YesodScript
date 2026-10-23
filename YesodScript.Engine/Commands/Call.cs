@@ -35,6 +35,11 @@ namespace YesodScript.Engine.Commands
 
 			foreach (var ins in _fired)
 			{
+				if (ins == Instruction)
+				{
+					throw new InvalidOperationException($"{id} self-references the same script. Move it to other ysl.");
+				}
+
 				if (!ins.IsRunning) continue;
 
 				VM.RunInline(ins, deltaTime); //run immediately
