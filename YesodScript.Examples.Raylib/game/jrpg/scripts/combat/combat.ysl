@@ -22,6 +22,8 @@
     DEFVAR _name "?" string
     DEFVAR _last -1 int
     DEFVAR _acted false bool
+    DEFVAR _c 0 int
+    DEFVAR _hp 0 int
 
     $LIST_CLEAR4 C_CURRENTACTIONS C_ACTEDMEMBERS C_MENU_LABELS C_MENU_IDS
     SETVAR C_PHASE 0
@@ -114,9 +116,50 @@
             PRINT "BATTLE PHASE"
             $WAITPRESS "Space"
 
+            LISTCOUNT ACTIONS_ID _c
+
+            SETVAR  _i 0
+            >BP_LOOP
+                JUMPGE _i [[_c]] COMBAT_LOOP
+                LISTGET ACTIONS_INFOID [[_i]] C_ACTION_ID
+                LISTGET ACTIONS_SOURCE [[_i]] C_ACTOR
+                LISTGET ACTIONS_TARGET [[_i]] C_TARGET
+
+                #hp check
+                $CHARACTER_GET_HP [[C_ACTOR]] _hp
+                JUMPLE _hp 0 BP_NEXT
+                $CHARACTER_GET_HP [[C_TARGET]] _hp
+                JUMPLE _hp 0 BP_NEXT
+
+                # skip if actor can no longer perform this action (mana/cooldown/etc)
+                $ACTION_PREVALIDATE [[C_ACTOR]] [[C_ACTION_ID]]
+                JUMPEQ ACTION_C_VALID false BP_NEXT
+
+                CALL "COMBAT:ACTION:[[C_ACTION_ID]] [[C_ACTOR]] [[C_TARGET]]"
+                $WAITPRESS "Space"
+
+                >BP_NEXT
+                    ADD _i 1
+                    JUMP BP_LOOP
+
         JUMP COMBAT_LOOP
         BREAK
 
     >COMBAT_END
+        JUMPEQ C_PCOUNT 0 COMBAT_LOSE
+        JUMPEQ C_ECOUNT 0 COMBAT_WIN
+        JUMP COMBAT_END_DONE
+
+    >COMBAT_WIN
+        PRINT "YOU WIN!"
+        #stub: rewards, exp, return to overworld, etc.
+        JUMP COMBAT_END_DONE
+
+    >COMBAT_LOSE
+        PRINT "YOU LOSE!"
+        #stub: game over / retreat flow, etc.
+        JUMP COMBAT_END_DONE
+
+    >COMBAT_END_DONE
         PRINT "COMBAT END"
         BREAK

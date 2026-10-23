@@ -118,4 +118,6 @@
         LISTADD ACTIONS_NAME [[_disp]]
         LISTADD ACTIONS_SOURCE <from>
         LISTADD ACTIONS_TARGET <target>
+
+        PRINT "ADDED ACTION [[_disp]] by <from> to <target>"
         BREAK

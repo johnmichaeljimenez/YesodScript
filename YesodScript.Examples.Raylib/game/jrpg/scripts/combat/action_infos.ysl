@@ -2,3 +2,12 @@
     $ACTIONINFO_CREATE "attack" "Attack" 0
     $ACTIONINFO_CREATE "defend" "Defend" 1
     $ACTIONINFO_CREATE "pass" "Pass" 1
+
+@COMBAT:ACTION:ATTACK <from> <to>
+    PRINT "<from> attacks <to>"
+    
+@COMBAT:ACTION:DEFEND <from>
+    PRINT "<from> defends"
+    
+@COMBAT:ACTION:PASS <from>
+    PRINT "<from> skipped turn"

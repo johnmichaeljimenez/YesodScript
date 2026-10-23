@@ -7,5 +7,4 @@
 	JUMP LOOP
 
 >END
-	PRINT "PRESS"
 	BREAK
