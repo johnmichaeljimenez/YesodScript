@@ -1,0 +1,5 @@
+@_INIT
+    PRINT "STARTING"
+    $O2_A
+    
+    BREAK

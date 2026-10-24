@@ -26,9 +26,13 @@ public sealed class CommandParameterAttribute : Attribute { }
 public class VirtualMachine : IDisposable
 {
 	private const string CALL_SHORTHAND = "$";
+	private const int DefaultMaxCallDepth = 256;
 
 	public long CurrentTick { get; private set; }
 	public readonly List<Var> Vars = new();
+
+	public int MaxCallDepth { get; set; } = DefaultMaxCallDepth;
+	public bool ValidateCallGraphOnInitialize { get; set; } = true;
 
 	private Dictionary<string, CommandType> commandTypes;
 
@@ -36,6 +40,7 @@ public class VirtualMachine : IDisposable
 	private readonly List<Instruction> runningCommands = new();
 	private readonly List<Instruction> _toRemove = new();
 	private int _cloneCounter;
+	private int _syncCallDepth;
 
 	public Random RNG { get; private set; }
 	private int _randomSeed = -1;
@@ -112,9 +117,107 @@ public class VirtualMachine : IDisposable
 			(x.ID.Equals("main", StringComparison.InvariantCultureIgnoreCase) ? 0 : 1).CompareTo(y.ID == "main" ? 0 : 1)
 		);
 
+		if (ValidateCallGraphOnInitialize)
+			ValidateSyncCallGraph();
+
 		OnInitialize();
 		FireTrigger("_INIT");
 		Tick(0);
+	}
+	
+	public void ValidateSyncCallGraph()
+	{
+		var edges = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+		foreach (var ins in allCommands)
+		{
+			string owningTrigger = null;
+			for (int i = 0; i < ins.Commands.Count; i++)
+			{
+				var cmd = ins.Commands[i];
+				if (cmd is _Trigger trigger)
+				{
+					owningTrigger = trigger.TriggerKey;
+					continue;
+				}
+
+				if (owningTrigger == null || cmd is not Call call)
+					continue;
+
+				if (call.IsFireAndForget || !call.HasStaticTarget)
+					continue;
+
+				var targetTrigger = ExtractCallTriggerName(call.TargetId);
+				if (string.IsNullOrEmpty(targetTrigger))
+					continue;
+
+				if (!edges.TryGetValue(owningTrigger, out var targets))
+				{
+					targets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+					edges[owningTrigger] = targets;
+				}
+
+				targets.Add(targetTrigger);
+			}
+		}
+
+		if (edges.Count == 0)
+			return;
+
+		var visiting = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		var stack = new List<string>();
+
+		foreach (var node in edges.Keys)
+		{
+			if (visited.Contains(node))
+				continue;
+
+			DetectCallCycle(node, edges, visiting, visited, stack);
+		}
+	}
+
+	private static void DetectCallCycle(
+		string node,
+		Dictionary<string, HashSet<string>> edges,
+		HashSet<string> visiting,
+		HashSet<string> visited,
+		List<string> stack)
+	{
+		if (visited.Contains(node))
+			return;
+
+		if (!visiting.Add(node))
+		{
+			var cycleStart = stack.FindIndex(s => string.Equals(s, node, StringComparison.OrdinalIgnoreCase));
+			var cycle = cycleStart >= 0
+				? stack.Skip(cycleStart).Append(node)
+				: stack.Append(node);
+			throw new InvalidOperationException(
+				$"Sync CALL cycle detected: {string.Join(" -> ", cycle)}. " +
+				"Use CALL ... true (fire-and-forget), break the cycle, or lower recursion.");
+		}
+
+		stack.Add(node);
+
+		if (edges.TryGetValue(node, out var targets))
+		{
+			foreach (var target in targets)
+				DetectCallCycle(target, edges, visiting, visited, stack);
+		}
+
+		stack.RemoveAt(stack.Count - 1);
+		visiting.Remove(node);
+		visited.Add(node);
+	}
+
+	private static string ExtractCallTriggerName(string callId)
+	{
+		if (string.IsNullOrWhiteSpace(callId))
+			return null;
+
+		var parts = callId.SplitArguments();
+		return parts.Count > 0 ? parts[0] : null;
 	}
 
 	public void Dispose()
@@ -261,32 +364,46 @@ public class VirtualMachine : IDisposable
 
 	public void RunInline(Instruction i, float deltaTime)
 	{
-		while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
+		if (_syncCallDepth >= MaxCallDepth)
 		{
-			var line = i.Commands[i.CurrentIndex];
-			if (line is _Trigger) { i.IsRunning = false; break; }
-
-			var currentIndex = i.CurrentIndex;
-			bool updateDone;
-			try { updateDone = line.OnTick(deltaTime); }
-			catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
-
-			if (!updateDone) break; //real wait
-
-			try { line.OnExit(); }
-			catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
-
-			OnPostExecuteCommand(line);
-
-			if (!i.IsRunning) break;
-			if (currentIndex != i.CurrentIndex) continue; // jumped
-			i.SetIndex(i.CurrentIndex + 1);
+			throw new InvalidOperationException(
+				$"Sync CALL depth exceeded (max {MaxCallDepth}). Possible infinite recursion via CALL/$.");
 		}
 
-		if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
+		_syncCallDepth++;
+		try
 		{
-			i.IsRunning = false;
-			runningCommands.Remove(i);
+			while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
+			{
+				var line = i.Commands[i.CurrentIndex];
+				if (line is _Trigger) { i.IsRunning = false; break; }
+
+				var currentIndex = i.CurrentIndex;
+				bool updateDone;
+				try { updateDone = line.OnTick(deltaTime); }
+				catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
+
+				if (!updateDone) break; //real wait
+
+				try { line.OnExit(); }
+				catch (Exception ex) { throw Instruction.LineError(i, line, ex.Message); }
+
+				OnPostExecuteCommand(line);
+
+				if (!i.IsRunning) break;
+				if (currentIndex != i.CurrentIndex) continue; // jumped
+				i.SetIndex(i.CurrentIndex + 1);
+			}
+
+			if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
+			{
+				i.IsRunning = false;
+				runningCommands.Remove(i);
+			}
+		}
+		finally
+		{
+			_syncCallDepth--;
 		}
 	}
 

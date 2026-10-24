@@ -15,6 +15,14 @@ namespace YesodScript.Engine.Commands
 
 		private List<Instruction> _fired;
 
+		internal string TargetId => id;
+		internal bool IsFireAndForget => fireAndForget;
+
+		internal bool HasStaticTarget =>
+			!string.IsNullOrEmpty(id)
+			&& id.IndexOf("[[", StringComparison.Ordinal) < 0
+			&& id.IndexOf('<') < 0;
+
 		public override void OnEnter()
 		{
 			_fired = VM.FireTrigger(id, Instruction);

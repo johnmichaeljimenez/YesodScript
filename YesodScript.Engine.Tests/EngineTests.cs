@@ -237,7 +237,75 @@ public partial class EngineTests
         output.Should().Contain("SPAWNED");
         output.Should().Contain("SECRET 99");
         output.Should().Contain("GOT CloneMe#1");
-        
+
         output.Split("SPAWNED").Length.Should().Be(3);
+    }
+
+    [Fact]
+    public void Overflow_StaticCallCycle_IsRejectedOnInitialize()
+    {
+        FluentActions.Invoking(() => Utils.Test(out _, "Overflow1.ysl", "Overflow2.ysl", "Overflow3.ysl"))
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("*Sync CALL cycle detected*");
+    }
+
+    [Fact]
+    public void Overflow_RuntimeCallDepth_IsGuarded()
+    {
+        var vm = new VirtualMachine
+        {
+            ValidateCallGraphOnInitialize = false,
+            MaxCallDepth = 8
+        };
+
+        vm.CompileFile("scripts/Overflow1.ysl");
+        vm.CompileFile("scripts/Overflow2.ysl");
+        vm.CompileFile("scripts/Overflow3.ysl");
+
+        FluentActions.Invoking(() => vm.Initialize())
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("*Sync CALL depth exceeded*");
+    }
+
+    [Fact]
+    public void Overflow_SelfCallCycle_IsRejectedOnInitialize()
+    {
+        var vm = new VirtualMachine();
+        vm.Compile("SelfLoop", """
+            @LOOP
+                $LOOP
+            """);
+        vm.Compile("Boot", """
+            @_INIT
+                $LOOP
+            """);
+
+        FluentActions.Invoking(() => vm.Initialize())
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("*Sync CALL cycle detected*LOOP*");
+    }
+
+    [Fact]
+    public void Overflow_FireAndForget_DoesNotCountAsSyncCycle()
+    {
+        var vm = new VirtualMachine();
+        vm.Compile("Ping", """
+            @PING
+                PRINT "PING"
+                CALL "PONG" * true
+            """);
+        vm.Compile("Pong", """
+            @PONG
+                PRINT "PONG"
+                CALL "PING" * true
+            """);
+        vm.Compile("Main", """
+            @_INIT
+                CALL "PING" * true
+                PRINT "OK"
+            """);
+
+        vm.OnOutput += _ => { };
+        FluentActions.Invoking(() => vm.Initialize()).Should().NotThrow();
     }
 }
