@@ -1,0 +1,16 @@
+@BUFF:CAST:DEFEND <from>
+    # expires on end of battle phase (duration 0)
+    $BUFFS:REGISTER "DEFEND" <from> 0
+
+    # defend buffs DEF immediately so higher-SPD defenders are protected from later attacks this turn
+    $STATUS_EFFECT_ADD <from> "DEF" 0.5
+    BREAK
+
+@BUFF:END_TURN:DEFEND <from>
+    $STATUS_EFFECT_REMOVE <from> "DEF" 0.5
+    BREAK
+
+@BUFF:TICK:BURN <from>
+    # leave as stub for now
+    PRINT "BURNED!"
+    BREAK

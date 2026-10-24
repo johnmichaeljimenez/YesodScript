@@ -1,0 +1,3 @@
+@BUFFS:ADD <name> <target>
+    CALL "BUFF:CAST:<name> <target>"
+    BREAK

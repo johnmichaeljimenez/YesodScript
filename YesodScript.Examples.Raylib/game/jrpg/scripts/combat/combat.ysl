@@ -125,12 +125,20 @@
 
             SETVAR  _i 0
             >BP_LOOP
-                JUMPGE _i [[_c]] COMBAT_LOOP
+                JUMPGE _i [[_c]] END_PHASE
                 LISTGET ACTIONS_INFOID [[_i]] C_ACTION_ID
                 LISTGET ACTIONS_SOURCE [[_i]] C_ACTOR
                 LISTGET ACTIONS_TARGET [[_i]] C_TARGET
 
                 #hp check
+                $CHARACTER_GET_HP [[C_ACTOR]] _hp
+                JUMPLE _hp 0 BP_NEXT
+                $CHARACTER_GET_HP [[C_TARGET]] _hp
+                JUMPLE _hp 0 BP_NEXT
+
+                $BUFFS:TICK [[C_ACTOR]]
+                
+                #hp check again (ex. died from burn tick)
                 $CHARACTER_GET_HP [[C_ACTOR]] _hp
                 JUMPLE _hp 0 BP_NEXT
                 $CHARACTER_GET_HP [[C_TARGET]] _hp
@@ -147,8 +155,10 @@
                     ADD _i 1
                     JUMP BP_LOOP
 
-        JUMP COMBAT_LOOP
-        BREAK
+        >END_PHASE
+            $BUFFS:ENDTURN
+            JUMP COMBAT_LOOP
+            BREAK
 
     >COMBAT_END
         JUMPEQ C_PCOUNT 0 COMBAT_LOSE
@@ -166,6 +176,8 @@
         JUMP COMBAT_END_DONE
 
     >COMBAT_END_DONE
+        $BUFFS:CLEAR
+        $STATUS_EFFECT_CLEAR
         PRINT "COMBAT END"
         $FADE_OUT
         BREAK

@@ -1,0 +1,63 @@
+@_INIT
+    # used by @CHARACTER_INFO in character.ysl
+    DEFLIST STATEFF_ID int
+
+    # character instance that holds this buff (so multiple instances sharing character info still have unique stats)
+    DEFLIST STATEFF_CHARACTER int
+
+    # from character info (CHI) stat name, e.g. DEF / ATK / SPD
+    DEFLIST STATEFF_STAT string
+
+    # 1.0 = +100% buff, 0.5 = +50% buff, -0.5 = 50% debuff
+    DEFLIST STATEFF_AMOUNT float
+
+    DEFVAR STATEFF_NEXT_ID 1 int
+
+@STATUS_EFFECT_ADD <character> <stat> <amt>
+    DEFVAR _id 0 int
+
+    SETVAR _id [[STATEFF_NEXT_ID]]
+    ADD STATEFF_NEXT_ID 1
+
+    LISTADD STATEFF_ID [[_id]]
+    LISTADD STATEFF_CHARACTER <character>
+    LISTADD STATEFF_STAT <stat>
+    LISTADD STATEFF_AMOUNT <amt>
+    BREAK
+
+@STATUS_EFFECT_REMOVE <character> <stat> <amt>
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _cid 0 int
+    DEFVAR _stat * string
+    DEFVAR _amt 0.0 float
+
+    LISTCOUNT STATEFF_ID _n
+    SETVAR _i [[_n]]
+    SUB _i 1
+
+    >STATUS_EFFECT_REMOVE_LOOP
+        JUMPLT _i 0 STATUS_EFFECT_REMOVE_END
+
+        LISTGET STATEFF_CHARACTER [[_i]] _cid
+        JUMPNEQ _cid <character> STATUS_EFFECT_REMOVE_NEXT
+
+        LISTGET STATEFF_STAT [[_i]] _stat
+        JUMPNEQ _stat <stat> STATUS_EFFECT_REMOVE_NEXT
+
+        LISTGET STATEFF_AMOUNT [[_i]] _amt
+        JUMPNEQ _amt <amt> STATUS_EFFECT_REMOVE_NEXT
+
+        $LIST_REMOVE_AT4 [[_i]] STATEFF_ID STATEFF_CHARACTER STATEFF_STAT STATEFF_AMOUNT
+        JUMP STATUS_EFFECT_REMOVE_END
+
+        >STATUS_EFFECT_REMOVE_NEXT
+            SUB _i 1
+            JUMP STATUS_EFFECT_REMOVE_LOOP
+
+    >STATUS_EFFECT_REMOVE_END
+        BREAK
+
+@STATUS_EFFECT_CLEAR
+    $LIST_CLEAR4 STATEFF_ID STATEFF_CHARACTER STATEFF_STAT STATEFF_AMOUNT
+    BREAK

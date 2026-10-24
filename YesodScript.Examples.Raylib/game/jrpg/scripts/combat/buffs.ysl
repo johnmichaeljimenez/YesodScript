@@ -1,5 +1,65 @@
-@_INIT
-    DEFLIST BUFFS_ID int
-    DEFLIST BUFFS_NAME string
-    DEFLIST BUFFS_TARGET int
-    DEFLIST BUFFS_DURATION int
+@BUFFS:TICK <from>
+    # per-actor tick (DoTs etc). Duration is handled in BUFFS:ENDTURN.
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _target 0 int
+    DEFVAR _name * string
+
+    LISTCOUNT BUFFS_ID _n
+    SETVAR _i 0
+
+    >BUFFS_TICK_LOOP
+        JUMPGE _i [[_n]] BUFFS_TICK_END
+
+        LISTGET BUFFS_TARGET [[_i]] _target
+        JUMPNEQ _target <from> BUFFS_TICK_NEXT
+
+        LISTGET BUFFS_NAME [[_i]] _name
+        CALL "BUFF:TICK:[[_name]] <from>"
+
+        >BUFFS_TICK_NEXT
+            ADD _i 1
+            JUMP BUFFS_TICK_LOOP
+
+    >BUFFS_TICK_END
+        BREAK
+
+@BUFFS:ENDTURN
+    # end-of-turn hooks for every buff, then expire/count down durations
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _target 0 int
+    DEFVAR _name * string
+    DEFVAR _dur 0 int
+
+    LISTCOUNT BUFFS_ID _n
+    SETVAR _i [[_n]]
+    SUB _i 1
+
+    >BUFFS_ENDTURN_LOOP
+        JUMPLT _i 0 BUFFS_ENDTURN_END
+
+        LISTGET BUFFS_NAME [[_i]] _name
+        LISTGET BUFFS_TARGET [[_i]] _target
+        CALL "BUFF:END_TURN:[[_name]] [[_target]]"
+
+        LISTGET BUFFS_DURATION [[_i]] _dur
+
+        # 0 = expires at end of this turn
+        JUMPEQ _dur 0 BUFFS_ENDTURN_REMOVE
+
+        # >0 = remaining turns; -1 = infinite (leave alone)
+        JUMPLE _dur 0 BUFFS_ENDTURN_NEXT
+        SUB _dur 1
+        LISTSET BUFFS_DURATION [[_i]] [[_dur]]
+        JUMPNEQ _dur 0 BUFFS_ENDTURN_NEXT
+
+        >BUFFS_ENDTURN_REMOVE
+            $LIST_REMOVE_AT4 [[_i]] BUFFS_ID BUFFS_NAME BUFFS_TARGET BUFFS_DURATION
+
+        >BUFFS_ENDTURN_NEXT
+            SUB _i 1
+            JUMP BUFFS_ENDTURN_LOOP
+
+    >BUFFS_ENDTURN_END
+        BREAK

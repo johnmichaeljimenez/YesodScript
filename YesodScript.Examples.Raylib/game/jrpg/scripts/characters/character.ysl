@@ -75,9 +75,17 @@
 @CHARACTER_INFO <id> <stat> <outvar>
     # SET <outvar> to id (instance)'s info as CHI_<stat>
     # ex. $CHARACTER_INFO 2 DEF _def
+    # applies STATEFF_* percent modifiers: final = base * (1 + sum(amounts))
     DEFVAR _idx -1 int
     DEFVAR _infoIdx -1 int
     DEFVAR _ref * string
+    DEFVAR _base 0 int
+    DEFVAR _i 0 int
+    DEFVAR _n 0 int
+    DEFVAR _cid 0 int
+    DEFVAR _stat * string
+    DEFVAR _amt 0.0 float
+    DEFVAR _mult 1.0 float
 
     SETVAR <outvar> 0
     LISTFIND CH_IDS <id> _idx
@@ -87,7 +95,30 @@
     LISTFIND CHI_IDS [[_ref]] _infoIdx
     JUMPLT _infoIdx 0 CHARACTER_INFO_END
 
-    LISTGET "CHI_<stat>" [[_infoIdx]] <outvar>
+    LISTGET "CHI_<stat>" [[_infoIdx]] _base
+
+    LISTCOUNT STATEFF_ID _n
+    SETVAR _i 0
+
+    >CHARACTER_INFO_BUFF_LOOP
+        JUMPGE _i [[_n]] CHARACTER_INFO_BUFF_DONE
+
+        LISTGET STATEFF_CHARACTER [[_i]] _cid
+        JUMPNEQ _cid <id> CHARACTER_INFO_BUFF_NEXT
+
+        LISTGET STATEFF_STAT [[_i]] _stat
+        JUMPNEQ _stat <stat> CHARACTER_INFO_BUFF_NEXT
+
+        LISTGET STATEFF_AMOUNT [[_i]] _amt
+        ADD _mult [[_amt]]
+
+        >CHARACTER_INFO_BUFF_NEXT
+            ADD _i 1
+            JUMP CHARACTER_INFO_BUFF_LOOP
+
+    >CHARACTER_INFO_BUFF_DONE
+        SETVAR <outvar> [[_base]]
+        MUL <outvar> [[_mult]]
 
     >CHARACTER_INFO_END
         BREAK

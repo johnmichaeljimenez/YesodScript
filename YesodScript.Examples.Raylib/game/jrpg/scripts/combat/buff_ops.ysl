@@ -1,0 +1,26 @@
+@_INIT
+    DEFLIST BUFFS_ID int
+    DEFLIST BUFFS_NAME string
+    DEFLIST BUFFS_TARGET int
+
+    #-1 = infinite duration, 0 = expires on end of turn, >0 = turn duration
+    DEFLIST BUFFS_DURATION int
+
+    DEFVAR BUFFS_NEXT_ID 1 int
+    BREAK
+
+@BUFFS:REGISTER <name> <target> <duration>
+    DEFVAR _id 0 int
+
+    SETVAR _id [[BUFFS_NEXT_ID]]
+    ADD BUFFS_NEXT_ID 1
+
+    LISTADD BUFFS_ID [[_id]]
+    LISTADD BUFFS_NAME <name>
+    LISTADD BUFFS_TARGET <target>
+    LISTADD BUFFS_DURATION <duration>
+    BREAK
+
+@BUFFS:CLEAR
+    $LIST_CLEAR4 BUFFS_ID BUFFS_NAME BUFFS_TARGET BUFFS_DURATION
+    BREAK

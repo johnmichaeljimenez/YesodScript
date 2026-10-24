@@ -10,6 +10,9 @@
     
 @COMBAT:ACTION:DEFEND <from>
     PRINT "<from> defends"
+    $BUFFS:ADD "DEFEND" <from>
+    BREAK
     
 @COMBAT:ACTION:PASS <from>
     PRINT "<from> skipped turn"
+    BREAK
