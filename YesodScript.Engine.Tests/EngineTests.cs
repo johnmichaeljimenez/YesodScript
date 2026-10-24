@@ -102,7 +102,7 @@ public partial class EngineTests
     [Fact]
     public void Test_ExecOrder()
     {
-        var vm = Utils.Test(out var output, "ExecutionOrder.ysl", "HelloWorld.ysl", "Math.ysl");
+        var vm = Utils.Test(out var output, "ExecutionOrder.ysl", "CallShorthand2.ysl", "Params3.ysl");
         var tickCount = vm.CurrentTick;
         tickCount.Should().Be(1);
     }
@@ -258,9 +258,19 @@ public partial class EngineTests
             MaxCallDepth = 8
         };
 
-        vm.CompileFile("scripts/Overflow1.ysl");
-        vm.CompileFile("scripts/Overflow2.ysl");
-        vm.CompileFile("scripts/Overflow3.ysl");
+        const int chain = 20;
+        for (var i = 0; i < chain; i++)
+        {
+            var body = i < chain - 1
+                ? $"@D{i}\n    $D{i + 1}\n"
+                : $"@D{i}\n    PRINT \"END\"\n";
+            vm.Compile($"Depth{i}", body);
+        }
+
+        vm.Compile("Boot", """
+            @_INIT
+                $D0
+            """);
 
         FluentActions.Invoking(() => vm.Initialize())
             .Should().Throw<InvalidOperationException>()
@@ -307,5 +317,33 @@ public partial class EngineTests
 
         vm.OnOutput += _ => { };
         FluentActions.Invoking(() => vm.Initialize()).Should().NotThrow();
+    }
+
+    [Fact]
+    public void Overflow_SameFileReentrancy_ViaIntermediate_ThrowsCatchableError()
+    {
+        var vm = new VirtualMachine();
+        vm.Compile("ActionInfos", """
+            @ACTION:DEFEND
+                $BUFFS:ADD
+                BREAK
+
+            @BUFF:CAST:DEFEND
+                PRINT "CAST"
+                BREAK
+            """);
+        vm.Compile("BuffCast", """
+            @BUFFS:ADD
+                $BUFF:CAST:DEFEND
+                BREAK
+            """);
+        vm.Compile("Boot", """
+            @_INIT
+                $ACTION:DEFEND
+            """);
+
+        FluentActions.Invoking(() => vm.Initialize())
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage("*Re-entrant trigger*BUFF:CAST:DEFEND*ActionInfos*");
     }
 }

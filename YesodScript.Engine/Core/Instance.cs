@@ -67,7 +67,12 @@ namespace YesodScript.Engine.Core
 
 		public static Exception LineError(Instruction ins, Command cmd, string msg)
 		{
-			throw new InvalidOperationException($"Runtime error at '{ins.ID}' line {ins.LineReference[cmd]}: {msg}");
+			var id = ins?.ID ?? "?";
+			var line = "?";
+			if (ins != null && cmd != null && ins.LineReference.TryGetValue(cmd, out var lineNum))
+				line = lineNum.ToString();
+
+			throw new InvalidOperationException($"Runtime error at '{id}' line {line}: {msg}");
 		}
 	}
 }

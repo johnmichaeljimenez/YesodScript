@@ -277,6 +277,14 @@ public class VirtualMachine : IDisposable
 			{
 				if (string.Equals(trigger.Key, triggerName, StringComparison.InvariantCultureIgnoreCase))
 				{
+					if (i.IsRunning)
+					{
+						throw new InvalidOperationException(
+							$"Re-entrant trigger '{triggerName}' on already-running script '{i.ID}'. " +
+							"Triggers in the same .ysl file share one instruction and cannot nest. " +
+							$"Move '{triggerName}' to a separate .ysl file.");
+					}
+
 					var parameters = trigger.Parameters.Keys.ToList();
 					for (int j = 0; j < parts.Count; j++)
 					{
