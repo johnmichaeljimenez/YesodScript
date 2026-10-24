@@ -109,7 +109,7 @@
 	$MAP_SET 13 3 0 1 0 0 0 0 * * *
 	$MAP_SET 13 4 0 1 0 0 0 0 * * *
 	$MAP_SET 13 5 0 1 0 0 0 0 * * *
-	$MAP_SET 13 9 0 1 0 0 0 0 * * *
+	$MAP_SET 13 9 "89df7080" 2 0 0 0 0 * * *
 	$MAP_SET 13 15 "3ddeb6f0" 6 0 "intro_field_main" 40248840 0 * * *
 	$MAP_SET 14 0 0 1 0 0 0 0 * * *
 	$MAP_SET 14 1 0 1 0 0 0 0 * * *
@@ -117,7 +117,7 @@
 	$MAP_SET 14 3 0 1 0 0 0 0 * * *
 	$MAP_SET 14 4 0 1 0 0 0 0 * * *
 	$MAP_SET 14 5 0 1 0 0 0 0 * * *
-	$MAP_SET 14 9 "89df7080" 2 0 0 0 0 * * *
+	$MAP_SET 14 9 0 1 0 0 0 0 * * *
 	$MAP_SET 14 15 "3ddeb6f0" 6 0 "intro_field_main" 40248840 0 * * *
 	$MAP_SET 15 0 0 1 0 0 0 0 * * *
 	$MAP_SET 15 1 0 1 0 0 0 0 * * *
