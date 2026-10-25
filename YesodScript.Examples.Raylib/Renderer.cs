@@ -220,9 +220,21 @@ public class Renderer : IDisposable
 
 		if (item.Sprite.Id != 0)
 		{
-			var size = item.Sprite.Dimensions;
-			w = size.X * MathF.Abs(item.ScaleX);
-			h = size.Y * MathF.Abs(item.ScaleY);
+			float baseW, baseH;
+			if (item.TileIndex >= 0)
+			{
+				baseW = RenderData.DefaultTileSize;
+				baseH = RenderData.DefaultTileSize;
+			}
+			else
+			{
+				var size = item.Sprite.Dimensions;
+				baseW = size.X;
+				baseH = size.Y;
+			}
+
+			w = baseW * MathF.Abs(item.ScaleX);
+			h = baseH * MathF.Abs(item.ScaleY);
 			originX = w * 0.5f;
 			originY = h * 0.5f;
 		}
@@ -386,19 +398,48 @@ public class Renderer : IDisposable
 
 		if (i.Sprite.Id != 0)
 		{
-			var size = i.Sprite.Dimensions;
 			var scaleX = i.ScaleX;
 			var scaleY = i.ScaleY;
+			float srcX, srcY, srcW, srcH;
+			float baseW, baseH;
+
+			if (i.TileIndex >= 0)
+			{
+				const int tileSize = RenderData.DefaultTileSize;
+				var texSize = i.Sprite.Dimensions;
+				int columns = Math.Max(1, (int)texSize.X / tileSize);
+
+				int col = i.TileIndex % columns;
+				int row = i.TileIndex / columns;
+
+				srcX = col * tileSize;
+				srcY = row * tileSize;
+				srcW = tileSize;
+				srcH = tileSize;
+
+				baseW = tileSize;
+				baseH = tileSize;
+			}
+			else
+			{
+				var size = i.Sprite.Dimensions;
+				srcX = 0;
+				srcY = 0;
+				srcW = size.X;
+				srcH = size.Y;
+				baseW = size.X;
+				baseH = size.Y;
+			}
 
 			var source = new Rectangle(
-				0,
-				0,
-				scaleX < 0 ? -size.X : size.X,
-				scaleY < 0 ? -size.Y : size.Y
+				srcX,
+				srcY,
+				scaleX < 0 ? -srcW : srcW,
+				scaleY < 0 ? -srcH : srcH
 			);
 
-			var destW = size.X * MathF.Abs(scaleX);
-			var destH = size.Y * MathF.Abs(scaleY);
+			var destW = baseW * MathF.Abs(scaleX);
+			var destH = baseH * MathF.Abs(scaleY);
 			var dest = new Rectangle(drawX, drawY, destW, destH);
 			var origin = new Vector2(destW * i.OriginX, destH * i.OriginY);
 
@@ -432,6 +473,8 @@ public enum TextVAlign
 
 public class RenderData : IDisposable
 {
+	public const int DefaultTileSize = 16;
+
 	public int ID;
 	public bool Disabled;
 	public bool IsClickable;
@@ -451,6 +494,8 @@ public class RenderData : IDisposable
 
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
+	
+	public int TileIndex = -1;
 	public int FontSize = 14;
 	public string FontName = "";
 
