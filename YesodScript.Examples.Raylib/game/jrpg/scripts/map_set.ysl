@@ -13,6 +13,7 @@
     MUL _y [[GRID_SIZE]]
 
     JUMPEQ <type> 0 END
+    JUMPEQ <type> 1 END
     JUMPEQ <type> 6 END
     #2 Invisible = no render
     JUMPEQ <state> 2 END

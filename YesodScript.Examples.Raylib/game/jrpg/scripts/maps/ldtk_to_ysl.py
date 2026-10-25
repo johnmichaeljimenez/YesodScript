@@ -2,8 +2,21 @@
 """
 Export LDtk mapdata.ldtk -> mapdata.ysl MAPDATA sections.
 
+Also provides helpers to extract visual tile data from IntGrid auto-tile
+layers (everything except the "World" collider layer):
+
+  extract_tilemap_tiles(level) -> list[(layer, png, list[(x, y, tile_id)])]
+  extract_all_tilemaps(ldtk_path) -> dict[level_name, above]
+
 MAP_SET layout (see map.ysl / map_set.ysl):
   $MAP_SET x y id type v1 v2 t state sprite entitysprite alias
+
+TILESET_ADD layout (see tileset.ysl):
+  $TILESET_ADD x y tileindex sort spriteid
+  - emitted for Tilemap_Overworld / Tilemap_Walls autoLayerTiles
+  - spriteid is the LOADASSETS key (png stem under game assets/)
+  - sort: Overworld=-200, Walls=-150 (below entity MAP_SET at -100)
+
 
 Tile types:
   0 blank
@@ -57,6 +70,14 @@ from typing import Any
 
 # LDtk grid is 16px in this project.
 TILE_SIZE = 16
+
+# Visual IntGrid layers exported as TILESET_ADD (collider World is skipped).
+# Depth must stay below entity MAP_SET renders (-100).
+TILEMAP_LAYER_SORT = {
+    "Tilemap_Overworld": -200,
+    "Tilemap_Walls": -150,
+}
+TILEMAP_LAYER_SORT_DEFAULT = -180
 
 # Interactable.Type enum -> MAP tile type
 INTERACT_TYPE_TO_TILE = {
@@ -388,6 +409,33 @@ def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
     return "\t$MAP_SET " + " ".join(args)
 
 
+def sprite_id_from_tileset_path(png: str) -> str:
+    """
+    Map LDtk __tilesetRelPath onto the runtime asset id from LOADASSETS.
+    DirectoryExtractor keys are path stems under assets/, e.g.
+      ../../assets/tile-16px.png -> tile-16px
+      ../../assets/tile-16px-ref-wall.png -> tile-16px-ref-wall
+    """
+    name = Path(str(png).replace("\\", "/")).name
+    return Path(name).stem
+
+
+def layer_sort(layer_name: str) -> int:
+    return TILEMAP_LAYER_SORT.get(layer_name, TILEMAP_LAYER_SORT_DEFAULT)
+
+
+def format_tileset_add(
+    x: int,
+    y: int,
+    tile_index: int,
+    sort: int,
+    sprite_id: str,
+) -> str:
+    return (
+        f"\t$TILESET_ADD {x} {y} {tile_index} {sort} {ysl_token(sprite_id)}"
+    )
+
+
 def generate_mapdata(
     level: dict[str, Any],
     levels_by_iid: dict[str, dict[str, Any]],
@@ -408,6 +456,15 @@ def generate_mapdata(
     else:
         lines.append("\t# no PlayerStart found")
 
+    # Visual tiles first (behind entity/blocker MAP_SET renders).
+    # Emit bottom layers first so later same-depth draws stay stable.
+    for layer_name, png, tiles in reversed(extract_tilemap_tiles(level)):
+        sprite_id = sprite_id_from_tileset_path(png)
+        sort = layer_sort(layer_name)
+        lines.append(f"\t# tileset layer {layer_name} -> {sprite_id} sort={sort}")
+        for x, y, tid in tiles:
+            lines.append(format_tileset_add(x, y, tid, sort, sprite_id))
+
     tiles = collect_intgrid_blockers(level, gw, gh)
     apply_entities(level, gw, gh, tiles, levels_by_iid)
 
@@ -416,6 +473,82 @@ def generate_mapdata(
 
     lines.append("\tBREAK")
     return "\n".join(lines)
+
+
+def extract_tilemap_tiles(
+    level: dict[str, Any],
+) -> list[tuple[str, str, list[tuple[int, int, int]]]]:
+    """
+    Extract visual tile data from non-World IntGrid layers (Tilemap_Walls,
+    Tilemap_Overworld, etc.).
+
+    Skips the "World" layer (collider / blocker data).
+
+    Returns:
+        list of (layer_identifier, png_relpath, list of (grid_x, grid_y, tile_index))
+        in LDtk layer order (topmost first).
+
+    - png_relpath comes from the layer's __tilesetRelPath
+    - grid_x / grid_y are pixel position // TILE_SIZE
+    - tile_index is the LDtk auto-tile "t" value (tileset tile id)
+
+    autoLayerTiles already contain the resolved tiles produced by the IntGrid
+    auto-rules, so this is the painted visual result for each non-zero cell.
+    """
+    results: list[tuple[str, str, list[tuple[int, int, int]]]] = []
+
+    for layer in level.get("layerInstances", []):
+        layer_name = str(layer.get("__identifier") or "")
+        if layer_name == "World":
+            continue
+        if layer.get("__type") != "IntGrid":
+            continue
+
+        # Prefer the named visual layers; still accept other IntGrid+tileset layers.
+        png = layer.get("__tilesetRelPath")
+        if not png:
+            continue
+
+        tiles: list[tuple[int, int, int]] = []
+
+        # Auto-tiled tiles (the usual case for these layers)
+        for tile_data in layer.get("autoLayerTiles", []):
+            px = tile_data.get("px", [0, 0])
+            gx = int(px[0] // TILE_SIZE)
+            gy = int(px[1] // TILE_SIZE)
+            tid = int(tile_data.get("t", 0))
+            tiles.append((gx, gy, tid))
+
+        # Manual grid tiles (rare for IntGrid, but included for completeness)
+        for tile_data in layer.get("gridTiles", []):
+            px = tile_data.get("px", [0, 0])
+            gx = int(px[0] // TILE_SIZE)
+            gy = int(px[1] // TILE_SIZE)
+            tid = int(tile_data.get("t", 0))
+            tiles.append((gx, gy, tid))
+
+        if tiles:
+            # Stable order: row-major (y then x)
+            tiles.sort(key=lambda t: (t[1], t[0]))
+            results.append((layer_name, str(png), tiles))
+
+    return results
+
+
+def extract_all_tilemaps(
+    ldtk_path: Path,
+) -> dict[str, list[tuple[str, str, list[tuple[int, int, int]]]]]:
+    """
+    Load an LDtk project and extract visual tiles for every level.
+
+    Returns:
+        { level_identifier: extract_tilemap_tiles(level), ... }
+    """
+    data = json.loads(ldtk_path.read_text(encoding="utf-8"))
+    return {
+        level["identifier"]: extract_tilemap_tiles(level)
+        for level in data["levels"]
+    }
 
 
 def export_ldtk(

@@ -1,0 +1,25 @@
+@_INIT
+    DEFLIST TILESETS_ID int
+    BREAK
+
+#   Tilemap_Overworld = -200, Tilemap_Walls = -150
+# <spriteid> is the loaded asset id (png stem), e.g. tile-16px
+@TILESET_ADD <x> <y> <tileindex> <sort> <spriteid>
+    DEFVAR _rid 0 int
+    DEFVAR _x <x> int
+    DEFVAR _y <y> int
+    MUL _x [[GRID_SIZE]]
+    MUL _y [[GRID_SIZE]]
+
+    RENDER [[_x]] [[_y]] _rid <sort> "TILESET_<sort>"
+    EDIT [[_rid]] "SpriteID" <spriteid>
+    EDIT [[_rid]] "World" true
+    EDIT [[_rid]] "TileIndex" <tileindex>
+
+    LISTADD TILESETS_ID [[_rid]]
+    BREAK
+
+@TILESET_CLEAR
+    CLEAR "TILESET_*"
+    LISTCLEAR TILESETS_ID
+    BREAK

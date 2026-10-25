@@ -3787,25 +3787,6 @@
 			}
 		},
 		{
-			"__cWid": 0,
-			"__cHei": 0,
-			"identifier": "Tile_16px_grass",
-			"uid": 302,
-			"relPath": null,
-			"embedAtlas": null,
-			"pxWid": 0,
-			"pxHei": 0,
-			"tileGridSize": 16,
-			"spacing": 0,
-			"padding": 0,
-			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
-			"customData": [],
-			"savedSelections": [],
-			"cachedPixelData": null
-		},
-		{
 			"__cWid": 12,
 			"__cHei": 4,
 			"identifier": "Tile_16px_ref_wall",
