@@ -5,8 +5,6 @@
     $CHARACTER_GET <from> "MP" _mp
     $ACTIONINFO_GET_MPCOST <action> _ac
 
-    PRINT "MP COST: [[_ac]] CURRENT: [[_mp]]"
-
     SETVAR ACTION_C_VALID false
     JUMPLT _mp [[_ac]] VALIDATE_END
     SETVAR ACTION_C_VALID true
@@ -15,4 +13,21 @@
     BREAK
 
     >VALIDATE_END
+        BREAK
+
+@COMBAT:ACTION:ONSTART <action> <from> <target>
+    DEFVAR _mp 0 int
+    DEFVAR _ac 0 int
+    $ACTIONINFO_GET_MPCOST <action> _ac
+
+    JUMPEQ _ac 0 ONSTART_END
+
+    $CHARACTER_GET <from> "MP" _mp
+
+    SUB _mp [[_ac]]
+    $CHARACTER_STATS <from> "MP" [[_mp]]
+
+    PRINT "MP: [[_mp]]"
+
+    >ONSTART_END
         BREAK

@@ -141,6 +141,8 @@
                 #hp check again (ex. died from burn tick)
                 $CHARACTER_GET [[C_ACTOR]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
+
+                #TODO: change to random alive target
                 $CHARACTER_GET [[C_TARGET]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
 
@@ -148,6 +150,7 @@
                 $ACTION_PREVALIDATE [[C_ACTOR]] [[C_ACTION_ID]]
                 JUMPEQ ACTION_C_VALID false BP_NEXT
 
+                $COMBAT:ACTION:ONSTART [[C_ACTION_ID]] [[C_ACTOR]] [[C_TARGET]]
                 CALL "COMBAT:ACTION:[[C_ACTION_ID]] [[C_ACTOR]] [[C_TARGET]]"
                 $WAITPRESS "Space"
 
