@@ -1,0 +1,18 @@
+@ACTION_PREVALIDATE <from> <action>
+    DEFVAR _mp 0 int
+    DEFVAR _ac 0 int
+
+    $CHARACTER_GET <from> "MP" _mp
+    $ACTIONINFO_GET_MPCOST <action> _ac
+
+    PRINT "MP COST: [[_ac]] CURRENT: [[_mp]]"
+
+    SETVAR ACTION_C_VALID false
+    JUMPLT _mp [[_ac]] VALIDATE_END
+    SETVAR ACTION_C_VALID true
+
+    CALL "COMBAT:PREVALIDATE:<action>"
+    BREAK
+
+    >VALIDATE_END
+        BREAK

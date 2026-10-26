@@ -3,10 +3,14 @@
     $ACTIONINFO_CREATE "defend" "Defend" 1
     $ACTIONINFO_CREATE "pass" "Pass" 1
 
+    $ACTIONINFO_CREATE "sling" "Sling" 0 5
+    BREAK
+
 @COMBAT:ACTION:ATTACK <from> <to>
     DEFVAR _dmg 0 int
     $CHARACTER_INFO <from> "ATK" _dmg
     $COMBAT_APPLY_DAMAGE <from> <to> [[_dmg]]
+    BREAK
     
 @COMBAT:ACTION:DEFEND <from>
     PRINT "<from> defends"

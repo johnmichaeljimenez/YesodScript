@@ -3,6 +3,7 @@
     DEFLIST ACTIONINFOS_NAME string
     #0 = enemy, 1 = self (automatic, no targeting menu)
     DEFLIST ACTIONINFOS_TARGETTYPE int
+    DEFLIST ACTIONINFOS_MPCOST int
 
     DEFLIST ACTIONS_ID int
     DEFLIST ACTIONS_INFOID string
@@ -20,10 +21,11 @@
     DEFVAR ACTION_C_VALID false bool
     DEFVAR ACTION_NEXT_ID 1 int
 
-@ACTIONINFO_CREATE <id> <name> <targettype>
+@ACTIONINFO_CREATE <id> <name> <targettype> <mpcost>
     LISTADD ACTIONINFOS_ID <id>
     LISTADD ACTIONINFOS_NAME <name>
     LISTADD ACTIONINFOS_TARGETTYPE <targettype>
+    LISTADD ACTIONINFOS_MPCOST <mpcost>
 
 @ACTIONINFO_GET_TARGETTYPE <id> <out>
     DEFVAR _idx -1 int
@@ -33,6 +35,16 @@
     LISTGET ACTIONINFOS_TARGETTYPE [[_idx]] <out>
 
     >ACTIONINFO_GET_TARGETTYPE_END
+        BREAK
+
+@ACTIONINFO_GET_MPCOST <id> <out>
+    DEFVAR _idx -1 int
+    SETVAR <out> 0
+    LISTFIND ACTIONINFOS_ID <id> _idx
+    JUMPLT _idx 0 ACTIONINFO_GET_MPCOST_END
+    LISTGET ACTIONINFOS_MPCOST [[_idx]] <out>
+
+    >ACTIONINFO_GET_MPCOST_END
         BREAK
 
 @ACTION_CLEAR
@@ -87,13 +99,6 @@
 
     >ACTION_CHARACTER_LABELS_DONE
         BREAK
-
-#will be used for mana or cooldown checks (always true for now)
-@ACTION_PREVALIDATE <from> <action>
-    SETVAR ACTION_C_VALID true
-    #stub for now, will have something to call to next time
-    CALL "COMBAT:PREVALIDATE:<action>"
-    BREAK
 
 @ACTION_SUBMIT <name> <from> <target>
     DEFVAR _id 0 int

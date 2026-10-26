@@ -3,6 +3,7 @@
         $CHARACTERINFO_ADD_ABILITY "david" "attack"
         $CHARACTERINFO_ADD_ABILITY "david" "defend"
         $CHARACTERINFO_ADD_ABILITY "david" "pass"
+        $CHARACTERINFO_ADD_ABILITY "david" "sling"
 
     $CHARACTERINFO_CREATE "wolf" "Wolf" 8 6 6 8 1
         $CHARACTERINFO_ADD_ABILITY "wolf" "attack"
