@@ -1,6 +1,6 @@
 @_INIT
 
-@COMBAT_APPLY_DAMAGE <from> <to> <dmg>
+@COMBAT_APPLY_DAMAGE <from> <to> <dmg> <pure>
 	# dragon quest formula: (atk/2)-(def/4), plink min 1
 	DEFVAR _atk <dmg> int
 	DEFVAR _def 0 int
@@ -8,6 +8,8 @@
 	DEFVAR _final 0 int
 	DEFVAR _halfAtk 0 int
 	DEFVAR _quarterDef 0 int
+
+	JUMPEQ <pure> true COMBAT_APPLY_PURE_DAMAGE
 
 	$CHARACTER_INFO <to> "DEF" _def
 
@@ -22,6 +24,13 @@
 	#plink
 	JUMPGE _final 1 COMBAT_APPLY_DAMAGE_APPLY
 	SETVAR _final 1
+
+	JUMP COMBAT_APPLY_DAMAGE_APPLY
+
+	>COMBAT_APPLY_PURE_DAMAGE
+		SETVAR _final <dmg>
+		JUMP COMBAT_APPLY_DAMAGE_APPLY
+
 
 	>COMBAT_APPLY_DAMAGE_APPLY
 		$CHARACTER_GET <to> "HP" _hp
