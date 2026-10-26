@@ -24,7 +24,7 @@
 	SETVAR _final 1
 
 	>COMBAT_APPLY_DAMAGE_APPLY
-		$CHARACTER_GET_HP <to> _hp
+		$CHARACTER_GET <to> "HP" _hp
 		SUB _hp [[_final]]
 		JUMPGE _hp 0 COMBAT_APPLY_DAMAGE_SET
 		SETVAR _hp 0

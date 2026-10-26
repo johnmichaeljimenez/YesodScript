@@ -148,14 +148,14 @@
     LISTFIND CH_IDS <id> <outIdx>
     BREAK
 
-@CHARACTER_GET_HP <id> <outHp>
+@CHARACTER_GET <id> <stat> <outVar>
     DEFVAR _idx -1 int
     LISTFIND CH_IDS <id> _idx
-    JUMPLT _idx 0 CHARACTER_GET_HP_MISS
-    LISTGET CH_HP [[_idx]] <outHp>
+    JUMPLT _idx 0 CHARACTER_GET_MISS
+    LISTGET "CH_<stat>" [[_idx]] <outVar>
     BREAK
 
-    >CHARACTER_GET_HP_MISS
+    >CHARACTER_GET_MISS
         SETVAR <outHp> 0
         BREAK
 

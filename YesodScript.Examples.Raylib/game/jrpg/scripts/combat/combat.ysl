@@ -131,17 +131,17 @@
                 LISTGET ACTIONS_TARGET [[_i]] C_TARGET
 
                 #hp check
-                $CHARACTER_GET_HP [[C_ACTOR]] _hp
+                $CHARACTER_GET [[C_ACTOR]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
-                $CHARACTER_GET_HP [[C_TARGET]] _hp
+                $CHARACTER_GET [[C_TARGET]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
 
                 $BUFFS:TICK [[C_ACTOR]]
                 
                 #hp check again (ex. died from burn tick)
-                $CHARACTER_GET_HP [[C_ACTOR]] _hp
+                $CHARACTER_GET [[C_ACTOR]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
-                $CHARACTER_GET_HP [[C_TARGET]] _hp
+                $CHARACTER_GET [[C_TARGET]] "HP" _hp
                 JUMPLE _hp 0 BP_NEXT
 
                 # skip if actor can no longer perform this action (mana/cooldown/etc)

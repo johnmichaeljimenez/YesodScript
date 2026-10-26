@@ -12,7 +12,7 @@
         JUMPGE _i [[_n]] PARTY_REFRESH_SIDE_DONE
 
         LISTGET "<from>_PARTY" [[_i]] _cid
-        $CHARACTER_GET_HP [[_cid]] _hp
+        $CHARACTER_GET [[_cid]] "HP" _hp
         JUMPLE _hp 0 PARTY_REFRESH_SIDE_NEXT
 
         LISTADD "P<from>_ALIVE" [[_cid]]
