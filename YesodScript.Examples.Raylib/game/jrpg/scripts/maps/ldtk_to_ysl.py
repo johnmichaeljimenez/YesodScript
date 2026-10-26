@@ -3,9 +3,9 @@
 Export LDtk mapdata.ldtk -> mapdata.ysl MAPDATA sections.
 
 Also provides helpers to extract visual tile data from IntGrid auto-tile
-layers (everything except the "World" collider layer):
+layers (everything except the "World" gameplay/collider layer):
 
-  extract_tilemap_tiles(level) -> list[(layer, png, list[(x, y, tile_id)])]
+  extract_tilemap_tiles(level) -> list[(layer, png, sort, list[(x, y, tile_id)])]
   extract_all_tilemaps(ldtk_path) -> dict[level_name, above]
 
 MAP_SET layout (see map.ysl / map_set.ysl):
@@ -13,14 +13,17 @@ MAP_SET layout (see map.ysl / map_set.ysl):
 
 TILESET_ADD layout (see tileset.ysl):
   $TILESET_ADD x y tileindex sort spriteid
-  - emitted for Tilemap_Overworld / Tilemap_Walls autoLayerTiles
+  - emitted for every IntGrid layer that has a tileset / auto-tile rules
+  - World is never tileset-rendered; it only feeds gameplay MAP_SET blockers
   - spriteid is the LOADASSETS key (png stem under game assets/)
-  - sort: Overworld=-200, Walls=-150 (below entity MAP_SET at -100)
+  - sort follows LDtk layer stack order from TILESET_SORT_BASE upward
+    (bottom-most visual layer = base, each layer above += TILESET_SORT_STEP)
+  - keep sorts below entity MAP_SET renders (-100)
 
 
 Tile types:
   0 blank
-  1 blocker          (IntGrid value 1)
+  1 blocker          (IntGrid value 1 on World)
   2 misc / gate      (Interactable Type=Misc)
   3 npc              (Interactable Type=NPC)
   4 item / gold      (Interactable Type=Item)
@@ -71,13 +74,16 @@ from typing import Any
 # LDtk grid is 16px in this project.
 TILE_SIZE = 16
 
-# Visual IntGrid layers exported as TILESET_ADD (collider World is skipped).
-# Depth must stay below entity MAP_SET renders (-100).
-TILEMAP_LAYER_SORT = {
-    "Tilemap_Overworld": -200,
-    "Tilemap_Walls": -150,
-}
-TILEMAP_LAYER_SORT_DEFAULT = -180
+# Gameplay IntGrid layer: blockers / collision only (never TILESET_*).
+GAMEPLAY_INTGRID_LAYER = "World"
+
+# Visual IntGrid layers (tileset + rules) -> TILESET_ADD.
+# Sort is derived from LDtk stack order (topmost first in layerInstances):
+#   bottom-most visual layer = TILESET_SORT_BASE
+#   each layer above it     += TILESET_SORT_STEP
+# Must stay below entity MAP_SET renders (-100).
+TILESET_SORT_BASE = -200
+TILESET_SORT_STEP = 50
 
 # Interactable.Type enum -> MAP tile type
 INTERACT_TYPE_TO_TILE = {
@@ -334,11 +340,11 @@ def collect_intgrid_blockers(
     gw: int,
     gh: int,
 ) -> dict[tuple[int, int], dict[str, str | int]]:
-    """IntGrid value 1 -> solid blocker tiles (type 1)."""
+    """World IntGrid value 1 -> solid blocker tiles (type 1 gameplay)."""
     tiles: dict[tuple[int, int], dict[str, str | int]] = {}
 
     for layer in level["layerInstances"]:
-        if layer["__identifier"] != "World" or layer["__type"] != "IntGrid":
+        if not is_gameplay_intgrid_layer(layer):
             continue
 
         csv = layer["intGridCsv"]
@@ -420,8 +426,69 @@ def sprite_id_from_tileset_path(png: str) -> str:
     return Path(name).stem
 
 
-def layer_sort(layer_name: str) -> int:
-    return TILEMAP_LAYER_SORT.get(layer_name, TILEMAP_LAYER_SORT_DEFAULT)
+def is_gameplay_intgrid_layer(layer: dict[str, Any]) -> bool:
+    """World IntGrid is gameplay/collision only — never TILESET-rendered."""
+    return (
+        layer.get("__type") == "IntGrid"
+        and str(layer.get("__identifier") or "") == GAMEPLAY_INTGRID_LAYER
+    )
+
+
+def is_tileset_intgrid_layer(layer: dict[str, Any]) -> bool:
+    """
+    True for IntGrid layers that should emit TILESET_ADD.
+
+    Criteria:
+      - IntGrid
+      - not the World gameplay layer
+      - has a bound tileset path and/or resolved auto/grid tiles
+        (tile rules bake into autoLayerTiles in the LDtk export)
+    """
+    if layer.get("__type") != "IntGrid":
+        return False
+    if is_gameplay_intgrid_layer(layer):
+        return False
+
+    png = layer.get("__tilesetRelPath")
+    if png:
+        return True
+
+    # Fallback: resolved tiles even if relpath is missing for some reason.
+    if layer.get("autoLayerTiles") or layer.get("gridTiles"):
+        return True
+    return False
+
+
+def collect_layer_tiles(
+    layer: dict[str, Any],
+) -> list[tuple[int, int, int]]:
+    """Collect (grid_x, grid_y, tile_index) from autoLayerTiles + gridTiles."""
+    tiles: list[tuple[int, int, int]] = []
+
+    for tile_data in layer.get("autoLayerTiles", []):
+        px = tile_data.get("px", [0, 0])
+        gx = int(px[0] // TILE_SIZE)
+        gy = int(px[1] // TILE_SIZE)
+        tid = int(tile_data.get("t", 0))
+        tiles.append((gx, gy, tid))
+
+    for tile_data in layer.get("gridTiles", []):
+        px = tile_data.get("px", [0, 0])
+        gx = int(px[0] // TILE_SIZE)
+        gy = int(px[1] // TILE_SIZE)
+        tid = int(tile_data.get("t", 0))
+        tiles.append((gx, gy, tid))
+
+    tiles.sort(key=lambda t: (t[1], t[0]))
+    return tiles
+
+
+def tileset_sort_for_stack_index(index_from_bottom: int) -> int:
+    """
+    Map 0-based bottom->top stack index onto a render sort value.
+    index 0 (bottom-most) => TILESET_SORT_BASE
+    """
+    return TILESET_SORT_BASE + index_from_bottom * TILESET_SORT_STEP
 
 
 def format_tileset_add(
@@ -458,9 +525,8 @@ def generate_mapdata(
 
     # Visual tiles first (behind entity/blocker MAP_SET renders).
     # Emit bottom layers first so later same-depth draws stay stable.
-    for layer_name, png, tiles in reversed(extract_tilemap_tiles(level)):
+    for layer_name, png, sort, tiles in reversed(extract_tilemap_tiles(level)):
         sprite_id = sprite_id_from_tileset_path(png)
-        sort = layer_sort(layer_name)
         lines.append(f"\t# tileset layer {layer_name} -> {sprite_id} sort={sort}")
         for x, y, tid in tiles:
             lines.append(format_tileset_add(x, y, tid, sort, sprite_id))
@@ -477,16 +543,19 @@ def generate_mapdata(
 
 def extract_tilemap_tiles(
     level: dict[str, Any],
-) -> list[tuple[str, str, list[tuple[int, int, int]]]]:
+) -> list[tuple[str, str, int, list[tuple[int, int, int]]]]:
     """
-    Extract visual tile data from non-World IntGrid layers (Tilemap_Walls,
-    Tilemap_Overworld, etc.).
+    Extract visual tile data from IntGrid layers that have tilesets / rules.
 
-    Skips the "World" layer (collider / blocker data).
+    Skips the World gameplay layer (collider / blocker MAP_SET data only).
 
     Returns:
-        list of (layer_identifier, png_relpath, list of (grid_x, grid_y, tile_index))
+        list of (layer_identifier, png_relpath, sort, list of (grid_x, grid_y, tile_index))
         in LDtk layer order (topmost first).
+
+    Sort is assigned from stack order:
+      bottom-most visual IntGrid => TILESET_SORT_BASE
+      each layer above it        => previous + TILESET_SORT_STEP
 
     - png_relpath comes from the layer's __tilesetRelPath
     - grid_x / grid_y are pixel position // TILE_SIZE
@@ -495,49 +564,42 @@ def extract_tilemap_tiles(
     autoLayerTiles already contain the resolved tiles produced by the IntGrid
     auto-rules, so this is the painted visual result for each non-zero cell.
     """
-    results: list[tuple[str, str, list[tuple[int, int, int]]]] = []
+    # First pass: gather candidate visual layers in LDtk order (topmost first).
+    candidates: list[tuple[str, str, list[tuple[int, int, int]]]] = []
 
     for layer in level.get("layerInstances", []):
+        if not is_tileset_intgrid_layer(layer):
+            continue
+
         layer_name = str(layer.get("__identifier") or "")
-        if layer_name == "World":
+        png = layer.get("__tilesetRelPath") or ""
+        tiles = collect_layer_tiles(layer)
+        if not tiles:
             continue
-        if layer.get("__type") != "IntGrid":
-            continue
-
-        # Prefer the named visual layers; still accept other IntGrid+tileset layers.
-        png = layer.get("__tilesetRelPath")
         if not png:
+            print(
+                f"  warning: IntGrid layer '{layer_name}' has tiles but no "
+                f"__tilesetRelPath; skipping TILESET export"
+            )
             continue
 
-        tiles: list[tuple[int, int, int]] = []
+        candidates.append((layer_name, str(png), tiles))
 
-        # Auto-tiled tiles (the usual case for these layers)
-        for tile_data in layer.get("autoLayerTiles", []):
-            px = tile_data.get("px", [0, 0])
-            gx = int(px[0] // TILE_SIZE)
-            gy = int(px[1] // TILE_SIZE)
-            tid = int(tile_data.get("t", 0))
-            tiles.append((gx, gy, tid))
-
-        # Manual grid tiles (rare for IntGrid, but included for completeness)
-        for tile_data in layer.get("gridTiles", []):
-            px = tile_data.get("px", [0, 0])
-            gx = int(px[0] // TILE_SIZE)
-            gy = int(px[1] // TILE_SIZE)
-            tid = int(tile_data.get("t", 0))
-            tiles.append((gx, gy, tid))
-
-        if tiles:
-            # Stable order: row-major (y then x)
-            tiles.sort(key=lambda t: (t[1], t[0]))
-            results.append((layer_name, str(png), tiles))
+    # Second pass: assign sort from bottom -> top.
+    # candidates[0] is topmost; candidates[-1] is bottom-most.
+    n = len(candidates)
+    results: list[tuple[str, str, int, list[tuple[int, int, int]]]] = []
+    for top_index, (layer_name, png, tiles) in enumerate(candidates):
+        index_from_bottom = n - 1 - top_index
+        sort = tileset_sort_for_stack_index(index_from_bottom)
+        results.append((layer_name, png, sort, tiles))
 
     return results
 
 
 def extract_all_tilemaps(
     ldtk_path: Path,
-) -> dict[str, list[tuple[str, str, list[tuple[int, int, int]]]]]:
+) -> dict[str, list[tuple[str, str, int, list[tuple[int, int, int]]]]]:
     """
     Load an LDtk project and extract visual tiles for every level.
 

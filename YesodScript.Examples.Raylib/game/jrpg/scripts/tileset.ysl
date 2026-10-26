@@ -2,7 +2,7 @@
     DEFLIST TILESETS_ID int
     BREAK
 
-#   Tilemap_Overworld = -200, Tilemap_Walls = -150
+#bottom-most visual IntGrid = -200, each layer above += 50
 # <spriteid> is the loaded asset id (png stem), e.g. tile-16px
 @TILESET_ADD <x> <y> <tileindex> <sort> <spriteid>
     DEFVAR _rid 0 int
