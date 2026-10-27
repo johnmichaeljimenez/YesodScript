@@ -1,33 +1,38 @@
 @_INIT
     DEFLIST INVENTORY_INFOIDS string
-    DEFLIST INVENTORY_INFONAME string
+    DEFLIST INVENTORY_INFONAMES string
 
     DEFLIST INVENTORY_ITEMID string
     DEFLIST INVENTORY_ITEMQTY int
 
 @INVENTORY_ADD_INFO <id> <name>
     LISTADD INVENTORY_INFOIDS <id>
-    LISTADD INVENTORY_INFONAME <name>
+    LISTADD INVENTORY_INFONAMES <name>
     BREAK
 
 @INVENTORY_ADD_ITEM <id> <qty>
     DEFVAR _existing -1 int
     LISTFIND INVENTORY_ITEMID <id> _existing
-    JUMPGE _existing 0 EXISTING
+    JUMPEQ _existing -1 NON_EXISTING
 
     DEFVAR _amt 0 int
-    LISTGET INVENTORY_ITEMQTY <id> _amt
+    LISTGET INVENTORY_ITEMQTY [[_existing]] _amt
     ADD _amt <qty>
-    LISTSET INVENTORY_ITEMQTY <id> _amt
+    LISTSET INVENTORY_ITEMQTY [[_existing]] _amt
     BREAK
 
-    >EXISTING
+    >NON_EXISTING
         LISTADD INVENTORY_ITEMID <id>
         LISTADD INVENTORY_ITEMQTY <qty>
         BREAK
 
 @INVENTORY_GET_ID <index> <outvar>
     LISTGET INVENTORY_ITEMID <index> <outvar>
+
+@INVENTORY_GET_NAME <infoid> <outvar>
+    DEFVAR _index 0 int
+    LISTFIND INVENTORY_INFOIDS <infoid> _index
+    LISTGET INVENTORY_INFONAMES _index <outvar>
 
 @INVENTORY_USE_ITEM <id>
     DEFVAR _existing -1 int
