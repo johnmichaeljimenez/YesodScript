@@ -13,7 +13,7 @@
 @INVENTORY_ADD_ITEM <id> <qty>
     DEFVAR _existing -1 int
     LISTFIND INVENTORY_ITEMID <id> _existing
-    JUMPGE _existing true EXISTING
+    JUMPGE _existing 0 EXISTING
 
     DEFVAR _amt 0 int
     LISTGET INVENTORY_ITEMQTY <id> _amt
@@ -30,7 +30,19 @@
     LISTGET INVENTORY_ITEMID <index> <outvar>
 
 @INVENTORY_USE_ITEM <id>
-    BREAK
+    DEFVAR _existing -1 int
+    LISTFIND INVENTORY_ITEMID <id> _existing
+    JUMPEQ _existing -1 END
+
+    DEFVAR _amt 0 int
+    LISTGET INVENTORY_ITEMQTY <id> _amt
+    SUB _amt 1
+    LISTSET INVENTORY_ITEMQTY <id> _amt
+
+    CALL "ITEM:USE:<id>"
+    
+    >END
+        BREAK
 
 @INVENTORY_CLEAR
     $LISTCLEAR2 INVENTORY_ITEMID INVENTORY_ITEMQTY
