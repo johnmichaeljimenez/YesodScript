@@ -1,0 +1,4 @@
+@INFO_INIT
+    $INVENTORY_ADD_INFO "berry" "Berry"
+    $INVENTORY_ADD_INFO "badge" "Guard's Badge"
+    $INVENTORY_ADD_INFO "chimera-claw" "Chimera's Claw"
