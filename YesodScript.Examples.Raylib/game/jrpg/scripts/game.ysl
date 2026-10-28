@@ -7,6 +7,8 @@
 
     $PARTY_ADD "PLAYER" "david"
 
+    LOADDATA "player"
+
     $OVERWORLD_INIT
 	$FADE_OUT
 
@@ -58,4 +60,5 @@
 
     >END
         $OVERWORLD_END
+        SAVEDATA "player"
         BREAK

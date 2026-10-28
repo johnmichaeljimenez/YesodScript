@@ -5,6 +5,9 @@
     DEFLIST INVENTORY_ITEMID string
     DEFLIST INVENTORY_ITEMQTY int
 
+    REGSAVEVAR "player" INVENTORY_ITEMID
+    REGSAVEVAR "player" INVENTORY_ITEMQTY
+
 @INVENTORY_ADD_INFO <id> <name>
     LISTADD INVENTORY_INFOIDS <id>
     LISTADD INVENTORY_INFONAMES <name>
@@ -40,9 +43,9 @@
     JUMPEQ _existing -1 END
 
     DEFVAR _amt 0 int
-    LISTGET INVENTORY_ITEMQTY <id> _amt
+    LISTGET INVENTORY_ITEMQTY [[_existing]] _amt
     SUB _amt 1
-    LISTSET INVENTORY_ITEMQTY <id> _amt
+    LISTSET INVENTORY_ITEMQTY [[_existing]] _amt
 
     CALL "ITEM:USE:<id>"
     
