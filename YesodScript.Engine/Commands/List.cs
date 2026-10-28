@@ -29,9 +29,32 @@ public static class ListAccess
 		return i;
 	}
 
-	public static object Parse(OpList l, string raw, string field) =>
-		Command.ConvertArgument(raw, l.ElementType, field);
-}
+	public static object Parse(OpList l, string raw, string field, VirtualMachine? vm = null, Instruction? scope = null)
+		{
+			if (vm != null && !string.IsNullOrWhiteSpace(raw))
+			{
+				var referenced = vm.GetVar(raw, scope);
+				if (referenced != null)
+				{
+					if (referenced.Type == typeof(OpList))
+						throw new InvalidOperationException($"Cannot use list '{raw}' as a list element value.");
+
+					if (l.ElementType == typeof(string))
+						return Utils.FormatValue(referenced.Value);
+
+					if (referenced.Value != null && l.ElementType.IsInstanceOfType(referenced.Value))
+						return referenced.Value;
+
+					return Command.ConvertArgument(
+						Utils.FormatValue(referenced.Value),
+						l.ElementType,
+						field);
+				}
+			}
+
+			return Command.ConvertArgument(raw, l.ElementType, field);
+		}
+	}
 
 public class DefList : Command
 {
@@ -68,7 +91,7 @@ public class ListAdd : Command
 	public override void OnEnter()
 	{
 		var l = ListAccess.Get(VM, key, Instruction);
-		l.Items.Add(ListAccess.Parse(l, value, nameof(value)));
+			l.Items.Add(ListAccess.Parse(l, value, nameof(value), VM, Instruction));
 	}
 }
 
@@ -81,7 +104,7 @@ public class ListSet : Command
 	public override void OnEnter()
 	{
 		var l = ListAccess.Get(VM, key, Instruction);
-		l.Items[ListAccess.Index(l, index)] = ListAccess.Parse(l, value, nameof(value));
+			l.Items[ListAccess.Index(l, index)] = ListAccess.Parse(l, value, nameof(value), VM, Instruction);
 	}
 }
 
@@ -95,7 +118,7 @@ public class ListInsert : Command
 	{
 		var l = ListAccess.Get(VM, key, Instruction);
 		l.Items.Insert(ListAccess.Index(l, index, allowEnd: true),
-					   ListAccess.Parse(l, value, nameof(value)));
+						   ListAccess.Parse(l, value, nameof(value), VM, Instruction));
 	}
 }
 
@@ -128,7 +151,7 @@ public class ListFind : Command
 		var l = ListAccess.Get(VM, key, Instruction);
 		var v = VM.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
 
-		object target = ListAccess.Parse(l, value, nameof(value));
+		object target = ListAccess.Parse(l, value, nameof(value), VM, Instruction);
 		int found = l.Items.IndexOf(target);
 		v.SetValue(found.ToString(CultureInfo.InvariantCulture), false);
 	}

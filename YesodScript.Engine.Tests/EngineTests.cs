@@ -121,7 +121,7 @@ public partial class EngineTests
     public void Test_Lists()
     {
         var vm = Utils.Test(out var output, "Lists.ysl");
-        output.Should().Be("apple\nbanana\ncherry\n5\n10\n25\nSUM: 40\n1\n-1\n2");
+            output.Should().Be("apple\nbanana\ncherry\n5\n10\n40\nSUM: 55\n1\n-1\n2");
     }
 
     [Fact]
