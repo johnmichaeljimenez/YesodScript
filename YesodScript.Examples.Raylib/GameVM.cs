@@ -14,13 +14,14 @@ public class GameVM : VirtualMachine
 	private Var hoveredId, clickedId;
 	private Var logString;
 
+	public readonly SaveManager SaveManager;
+
 	public GameVM(int randomSeed = 0) : base(randomSeed)
 	{
+		SaveManager = new SaveManager(this);
 	}
 
 	public static GameVM Instance { get; private set; }
-
-
 
 	public static GameVM Create()
 	{
@@ -317,6 +318,43 @@ public class TweenCam : GameCommand
 					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
 
 		TweenManager.Add(tween);
+	}
+}
+
+public class RegSaveVar : GameCommand
+{
+	[CommandParameter]
+	private string group;
+
+	[CommandParameter]
+	private string varName;
+
+	public override void OnEnter()
+	{
+		var variable = GameVM.GetVar(varName, Instruction);
+		GameVM.SaveManager.RegisterVar(group, variable);
+	}
+}
+
+public class SaveData : GameCommand
+{
+	[CommandParameter]
+	private string group;
+
+	public override void OnEnter()
+	{
+		GameVM.SaveManager.Save(group);
+	}
+}
+
+public class LoadData : GameCommand
+{
+	[CommandParameter]
+	private string group;
+
+	public override void OnEnter()
+	{
+		GameVM.SaveManager.Load(group);
 	}
 }
 
