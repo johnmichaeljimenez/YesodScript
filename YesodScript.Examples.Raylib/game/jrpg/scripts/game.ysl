@@ -60,5 +60,4 @@
 
     >END
         $OVERWORLD_END
-        SAVEDATA "player"
         BREAK

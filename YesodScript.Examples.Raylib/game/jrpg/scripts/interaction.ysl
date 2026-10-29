@@ -16,12 +16,20 @@
     # only Active (0) is interactable (MAP_STEP should already filter this)
     JUMPNEQ _state 0 END
 
+    JUMPEQ _type 7 I_SAVEPOINT
     JUMPEQ _type 6 I_TRIGGER
     JUMPEQ _type 4 I_ITEM
     JUMPEQ _type 3 I_NPC
     JUMPEQ _type 2 I_MISC
     JUMPEQ _type 5 I_SWITCH
     BREAK
+
+    >I_SAVEPOINT
+        SAVEDATA "player"
+        $FADE_IN
+        WAIT 1
+        $FADE_OUT
+        BREAK
 
     >I_TRIGGER
         JUMPNEQ _target 0 I_TRIGGER_EXIT
