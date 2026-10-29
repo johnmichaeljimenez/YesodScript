@@ -20,3 +20,11 @@
 @COMBAT:ACTION:PASS <from>
     PRINT "<from> skipped turn"
     BREAK
+
+@COMBAT:ACTION:SLING <from> <to>
+    DEFVAR _dmg 0 int
+    $CHARACTER_INFO <from> "ATK" _dmg
+
+    #pure damage
+    $COMBAT_APPLY_DAMAGE <from> <to> [[_dmg]] true
+    BREAK
