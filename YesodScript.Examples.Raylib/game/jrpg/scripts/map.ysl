@@ -23,6 +23,14 @@
     REGSAVEVAR "player" MAP_SAVE_ID
     REGSAVEVAR "player" MAP_SAVE_VALUE
 
+    DEFVAR MAP_SAVE_CURRENT_ID * string
+    DEFVAR MAP_SAVE_CURRENT_X 0 int
+    DEFVAR MAP_SAVE_CURRENT_Y 0 int
+
+    REGSAVEVAR "player" MAP_SAVE_CURRENT_ID
+    REGSAVEVAR "player" MAP_SAVE_CURRENT_X
+    REGSAVEVAR "player" MAP_SAVE_CURRENT_Y
+
 
     #lists are 1d here, but I have function that returns x,y parameter into int 1d index
 

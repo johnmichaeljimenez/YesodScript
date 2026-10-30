@@ -1,5 +1,6 @@
 @_INIT
-    
+    DEFVAR NEWGAME true bool
+    REGSAVEVAR "player" NEWGAME
 
 @GAME_INIT
     $PARTY_CLEAR "PLAYER"
