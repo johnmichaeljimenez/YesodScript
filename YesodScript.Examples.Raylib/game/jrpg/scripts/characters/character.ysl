@@ -28,6 +28,8 @@
 
     DEFVAR CH_TEMP_ID 0 int
     DEFVAR CH_NEXT_ID 1 int
+    
+    REGSAVEVAR "player" CH_NEXT_ID
     BREAK
 
 @CHARACTERINFO_CREATE <id> <name> <hp> <mp> <atk> <spd> <def>

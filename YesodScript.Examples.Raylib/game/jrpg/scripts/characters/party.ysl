@@ -10,6 +10,10 @@
     #not stunned and alive (at least alive for now)
     DEFLIST PPLAYER_ACTING int
     DEFLIST PENEMY_ACTING int
+
+    REGSAVEVAR "player" PLAYER_PARTY
+    REGSAVEVAR "player" PPLAYER_ALIVE
+
     BREAK
 
 @PARTY_CLEAR <from>

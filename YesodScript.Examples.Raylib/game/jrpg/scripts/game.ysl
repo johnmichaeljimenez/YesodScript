@@ -1,18 +1,23 @@
 @_INIT
     DEFVAR NEWGAME true bool
-    REGSAVEVAR "player" NEWGAME
 
 @GAME_INIT
-    $PARTY_CLEAR "PLAYER"
     $PARTY_CLEAR "ENEMY"
+    
+    JUMPEQ NEWGAME false GAME_INIT_LOAD
+    $INVENTORY_CLEAR
+    $PARTY_CLEAR "PLAYER"
 
     $PARTY_ADD "PLAYER" "david"
+    JUMP GAME_INIT_READY
 
-    LOADDATA "player" "slot-0"
-    SAVEDATA "player" "slot-0"
+    >GAME_INIT_LOAD
+        LOADDATA "player" "slot-0"
 
-    $OVERWORLD_INIT
-	$FADE_OUT
+    >GAME_INIT_READY
+        $OVERWORLD_INIT
+        SAVEDATA "player" "slot-0"
+        $FADE_OUT
 
 @GAME_TICK
     DEFVAR _t 0 int
