@@ -20,6 +20,9 @@
     DEFLIST MAP_SAVE_ID string
     DEFLIST MAP_SAVE_VALUE int
 
+    REGSAVEVAR "player" MAP_SAVE_ID
+    REGSAVEVAR "player" MAP_SAVE_VALUE
+
 
     #lists are 1d here, but I have function that returns x,y parameter into int 1d index
 

@@ -21,6 +21,11 @@
     DEFLIST CH_HP int
     DEFLIST CH_MP int
 
+    REGSAVEVAR "player" CH_REFS
+    REGSAVEVAR "player" CH_IDS
+    REGSAVEVAR "player" CH_HP
+    REGSAVEVAR "player" CH_MP
+
     DEFVAR CH_TEMP_ID 0 int
     DEFVAR CH_NEXT_ID 1 int
     BREAK
