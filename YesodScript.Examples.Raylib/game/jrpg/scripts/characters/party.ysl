@@ -13,8 +13,22 @@
     BREAK
 
 @PARTY_CLEAR <from>
-    $LIST_CLEAR3 "<from>_PARTY" "P<from>_ALIVE" "P<from>_ACTING"
-    BREAK
+    DEFVAR _i 0 int
+    DEFVAR _c 0 int
+    LISTCOUNT "<from>_PARTY" _c
+    
+    JUMPEQ _c 0 PARTY_CLEAR_END
+    
+    >LOOP 
+        JUMPGE _i [[_c]] PARTY_CLEAR_END
+        LISTGET "<from>_PARTY" [[_i]] CH_TEMP_ID
+        $CHARACTER_REMOVE [[CH_TEMP_ID]]
+        ADD _i 1
+        JUMP LOOP
+
+    >PARTY_CLEAR_END
+        $LIST_CLEAR3 "<from>_PARTY" "P<from>_ALIVE" "P<from>_ACTING"
+        BREAK
 
 @PARTY_ADD <from> <characterinfo>
     SETVAR CH_TEMP_ID 0
