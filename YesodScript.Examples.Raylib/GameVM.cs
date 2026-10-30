@@ -340,10 +340,12 @@ public class SaveData : GameCommand
 {
 	[CommandParameter]
 	private string group;
+	[CommandParameter]
+	private string filename;
 
 	public override void OnEnter()
 	{
-		GameVM.SaveManager.Save(group);
+		GameVM.SaveManager.Save(group, filename);
 	}
 }
 
@@ -351,10 +353,12 @@ public class LoadData : GameCommand
 {
 	[CommandParameter]
 	private string group;
+	[CommandParameter]
+	private string filename;
 
 	public override void OnEnter()
 	{
-		GameVM.SaveManager.Load(group);
+		GameVM.SaveManager.Load(group, filename);
 	}
 }
 

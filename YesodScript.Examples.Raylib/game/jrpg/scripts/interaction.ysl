@@ -25,7 +25,7 @@
     BREAK
 
     >I_SAVEPOINT
-        SAVEDATA "player"
+        SAVEDATA "player" "slot-0"
         $FADE_IN
         WAIT 1
         $FADE_OUT

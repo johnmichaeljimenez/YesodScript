@@ -7,7 +7,8 @@
 
     $PARTY_ADD "PLAYER" "david"
 
-    LOADDATA "player"
+    LOADDATA "player" "slot-0"
+    SAVEDATA "player" "slot-0"
 
     $OVERWORLD_INIT
 	$FADE_OUT

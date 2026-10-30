@@ -38,12 +38,12 @@ public class SaveManager
 		list.Add(variable);
 	}
 
-	public void Load(string group)
+	public void Load(string group, string filename)
 	{
 		if (!saveData.TryGetValue(group, out var vars))
 			throw new Exception($"No save data registered for group '{group}'");
 
-		var path = GetSavePath(group);
+		var path = GetSavePath(filename);
 		if (!File.Exists(path))
 			return;
 
@@ -64,12 +64,12 @@ public class SaveManager
 		}
 	}
 
-	public void Save(string group)
+	public void Save(string group, string filename)
 	{
 		if (!saveData.TryGetValue(group, out var vars))
 			throw new Exception($"No save data registered for group '{group}'");
 
-		var path = GetSavePath(group);
+		var path = GetSavePath(filename);
 		var data = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 
 		foreach (var variable in vars)
@@ -79,12 +79,12 @@ public class SaveManager
 		File.WriteAllText(path, json);
 	}
 
-	public string GetSavePath(string group)
+	public string GetSavePath(string filename)
 	{
 		if (!Directory.Exists("saves"))
 			Directory.CreateDirectory("saves");
 
-		return Path.Combine("saves", $"{group}.json");
+		return Path.Combine("saves", $"{filename}.json");
 	}
 
 	private static object? SerializeValue(Var variable)
