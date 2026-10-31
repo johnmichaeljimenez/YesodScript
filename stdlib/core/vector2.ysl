@@ -49,7 +49,6 @@
 	DEFVAR _xx 0 float
 	DEFVAR _yy 0 float
 
-	# copy via ADD (bare param is a var name; [[<name>]] is not supported)
 	ADD _x <xvar>
 	ADD _y <yvar>
 	SETVAR _xx [[_x]]
@@ -81,7 +80,6 @@
 	ADD <out> [[_y]]
 	BREAK
 
-# Writes 1 to <outBool> when distance(a,b) <= dist, else 0.
 @VINRANGE <ax> <ay> <bx> <by> <dist> <outBool>
 	DEFVAR _dx <ax> float
 	SUB _dx <bx>
@@ -99,9 +97,9 @@
 	MUL _lim <dist>
 
 	JUMPLE _dsq [[_lim]] VINRANGE_YES
-	SETVAR <outBool> 0
+	SETVAR <outBool> false
 	BREAK
 
 	>VINRANGE_YES
-		SETVAR <outBool> 1
+		SETVAR <outBool> true
 		BREAK
