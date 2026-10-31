@@ -1,3 +1,6 @@
+@_INIT
+    DEFVAR REQ_EXIT_TO_MENU false bool
+
 @GAME_INIT
     $SAVE:INIT
     
@@ -17,7 +20,8 @@
     DEFVAR _t 0 int
 
     >LOOP
-        JUMPKEYPRESS "Escape" END
+        JUMPEQ REQ_EXIT_TO_MENU true END
+        JUMPKEYPRESS "Escape" PAUSE
         JUMPKEY "C" TESTCOMBAT
         JUMPKEY "W" MOVE_UP
         JUMPKEY "S" MOVE_DOWN
@@ -59,6 +63,11 @@
         WAITFRAME
         JUMP LOOP
 
+    >PAUSE
+        $PAUSE_MENU
+        JUMP LOOP
+
     >END
+        SETVAR REQ_EXIT_TO_MENU false
         $OVERWORLD_END
         BREAK
