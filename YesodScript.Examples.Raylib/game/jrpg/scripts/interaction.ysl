@@ -83,7 +83,7 @@
 
     >I_ITEM
         # one-shot pickup: hide + persist by object id (survives map reloads)
-        $MAP_SET_TILE_STATE [[_id]] 2
+        $MAP_SET_TILE_STATE_FADE [[_id]] 2
 
         $INVENTORY_ADD_ITEM [[_v1]] [[_v2]]
         CALL "EV_ITEM:[[MAP_NAME]]:[[_alias]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
@@ -117,7 +117,7 @@
 
         # target id is global — works on this map now, and on other maps via save restore
         # (level_6 switch -> test gate e94b4120, and vice versa)
-        $MAP_SET_TILE_STATE [[_target]] 2
+        $MAP_SET_TILE_STATE_FADE [[_target]] 2
 
         >I_SWITCH_EVENT
             CALL "EV_SWITCH:[[MAP_NAME]]:[[_alias]] [[_target]]" I_SWITCH_GENERIC

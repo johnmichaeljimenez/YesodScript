@@ -15,3 +15,20 @@
 
     >MAP_SET_TILE_STATE_END
         BREAK
+
+@MAP_SET_TILE_STATE_FADE <id> <state>
+    JUMPEQ <id> 0 MAP_SET_TILE_STATE_FADE_END
+
+    $MAP_SAVE_STATE <id> <state>
+
+    DEFVAR _idx -1 int
+    LISTFIND TILE_IDS <id> _idx
+    JUMPLT _idx 0 MAP_SET_TILE_STATE_FADE_END
+
+    LISTSET TILE_STATES [[_idx]] <state>
+
+    JUMPNEQ <state> 2 MAP_SET_TILE_STATE_FADE_END
+    $TILE_CLEAR_RENDER_FADE [[_idx]]
+
+    >MAP_SET_TILE_STATE_FADE_END
+        BREAK

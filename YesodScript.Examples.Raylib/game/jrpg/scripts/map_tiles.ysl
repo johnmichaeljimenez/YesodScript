@@ -48,3 +48,15 @@
 
     >TILE_CLEAR_RENDER_END
         BREAK
+
+@TILE_CLEAR_RENDER_FADE <index>
+    DEFVAR _rid 0 int
+    LISTGET TILE_RENDER <index> _rid
+    JUMPLE _rid 0 TILE_CLEAR_RENDER_FADE_END
+    TWEEN [[_rid]] "Opacity" 1 0 false [[FADE_SPEED]] "QUAD"
+    WAIT [[FADE_SPEED]]
+    REMOVERENDER [[_rid]]
+    LISTSET TILE_RENDER <index> 0
+
+    >TILE_CLEAR_RENDER_FADE_END
+        BREAK
