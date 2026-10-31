@@ -11,7 +11,7 @@
 	"iid": "90256290-bde0-11f1-81f7-6fb9e3ed245b",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 525,
+	"nextUid": 528,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -3521,12 +3521,12 @@
 					"canBeNull": false,
 					"arrayMinLength": null,
 					"arrayMaxLength": null,
-					"editorDisplayMode": "EntityTile",
+					"editorDisplayMode": "ValueOnly",
 					"editorDisplayScale": 1,
 					"editorDisplayPos": "Above",
 					"editorLinkStyle": "StraightArrow",
 					"editorDisplayColor": null,
-					"editorAlwaysShow": true,
+					"editorAlwaysShow": false,
 					"editorShowInWorld": true,
 					"editorCutLongValues": true,
 					"editorTextSuffix": null,
@@ -3738,6 +3738,80 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "SpriteDefault",
+					"doc": null,
+					"__type": "Tile",
+					"uid": 525,
+					"type": "F_Tile",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "EntityTile",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": 527
+				},
+				{
+					"identifier": "SpriteDisabled",
+					"doc": null,
+					"__type": "Tile",
+					"uid": 526,
+					"type": "F_Tile",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "EntityTile",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": 527
 				}
 			]
 		}
@@ -3806,6 +3880,28 @@
 			"cachedPixelData": {
 				"opaqueTiles": "000000000000000000000000000000000100000000000000",
 				"averageColors": "3ff37cf8acf97cf8bcf9cef7cef7bcf98ff3eff3dff38ff34ff37df8bcf97df89ff3eff3eff39ff39ff3def70000def73bfa6afbaafb6afb8df8eef6eef68df8def7fff3def79ff32afb6afb9afb6afbcef7bafbbafbcef77bfabbfaccf97bfa"
+			}
+		},
+		{
+			"__cWid": 8,
+			"__cHei": 8,
+			"identifier": "Tile_props",
+			"uid": 527,
+			"relPath": "../../assets/tile-props.png",
+			"embedAtlas": null,
+			"pxWid": 128,
+			"pxHei": 128,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "0010000000000000000000000000000000000000000000000000000000000000",
+				"averageColors": "c554c564f54300000000000000000000e864e753000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 			}
 		}
 	], "enums": [
@@ -3919,7 +4015,7 @@
 							"__grid": [13,9],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 272, "y": 272, "w": 16, "h": 16 },
+							"__tile": { "tilesetUid": 527, "x": 32, "y": 0, "w": 16, "h": 16 },
 							"__smartColor": "#D77643",
 							"iid": "89df7080-bde0-11f1-bb9b-673228911d17",
 							"width": 16,
@@ -3927,7 +4023,7 @@
 							"defUid": 12,
 							"px": [208,144],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Misc", "__tile": { "tilesetUid": 4, "x": 272, "y": 272, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Misc", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Misc"]
 								}] },
@@ -3935,7 +4031,12 @@
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": { "tilesetUid": 527, "x": 32, "y": 0, "w": 16, "h": 16 }, "__tile": { "tilesetUid": 527, "x": 32, "y": 0, "w": 16, "h": 16 }, "defUid": 525, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["32,0,16,16"]
+								}] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": 208,
 							"__worldY": 144
@@ -3945,7 +4046,7 @@
 							"__grid": [12,10],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 },
+							"__tile": { "tilesetUid": 527, "x": 0, "y": 0, "w": 16, "h": 16 },
 							"__smartColor": "#D77643",
 							"iid": "8f9896a0-bde0-11f1-bb9b-2f1ad6f1d677",
 							"width": 16,
@@ -3953,7 +4054,7 @@
 							"defUid": 12,
 							"px": [192,160],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Switch", "__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Switch", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Switch"]
 								}] },
@@ -3969,7 +4070,15 @@
 									"params": ["89df7080-bde0-11f1-bb9b-673228911d17"]
 								}] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": { "tilesetUid": 527, "x": 0, "y": 0, "w": 16, "h": 16 }, "__tile": { "tilesetUid": 527, "x": 0, "y": 0, "w": 16, "h": 16 }, "defUid": 525, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["0,0,16,16"]
+								}] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": { "tilesetUid": 527, "x": 16, "y": 0, "w": 16, "h": 16 }, "__tile": { "tilesetUid": 527, "x": 16, "y": 0, "w": 16, "h": 16 }, "defUid": 526, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["16,0,16,16"]
+								}] }
 							],
 							"__worldX": 192,
 							"__worldY": 160
@@ -4009,7 +4118,7 @@
 							"__grid": [11,3],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 48, "y": 256, "w": 16, "h": 16 },
+							"__tile": { "tilesetUid": 527, "x": 0, "y": 16, "w": 16, "h": 16 },
 							"__smartColor": "#D77643",
 							"iid": "378041a0-bde0-11f1-ad18-c786144e9bf1",
 							"width": 16,
@@ -4017,7 +4126,7 @@
 							"defUid": 12,
 							"px": [176,48],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Item", "__tile": { "tilesetUid": 4, "x": 48, "y": 256, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Item", "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "Value1", "__type": "String", "__value": "berry", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["berry"]
@@ -4028,7 +4137,15 @@
 								}] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": { "tilesetUid": 527, "x": 0, "y": 16, "w": 16, "h": 16 }, "__tile": { "tilesetUid": 527, "x": 0, "y": 16, "w": 16, "h": 16 }, "defUid": 525, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["0,16,16,16"]
+								}] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": { "tilesetUid": 527, "x": 16, "y": 16, "w": 16, "h": 16 }, "__tile": { "tilesetUid": 527, "x": 16, "y": 16, "w": 16, "h": 16 }, "defUid": 526, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["16,16,16,16"]
+								}] }
 							],
 							"__worldX": 176,
 							"__worldY": 48
@@ -5650,7 +5767,7 @@
 							"__grid": [11,9],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 64, "y": 32, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "b08b5ee0-bde0-11f1-bb9b-c55c1d72d29d",
 							"width": 16,
@@ -5658,7 +5775,7 @@
 							"defUid": 12,
 							"px": [176,144],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Savepoint", "__tile": { "tilesetUid": 4, "x": 64, "y": 32, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Savepoint", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Savepoint"]
 								}] },
@@ -5666,7 +5783,9 @@
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": null, "__tile": null, "defUid": 525, "realEditorValues": [] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": 752,
 							"__worldY": 144
@@ -6437,7 +6556,7 @@
 							"__grid": [7,2],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 48, "y": 256, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "1fea21e0-bde0-11f1-ada7-4ddd17a91668",
 							"width": 16,
@@ -6445,7 +6564,7 @@
 							"defUid": 12,
 							"px": [112,32],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Item", "__tile": { "tilesetUid": 4, "x": 48, "y": 256, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Item", "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "Value1", "__type": "String", "__value": "gold", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["gold"]
@@ -6456,7 +6575,9 @@
 								}] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": null, "__tile": null, "defUid": 525, "realEditorValues": [] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": 112,
 							"__worldY": -224
@@ -6466,7 +6587,7 @@
 							"__grid": [5,5],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 272, "y": 272, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "e94b4120-bde0-11f1-ada7-f7bf4b71b387",
 							"width": 16,
@@ -6474,7 +6595,7 @@
 							"defUid": 12,
 							"px": [80,80],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Misc", "__tile": { "tilesetUid": 4, "x": 272, "y": 272, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Misc", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Misc"]
 								}] },
@@ -6485,7 +6606,9 @@
 								{ "__identifier": "Alias", "__type": "String", "__value": "gate", "__tile": null, "defUid": 32, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["gate"]
-								}] }
+								}] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": null, "__tile": null, "defUid": 525, "realEditorValues": [] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": 80,
 							"__worldY": -176
@@ -6526,7 +6649,7 @@
 							"__grid": [2,2],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 160, "y": 16, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "09fd4a50-bde0-11f1-ada7-077b8a96e780",
 							"width": 16,
@@ -6534,7 +6657,7 @@
 							"defUid": 12,
 							"px": [32,32],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "NPC", "__tile": { "tilesetUid": 4, "x": 160, "y": 16, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "NPC", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["NPC"]
 								}] },
@@ -6545,7 +6668,9 @@
 								{ "__identifier": "Value2", "__type": "String", "__value": "", "__tile": null, "defUid": 24, "realEditorValues": [] },
 								{ "__identifier": "Target", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] },
 								{ "__identifier": "State", "__type": "LocalEnum.ActiveType", "__value": "Active", "__tile": null, "defUid": 30, "realEditorValues": [] },
-								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] }
+								{ "__identifier": "Alias", "__type": "String", "__value": "", "__tile": null, "defUid": 32, "realEditorValues": [] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": null, "__tile": null, "defUid": 525, "realEditorValues": [] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": 32,
 							"__worldY": -224
@@ -6758,7 +6883,7 @@
 							"__grid": [2,1],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "d572e4b0-bde0-11f1-82f0-5ddcfa62d934",
 							"width": 16,
@@ -6766,7 +6891,7 @@
 							"defUid": 12,
 							"px": [32,16],
 							"fieldInstances": [
-								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Switch", "__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 }, "defUid": 13, "realEditorValues": [{
+								{ "__identifier": "Type", "__type": "LocalEnum.InteractType", "__value": "Switch", "__tile": null, "defUid": 13, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Switch"]
 								}] },
@@ -6785,7 +6910,9 @@
 								{ "__identifier": "Alias", "__type": "String", "__value": "lever", "__tile": null, "defUid": 32, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["lever"]
-								}] }
+								}] },
+								{ "__identifier": "SpriteDefault", "__type": "Tile", "__value": null, "__tile": null, "defUid": 525, "realEditorValues": [] },
+								{ "__identifier": "SpriteDisabled", "__type": "Tile", "__value": null, "__tile": null, "defUid": 526, "realEditorValues": [] }
 							],
 							"__worldX": -64,
 							"__worldY": -160
