@@ -55,12 +55,14 @@
     #optional target id
     DEFLIST TILE_TARGETS string
     #tile state (ActiveType): 0 Active, 1 Non_Interactable, 2 Invisible
+    # 1 = opened chest / used switch (blocks + SpriteDisabled, no interact)
+    # 2 = gone (no collision, no sprite) — gates, removed props
     DEFLIST TILE_STATES int
-    # SpriteDefault asset id (Interactable entity tile atlas), * = none
+    # SpriteDefault asset id (closed chest / active entity), * = none
     DEFLIST TILE_SPRITES string
     # SpriteDefault tile index in that atlas, -1 = none
     DEFLIST TILE_SPRITE_TILES int
-    # SpriteDisabled asset id (state 1), * = none / fall back to default
+    # SpriteDisabled asset id (state 1 opened/used), * = none / fall back to default
     DEFLIST TILE_ENTITYSPRITES string
     # SpriteDisabled tile index, -1 = none
     DEFLIST TILE_ENTITYSPRITE_TILES int
@@ -128,22 +130,16 @@
     JUMPEQ _state 2 INTERACT_END
 
     JUMPEQ _tile 0 INTERACT_END
-    JUMPEQ _tile 4 INTERACT_ITEM
     JUMPEQ _tile 6 INTERACT_TRIGGER
     SETVAR <blocked> true
     JUMPEQ _tile 1 INTERACT_END
 
     # 1 Non_Interactable = still blocks, but no interaction
+    # (opened chests / used switches stay solid + show SpriteDisabled)
     JUMPEQ _state 1 INTERACT_END
 
     $INTERACT [[MAP_TEMP_CURRENT]]
     BREAK
-
-    >INTERACT_ITEM
-        # walkable pickup: only Active items fire after move completes
-        JUMPNEQ _state 0 INTERACT_END
-        SETVAR <trigger> [[MAP_TEMP_CURRENT]]
-        JUMP INTERACT_END
 
     >INTERACT_TRIGGER
         # only Active triggers fire

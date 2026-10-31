@@ -82,8 +82,7 @@
                 BREAK
 
     >I_ITEM
-        # one-shot pickup: hide + persist by object id (survives map reloads)
-        $MAP_SET_TILE_STATE_FADE [[_id]] 2
+        $MAP_SET_TILE_STATE [[_id]] 1
 
         $INVENTORY_ADD_ITEM [[_v1]] [[_v2]]
         CALL "EV_ITEM:[[MAP_NAME]]:[[_alias]] [[_v1]] [[_v2]]" I_ITEM_GENERIC
