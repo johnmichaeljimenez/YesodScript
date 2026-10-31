@@ -1,0 +1,14 @@
+@_INIT
+
+DEFVAR R 0 int
+
+$SIGN 5 R
+PRINT "[[R]]"
+
+$SIGN -3 R
+PRINT "[[R]]"
+
+$SIGN 0 R
+PRINT "[[R]]"
+
+BREAK

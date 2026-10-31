@@ -50,7 +50,8 @@ public class GameVM : VirtualMachine
 			Raylib.TraceLog(TraceLogLevel.Info, $"[{vm.CurrentTick}] {msg}");
 		};
 
-		vm.CompileDirectory(GameContent.CorePath);
+		foreach (var corePath in GameContent.CorePaths)
+			vm.CompileDirectory(corePath);
 		vm.CompileDirectory(GameContent.ScriptsPath);
 
 		Instance = vm;

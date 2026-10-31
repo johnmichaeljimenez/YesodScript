@@ -24,6 +24,10 @@
   <ItemGroup>
     <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
     <None Include="scripts/**/*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\stdlib\core\**\*">
+      <Link>core\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

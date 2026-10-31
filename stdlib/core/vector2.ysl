@@ -1,0 +1,107 @@
+@VADD <xvar> <yvar> <bx> <by>
+	ADD <xvar> <bx>
+	ADD <yvar> <by>
+	BREAK
+
+@VSUB <xvar> <yvar> <bx> <by>
+	SUB <xvar> <bx>
+	SUB <yvar> <by>
+	BREAK
+
+@VMUL <xvar> <yvar> <bx> <by>
+	MUL <xvar> <bx>
+	MUL <yvar> <by>
+	BREAK
+
+@VDIV <xvar> <yvar> <bx> <by>
+	DIV <xvar> <bx>
+	DIV <yvar> <by>
+	BREAK
+
+@VSCALE <xvar> <yvar> <s>
+	MUL <xvar> <s>
+	MUL <yvar> <s>
+	BREAK
+
+@VLENGTHSQUARED <x> <y> <out>
+	DEFVAR _xx <x> float
+	MUL _xx <x>
+	DEFVAR _yy <y> float
+	MUL _yy <y>
+	SETVAR <out> [[_xx]]
+	ADD <out> [[_yy]]
+	BREAK
+
+@VLENGTH <x> <y> <out>
+	DEFVAR _xx <x> float
+	MUL _xx <x>
+	DEFVAR _yy <y> float
+	MUL _yy <y>
+	SETVAR <out> [[_xx]]
+	ADD <out> [[_yy]]
+	SQRT <out>
+	BREAK
+
+@VNORMALIZE <xvar> <yvar>
+	DEFVAR _x 0 float
+	DEFVAR _y 0 float
+	DEFVAR _ls 0 float
+	DEFVAR _xx 0 float
+	DEFVAR _yy 0 float
+
+	# copy via ADD (bare param is a var name; [[<name>]] is not supported)
+	ADD _x <xvar>
+	ADD _y <yvar>
+	SETVAR _xx [[_x]]
+	MUL _xx [[_x]]
+	SETVAR _yy [[_y]]
+	MUL _yy [[_y]]
+	SETVAR _ls [[_xx]]
+	ADD _ls [[_yy]]
+
+	JUMPLE _ls 0.0000001 VNORM_ZERO
+	SQRT _ls
+	DIV _x [[_ls]]
+	DIV _y [[_ls]]
+	SETVAR <xvar> [[_x]]
+	SETVAR <yvar> [[_y]]
+	BREAK
+
+	>VNORM_ZERO
+		SETVAR <xvar> 0
+		SETVAR <yvar> 0
+		BREAK
+
+@VDOT <ax> <ay> <bx> <by> <out>
+	DEFVAR _x <ax> float
+	MUL _x <bx>
+	DEFVAR _y <ay> float
+	MUL _y <by>
+	SETVAR <out> [[_x]]
+	ADD <out> [[_y]]
+	BREAK
+
+# Writes 1 to <outBool> when distance(a,b) <= dist, else 0.
+@VINRANGE <ax> <ay> <bx> <by> <dist> <outBool>
+	DEFVAR _dx <ax> float
+	SUB _dx <bx>
+	DEFVAR _dy <ay> float
+	SUB _dy <by>
+	DEFVAR _dsq 0 float
+	DEFVAR _xx [[_dx]] float
+	MUL _xx [[_dx]]
+	DEFVAR _yy [[_dy]] float
+	MUL _yy [[_dy]]
+	SETVAR _dsq [[_xx]]
+	ADD _dsq [[_yy]]
+
+	DEFVAR _lim <dist> float
+	MUL _lim <dist>
+
+	JUMPLE _dsq [[_lim]] VINRANGE_YES
+	SETVAR <outBool> 0
+	BREAK
+
+	>VINRANGE_YES
+		SETVAR <outBool> 1
+		BREAK

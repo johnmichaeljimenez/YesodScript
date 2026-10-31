@@ -27,6 +27,7 @@ public static class GameContent
 	public static bool Transparent { get; private set; } = false;
 
 	public static string CorePath { get; private set; } = Path.Combine(AppContext.BaseDirectory, "core");
+	public static IReadOnlyList<string> CorePaths { get; private set; } = new[] { Path.Combine(AppContext.BaseDirectory, "core") };
 	public static string ScriptsPath => Path.Combine(Root, "scripts");
 	public static string AssetsPath => Path.Combine(Root, "assets");
 	public static string? ItchTarget { get; private set; }
@@ -38,7 +39,8 @@ public static class GameContent
 		GameId = gameId;
 
 		Root = ResolveRoot(baseDir, gameId);
-		CorePath = ResolveCorePath(baseDir, Root);
+		CorePaths = ResolveCorePaths(baseDir, Root);
+		CorePath = CorePaths[0];
 		Directory.SetCurrentDirectory(Root);
 
 		ApplyManifest(Path.Combine(Root, "game.json"), gameId);
@@ -105,33 +107,46 @@ public static class GameContent
 		return null;
 	}
 
-	private static string ResolveCorePath(string baseDir, string contentRoot)
+	private static IReadOnlyList<string> ResolveCorePaths(string baseDir, string contentRoot)
 	{
 		var besideBase = Path.Combine(baseDir, "core");
 		if (Directory.Exists(besideBase))
-			return Path.GetFullPath(besideBase);
+			return new[] { Path.GetFullPath(besideBase) };
 
 		var besideContent = Path.Combine(contentRoot, "core");
 		if (Directory.Exists(besideContent) && IsSamePath(contentRoot, baseDir))
-			return Path.GetFullPath(besideContent);
+			return new[] { Path.GetFullPath(besideContent) };
 
-		var projectCore = FindProjectCore(baseDir) ?? FindProjectCore(contentRoot);
-		if (projectCore != null)
-			return projectCore;
+		var projectCores = FindProjectCorePaths(baseDir) ?? FindProjectCorePaths(contentRoot);
+		if (projectCores != null && projectCores.Count > 0)
+			return projectCores;
 
 		throw new DirectoryNotFoundException(
-			$"Shared core/ stdlib not found. Expected '{besideBase}' next to the app, or a project core/ folder.");
+			$"Shared core/ stdlib not found. Expected '{besideBase}' next to the app, or repo stdlib/core + host core/.");
 	}
 
-	private static string? FindProjectCore(string startPath)
+	private static IReadOnlyList<string>? FindProjectCorePaths(string startPath)
 	{
 		var dir = new DirectoryInfo(startPath);
 		for (var i = 0; i < 8 && dir != null; i++, dir = dir.Parent)
 		{
-			var core = Path.Combine(dir.FullName, "core");
-			var games = Path.Combine(dir.FullName, "game");
-			if (Directory.Exists(core) && Directory.Exists(games))
-				return Path.GetFullPath(core);
+			var stdlibCore = Path.Combine(dir.FullName, "stdlib", "core");
+			var hostCore = Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "core");
+			var legacyCore = Path.Combine(dir.FullName, "core");
+			var games = Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "game");
+			if (!Directory.Exists(games))
+				games = Path.Combine(dir.FullName, "game");
+
+			var paths = new List<string>();
+			if (Directory.Exists(stdlibCore))
+				paths.Add(Path.GetFullPath(stdlibCore));
+			if (Directory.Exists(hostCore))
+				paths.Add(Path.GetFullPath(hostCore));
+			else if (Directory.Exists(legacyCore) && Directory.Exists(games))
+				paths.Add(Path.GetFullPath(legacyCore));
+
+			if (paths.Count > 0 && Directory.Exists(games))
+				return paths;
 		}
 
 		return null;

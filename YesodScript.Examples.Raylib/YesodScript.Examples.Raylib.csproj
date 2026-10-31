@@ -33,11 +33,16 @@
     <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
   </ItemGroup>
 
-  <!-- shared ysl stdlib -->
   <ItemGroup>
+    <None Include="..\stdlib\core\**\*">
+      <Link>core\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
     <None Include="core/**/*">
       <Link>core/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
 
@@ -66,8 +71,11 @@
 
   <Target Name="ValidateGameContent" BeforeTargets="Build">
     <Error
+      Condition="!Exists('..\stdlib\core')"
+      Text="Official stdlib folder is missing. Expected ../stdlib/core with .ysl helpers." />
+    <Error
       Condition="!Exists('core')"
-      Text="Shared stdlib folder 'core/' is missing. Expected YesodScript.Examples.Raylib/core with .ysl helpers." />
+      Text="Host core helpers folder 'core/' is missing. Expected YesodScript.Examples.Raylib/core with .ysl helpers." />
     <Error
       Condition="!Exists('game/$(GameId)/scripts') and !Exists('game/$(GameId)/assets')"
       Text="Game content not found for GameId=$(GameId). Expected game/$(GameId)/scripts and/or assets." />

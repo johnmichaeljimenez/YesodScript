@@ -93,6 +93,20 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_Sign()
+    {
+        var vm = Utils.Test(out var output, "Sign.ysl");
+        output.Should().Be("1\n-1\n1");
+    }
+
+    [Fact]
+    public void Test_Clamp()
+    {
+        var vm = Utils.Test(out var output, "Clamp.ysl");
+        output.Should().Be("10\n0\n5");
+    }
+
+    [Fact]
     public void Test_Params()
     {
         var vm = Utils.Test(out var output, "Params.ysl", "Params2.ysl", "Params3.ysl");

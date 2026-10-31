@@ -5,7 +5,7 @@ Usage:
   python package.py pong --upload push zip to itch.io via butler
 
 Content lives under game/<id>/ (assets, scripts, game.json).
-Shared stdlib is project-level core/ and is shipped beside scripts/assets.
+Official stdlib is repo stdlib/core/ (plus host core/ helpers) and is shipped as core/ beside scripts/assets.
 """
 
 from __future__ import annotations

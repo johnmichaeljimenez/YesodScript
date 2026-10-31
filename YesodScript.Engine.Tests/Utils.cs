@@ -8,6 +8,10 @@ public static class Utils
 	{
 		var vmOutput = "";
 		var vm = new VirtualMachine();
+
+		if (Directory.Exists("core"))
+			vm.CompileDirectory("core");
+
 		foreach (var i in scriptFileNames)
 		{
 			var path = i.Replace("\\", "/"); //for linux

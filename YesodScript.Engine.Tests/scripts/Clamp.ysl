@@ -1,0 +1,17 @@
+@_INIT
+
+DEFVAR X 0 int
+
+SETVAR X 15
+$CLAMP X [[X]] 0 10
+PRINT "[[X]]"
+
+SETVAR X -5
+$CLAMP X [[X]] 0 10
+PRINT "[[X]]"
+
+SETVAR X 5
+$CLAMP X [[X]] 0 10
+PRINT "[[X]]"
+
+BREAK
