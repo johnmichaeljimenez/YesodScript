@@ -65,9 +65,10 @@
 
     >PAUSE
         $PAUSE_MENU
-        JUMP LOOP
+        JUMP AFTERWAIT
 
     >END
         SETVAR REQ_EXIT_TO_MENU false
+        $FADE_IN
         $OVERWORLD_END
         BREAK
