@@ -14,7 +14,6 @@ public sealed class PathMember
 		typeof(float),  //no double
 		typeof(bool),
 		typeof(byte),
-		typeof(System.Numerics.Vector2),
 	};
 
 	private readonly MemberInfo[] _chain;
@@ -38,7 +37,7 @@ public sealed class PathMember
 	public int Depth => _chain.Length;
 
 	private static readonly string AllowedLeafTypeNames =
-		"string, int, float, bool, byte, Vector2, enum";
+		"string, int, float, bool, byte, enum";
 
 	public static bool IsAllowedLeafType(Type type)
 	{
@@ -137,12 +136,6 @@ public sealed class PathMember
 			return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
 		if (destination == typeof(byte))
 			return ParseByte(value);
-		if (destination == typeof(System.Numerics.Vector2))
-		{
-			if (Core.Utils.TryParseVector2(value, out var vec))
-				return vec;
-			throw new FormatException($"Cannot parse '{value}' as vector2.");
-		}
 		if (destination.IsEnum)
 			return ParseEnum(value, destination);
 
@@ -298,12 +291,6 @@ public sealed class PathMember
 				return float.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture);
 			if (destination == typeof(byte))
 				return ParseByte(text);
-			if (destination == typeof(System.Numerics.Vector2))
-			{
-				if (Core.Utils.TryParseVector2(text, out var vec))
-					return vec;
-				throw new FormatException($"Cannot parse '{text}' as vector2.");
-			}
 			if (destination.IsEnum)
 				return ParseEnum(text, destination);
 

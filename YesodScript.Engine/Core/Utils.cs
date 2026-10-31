@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -69,38 +68,9 @@ public static class Utils
         return false;
     }
 
-    public static bool TryParseVector2(string input, out Vector2 result)
-    {
-        result = default;
-        if (string.IsNullOrWhiteSpace(input))
-            return false;
-
-        var s = input.Trim();
-        if (s.Length >= 2 && s[0] == '<' && s[^1] == '>')
-            s = s[1..^1].Trim();
-        else if (s.Length >= 2 && s[0] == '(' && s[^1] == ')')
-            s = s[1..^1].Trim();
-
-        var parts = s.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length != 2)
-            return false;
-
-        if (!float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x))
-            return false;
-        if (!float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var y))
-            return false;
-
-        result = new Vector2(x, y);
-        return true;
-    }
-
-    public static string FormatVector2(Vector2 value) =>
-        string.Format(CultureInfo.InvariantCulture, "{0},{1}", value.X, value.Y);
-
     public static string FormatValue(object? value) => value switch
     {
         null => string.Empty,
-        Vector2 v => FormatVector2(v),
         IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? string.Empty,
         _ => Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty
     };

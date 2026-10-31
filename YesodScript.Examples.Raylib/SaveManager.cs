@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Numerics;
 using System.Text.Json;
 using YesodScript.Engine.Core;
 
@@ -105,9 +104,6 @@ public class SaveManager
 		if (value is null)
 			return null;
 
-		if (type == typeof(Vector2) || value is Vector2)
-			return Utils.FormatVector2((Vector2)value);
-
 		if (type == typeof(bool) || value is bool)
 			return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
 
@@ -209,45 +205,7 @@ public class SaveManager
 			};
 		}
 
-		if (type == typeof(Vector2))
-		{
-			if (element.ValueKind == JsonValueKind.String)
-			{
-				if (Utils.TryParseVector2(element.GetString() ?? string.Empty, out var v))
-					return v;
-			}
-			else if (element.ValueKind == JsonValueKind.Object)
-			{
-				float x = 0, y = 0;
-				if (TryGetPropertyIgnoreCase(element, "X", out var xEl)
-					|| TryGetPropertyIgnoreCase(element, "x", out xEl))
-					x = ReadFloat(xEl, varName + ".X");
-				if (TryGetPropertyIgnoreCase(element, "Y", out var yEl)
-					|| TryGetPropertyIgnoreCase(element, "y", out yEl))
-					y = ReadFloat(yEl, varName + ".Y");
-				return new Vector2(x, y);
-			}
-			else if (element.ValueKind == JsonValueKind.Array && element.GetArrayLength() == 2)
-			{
-				var arr = element.EnumerateArray().ToArray();
-				return new Vector2(ReadFloat(arr[0], varName + "[0]"), ReadFloat(arr[1], varName + "[1]"));
-			}
-
-			throw new InvalidDataException($"Cannot parse Vector2 for '{varName}'.");
-		}
-
 		throw new NotSupportedException($"Unsupported save type '{type.Name}' for '{varName}'.");
-	}
-
-	private static float ReadFloat(JsonElement element, string field)
-	{
-		if (element.ValueKind == JsonValueKind.Number && element.TryGetSingle(out var f))
-			return f;
-		if (element.ValueKind == JsonValueKind.String
-			&& float.TryParse(element.GetString(), NumberStyles.Float, CultureInfo.InvariantCulture, out f))
-			return f;
-
-		throw new InvalidDataException($"Cannot parse float for '{field}'.");
 	}
 
 	private static bool TryGetPropertyIgnoreCase(JsonElement obj, string name, out JsonElement value)
