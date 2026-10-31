@@ -1,4 +1,6 @@
 # Save + apply on current map if that id is loaded.
+# state 0/1 refresh entity sprite (SpriteDefault / SpriteDisabled)
+# 2 clears render
 @MAP_SET_TILE_STATE <id> <state>
     JUMPEQ <id> 0 MAP_SET_TILE_STATE_END
 
@@ -9,9 +11,7 @@
     JUMPLT _idx 0 MAP_SET_TILE_STATE_END
 
     LISTSET TILE_STATES [[_idx]] <state>
-
-    JUMPNEQ <state> 2 MAP_SET_TILE_STATE_END
-    $TILE_CLEAR_RENDER [[_idx]]
+    $TILE_REFRESH_ENTITY_RENDER [[_idx]]
 
     >MAP_SET_TILE_STATE_END
         BREAK
@@ -27,8 +27,14 @@
 
     LISTSET TILE_STATES [[_idx]] <state>
 
-    JUMPNEQ <state> 2 MAP_SET_TILE_STATE_FADE_END
+    # fade-out only when becoming Invisible; otherwise swap sprite immediately
+    JUMPNEQ <state> 2 MAP_SET_TILE_STATE_FADE_REFRESH
     $TILE_CLEAR_RENDER_FADE [[_idx]]
+    BREAK
+
+    >MAP_SET_TILE_STATE_FADE_REFRESH
+        $TILE_REFRESH_ENTITY_RENDER [[_idx]]
+        BREAK
 
     >MAP_SET_TILE_STATE_FADE_END
         BREAK

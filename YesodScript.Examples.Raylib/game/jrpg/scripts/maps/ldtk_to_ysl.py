@@ -9,7 +9,14 @@ layers (everything except the "World" gameplay/collider layer):
   extract_all_tilemaps(ldtk_path) -> dict[level_name, above]
 
 MAP_SET layout (see map.ysl / map_set.ysl):
-  $MAP_SET x y id type v1 v2 t state sprite entitysprite alias
+  $MAP_SET x y id type v1 v2 t state sprite tile entitysprite entitytile alias
+
+  sprite / tile           <- LDtk SpriteDefault  (Active / state 0)
+  entitysprite / entitytile <- LDtk SpriteDisabled (Non_Interactable / state 1)
+  - sprite ids are LOADASSETS keys (png stem under game assets/)
+  - tile indices are LDtk tileset tile ids (row-major), or -1 when unset
+  - missing Sprite* fields export as * -1
+  - decoration IntGrid layers still use TILESET_ADD only (untouched)
 
 TILESET_ADD layout (see tileset.ysl):
   $TILESET_ADD x y tileindex sort spriteid
@@ -38,6 +45,7 @@ Field mapping:
   switch/gate/item/npc/savepoint:
     v1 = Value1, v2 = Value2, t = Target iid, state = State (ActiveType)
     alias = Alias (optional stable name for EV_* handlers)
+    sprite/tile = SpriteDefault, entitysprite/entitytile = SpriteDisabled
   trigger:
     v1 = Trigger_Key (optional; unused when Target is set)
     v2 = Parameter
@@ -47,6 +55,7 @@ Field mapping:
     t = Target iid
     state = State (ActiveType)
     alias = Alias (optional; used by EV_TRIGGER:<map>:<alias>)
+    (triggers do not use SpriteDefault / SpriteDisabled)
 
 Aliases:
   - LDtk Alias field on Trigger / Interactable entities
@@ -55,13 +64,13 @@ Aliases:
   - interaction.ysl dispatches EV_<KIND>:<MAP_NAME>:<alias>
 
 Tile states (LDtk ActiveType -> int):
-  0 Active            visible + interactable
-  1 Non_Interactable  visible, no interaction
-  2 Invisible         hidden, no interaction
+  0 Active            visible + interactable  -> SpriteDefault
+  1 Non_Interactable  visible, no interaction -> SpriteDisabled
+  2 Invisible         hidden, no interaction  -> no entity render
 
 Empty / missing string fields become 0 (same default as MAP_FILL),
 except alias which defaults to *.
-sprite and entitysprite are always * for now.
+Entity sprite fields default to * / -1 when unset.
 """
 
 from __future__ import annotations
@@ -113,9 +122,14 @@ DEFAULT_TILE = {
     "t": "0",
     "state": STATE_ACTIVE,
     "sprite": "*",
+    "tile": -1,
     "entitysprite": "*",
+    "entitytile": -1,
     "alias": "*",
 }
+
+# tileset uid -> {relPath, cWid, tileGridSize} built per export
+TilesetInfo = dict[str, Any]
 
 
 def short_iid(iid: str | None) -> str:
@@ -235,6 +249,63 @@ def resolve_alias(fields: dict[str, Any]) -> str:
     return text if text else "*"
 
 
+def build_tileset_info(data: dict[str, Any]) -> dict[int, TilesetInfo]:
+    """Index LDtk tileset defs by uid for SpriteDefault / SpriteDisabled resolution."""
+    out: dict[int, TilesetInfo] = {}
+    for ts in data.get("defs", {}).get("tilesets", []):
+        uid = ts.get("uid")
+        if uid is None:
+            continue
+        out[int(uid)] = {
+            "relPath": ts.get("relPath") or "",
+            "cWid": int(ts.get("__cWid") or 1),
+            "tileGridSize": int(ts.get("tileGridSize") or TILE_SIZE),
+        }
+    return out
+
+
+def resolve_sprite_field(
+    fields: dict[str, Any],
+    field_name: str,
+    tilesets: dict[int, TilesetInfo],
+) -> tuple[str, int]:
+    """
+    Resolve an LDtk F_Tile field (SpriteDefault / SpriteDisabled) to
+    (sprite_asset_id, tile_index). Missing / invalid -> ("*", -1).
+    """
+    raw = fields.get(field_name)
+    if not isinstance(raw, dict):
+        return "*", -1
+
+    tileset_uid = raw.get("tilesetUid")
+    if tileset_uid is None:
+        return "*", -1
+
+    info = tilesets.get(int(tileset_uid))
+    if info is None:
+        print(f"  warning: {field_name} references unknown tileset uid {tileset_uid}")
+        return "*", -1
+
+    rel = str(info.get("relPath") or "")
+    if not rel:
+        # Internal / embedded atlas — not a runtime game asset.
+        print(f"  warning: {field_name} tileset has no relPath; skipping")
+        return "*", -1
+
+    grid = int(info.get("tileGridSize") or TILE_SIZE)
+    c_wid = max(1, int(info.get("cWid") or 1))
+    try:
+        x = int(raw.get("x", 0))
+        y = int(raw.get("y", 0))
+    except (TypeError, ValueError):
+        return "*", -1
+
+    col = x // grid
+    row = y // grid
+    tile_index = row * c_wid + col
+    return sprite_id_from_tileset_path(rel), tile_index
+
+
 def make_tile(
     *,
     entity_iid: str,
@@ -244,6 +315,10 @@ def make_tile(
     t: Any = "0",
     state: int = STATE_ACTIVE,
     alias: Any = "*",
+    sprite: str = "*",
+    tile: int = -1,
+    entitysprite: str = "*",
+    entitytile: int = -1,
 ) -> dict[str, str | int]:
     alias_text = "*" if alias in (None, "") else str(alias).strip() or "*"
     return {
@@ -253,8 +328,10 @@ def make_tile(
         "v2": "0" if v2 in (None, "") else str(v2).strip(),
         "t": "0" if t in (None, "") else str(t).strip(),
         "state": int(state),
-        "sprite": "*",
-        "entitysprite": "*",
+        "sprite": sprite if sprite else "*",
+        "tile": int(tile),
+        "entitysprite": entitysprite if entitysprite else "*",
+        "entitytile": int(entitytile),
         "alias": alias_text,
     }
 
@@ -262,6 +339,7 @@ def make_tile(
 def tile_from_entity(
     entity: dict[str, Any],
     levels_by_iid: dict[str, dict[str, Any]],
+    tilesets: dict[int, TilesetInfo],
 ) -> dict[str, str | int] | None:
     """
     Convert one LDtk entity into a MAP_SET payload.
@@ -304,8 +382,11 @@ def tile_from_entity(
             print(f"  warning: unknown Interactable.Type '{interact}', using misc(2)")
             tile_type = 2
 
+        sprite, tile = resolve_sprite_field(fields, "SpriteDefault", tilesets)
+        entitysprite, entitytile = resolve_sprite_field(fields, "SpriteDisabled", tilesets)
+
         # switch / gate / gold / npc / savepoint all share this shape:
-        # id type | v1=Value1 | v2=Value2 | t=target iid | State | alias
+        # id type | v1=Value1 | v2=Value2 | t=target iid | State | sprites | alias
         return make_tile(
             entity_iid=iid,
             tile_type=tile_type,
@@ -314,6 +395,10 @@ def tile_from_entity(
             t=target_iid(fields),
             state=state,
             alias=resolve_alias(fields),
+            sprite=sprite,
+            tile=tile,
+            entitysprite=entitysprite,
+            entitytile=entitytile,
         )
 
     print(f"  warning: skipping unsupported entity '{etype}' ({short_iid(iid)})")
@@ -365,6 +450,7 @@ def apply_entities(
     gh: int,
     tiles: dict[tuple[int, int], dict[str, str | int]],
     levels_by_iid: dict[str, dict[str, Any]],
+    tilesets: dict[int, TilesetInfo],
 ) -> None:
     """
     Stamp entity tiles on top of blockers.
@@ -375,7 +461,7 @@ def apply_entities(
             continue
 
         for entity in layer["entityInstances"]:
-            payload = tile_from_entity(entity, levels_by_iid)
+            payload = tile_from_entity(entity, levels_by_iid, tilesets)
             if payload is None:
                 continue
 
@@ -398,6 +484,14 @@ def format_alias_token(alias: Any) -> str:
     return ysl_token(text)
 
 
+def format_sprite_token(sprite: Any) -> str:
+    """Sprite asset id: bare * when unset, otherwise quoted/tokenized."""
+    text = "*" if sprite in (None, "") else str(sprite).strip() or "*"
+    if text == "*":
+        return "*"
+    return ysl_token(text)
+
+
 def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
     args = [
         str(x),
@@ -408,8 +502,10 @@ def format_map_set(x: int, y: int, data: dict[str, str | int]) -> str:
         ysl_token(data["v2"]),
         ysl_token(data["t"]),
         str(data["state"]),
-        str(data["sprite"]),
-        str(data["entitysprite"]),
+        format_sprite_token(data.get("sprite", "*")),
+        str(int(data.get("tile", -1))),
+        format_sprite_token(data.get("entitysprite", "*")),
+        str(int(data.get("entitytile", -1))),
         format_alias_token(data.get("alias", "*")),
     ]
     return "\t$MAP_SET " + " ".join(args)
@@ -506,6 +602,7 @@ def format_tileset_add(
 def generate_mapdata(
     level: dict[str, Any],
     levels_by_iid: dict[str, dict[str, Any]],
+    tilesets: dict[int, TilesetInfo],
 ) -> str:
     name = level["identifier"].lower()
     gw, gh = grid_size(level)
@@ -532,7 +629,7 @@ def generate_mapdata(
             lines.append(format_tileset_add(x, y, tid, sort, sprite_id))
 
     tiles = collect_intgrid_blockers(level, gw, gh)
-    apply_entities(level, gw, gh, tiles, levels_by_iid)
+    apply_entities(level, gw, gh, tiles, levels_by_iid, tilesets)
 
     for (x, y), data in sorted(tiles.items()):
         lines.append(format_map_set(x, y, data))
@@ -620,6 +717,7 @@ def export_ldtk(
 ) -> None:
     data = json.loads(ldtk_path.read_text(encoding="utf-8"))
     levels_by_iid = {level["iid"]: level for level in data["levels"]}
+    tilesets = build_tileset_info(data)
     sections: list[str] = []
 
     for level in data["levels"]:
@@ -627,7 +725,7 @@ def export_ldtk(
         if only_levels is not None and ident not in only_levels:
             continue
         print(f"exporting level: {ident}")
-        sections.append(generate_mapdata(level, levels_by_iid))
+        sections.append(generate_mapdata(level, levels_by_iid, tilesets))
 
     if not sections:
         raise SystemExit("no levels exported (check --only filter)")

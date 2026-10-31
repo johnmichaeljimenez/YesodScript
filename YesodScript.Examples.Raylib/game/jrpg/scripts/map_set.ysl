@@ -1,31 +1,9 @@
-@MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
+@MAP_SET <x> <y> <id> <type> <v1> <v2> <t> <state> <sprite> <tile> <entitysprite> <entitytile> <alias>
     $LIST_1D <x> <y> [[MAP_W]] [[MAP_H]] MAP_TEMP_CURRENT
     DEFVAR _tile [[MAP_TEMP_CURRENT]] int
 
-    $TILE_SET_ROW [[_tile]] <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
-
-    # PRINT "SET TILE DATA <x> <y> ([[_tile]])"
-
-    DEFVAR _x <x> int
-    DEFVAR _y <y> int
-
-    MUL _x [[GRID_SIZE]]
-    MUL _y [[GRID_SIZE]]
-
-    JUMPEQ <type> 0 END
-    JUMPEQ <type> 1 END
-    JUMPEQ <type> 6 END
-    #2 Invisible = no render
-    JUMPEQ <state> 2 END
-
-    DEFVAR _rid 0 int
-    RENDER [[_x]] [[_y]] _rid -100 "overworld_map_tile"
-    EDIT [[_rid]] "SpriteID" "r0_c1"
-    EDIT [[_rid]] "World" true
-    LISTSET TILE_RENDER [[_tile]] [[_rid]]
-    # PRINT "ADDED TILE RENDER [[_x]] [[_y]] rid=[[_rid]]"
-
->END
+    $TILE_SET_ROW [[_tile]] <id> <type> <v1> <v2> <t> <state> <sprite> <tile> <entitysprite> <entitytile> <alias>
+    $TILE_REFRESH_ENTITY_RENDER [[_tile]]
     BREAK
 
 @MAP_DISABLE_TILE <tile>

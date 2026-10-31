@@ -58,7 +58,8 @@ public class Renderer : IDisposable
 		var filter = GameContent.PixelArt ? TextureFilter.Point : TextureFilter.Bilinear;
 		Raylib.SetTextureFilter(rt.Texture, filter);
 
-		renderID = 0;
+		//0 = no render
+		renderID = 1;
 	}
 
 	public void Dispose()

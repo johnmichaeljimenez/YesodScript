@@ -35,10 +35,8 @@
         JUMPEQ _state 0 MAP_APPLY_NEXT
 
         LISTSET TILE_STATES [[_i]] [[_state]]
-
-        # Invisible: drop render if present (opened gates, picked items, etc.)
-        JUMPNEQ _state 2 MAP_APPLY_NEXT
-        $TILE_CLEAR_RENDER [[_i]]
+        # 1 Non_Interactable -> SpriteDisabled; 2 Invisible -> clear render
+        $TILE_REFRESH_ENTITY_RENDER [[_i]]
 
         >MAP_APPLY_NEXT
             ADD _i 1

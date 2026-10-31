@@ -165,6 +165,21 @@
     LISTCLEAR <j>
     BREAK
 
+@LIST_CLEAR12 <a> <b> <c> <d> <e> <f> <g> <h> <i> <j> <k> <l>
+    LISTCLEAR <a>
+    LISTCLEAR <b>
+    LISTCLEAR <c>
+    LISTCLEAR <d>
+    LISTCLEAR <e>
+    LISTCLEAR <f>
+    LISTCLEAR <g>
+    LISTCLEAR <h>
+    LISTCLEAR <i>
+    LISTCLEAR <j>
+    LISTCLEAR <k>
+    LISTCLEAR <l>
+    BREAK
+
 @LIST_REMOVE_AT2 <index> <a> <b>
     LISTREMOVE <a> <index>
     LISTREMOVE <b> <index>

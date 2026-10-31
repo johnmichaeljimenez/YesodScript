@@ -1,5 +1,5 @@
 @TILE_CLEAR_ALL
-    $LIST_CLEAR10 TILE_IDS TILE_TYPES TILE_VALUES1 TILE_VALUES2 TILE_TARGETS TILE_STATES TILE_SPRITES TILE_ENTITYSPRITES TILE_RENDER TILE_ALIASES
+    $LIST_CLEAR12 TILE_IDS TILE_TYPES TILE_VALUES1 TILE_VALUES2 TILE_TARGETS TILE_STATES TILE_SPRITES TILE_SPRITE_TILES TILE_ENTITYSPRITES TILE_ENTITYSPRITE_TILES TILE_RENDER TILE_ALIASES
     $TILESET_CLEAR
     BREAK
 
@@ -11,12 +11,14 @@
     $LIST_FILL TILE_TARGETS <count> 0
     $LIST_FILL TILE_STATES <count> 0
     $LIST_FILL TILE_SPRITES <count> *
+    $LIST_FILL TILE_SPRITE_TILES <count> -1
     $LIST_FILL TILE_ENTITYSPRITES <count> *
+    $LIST_FILL TILE_ENTITYSPRITE_TILES <count> -1
     $LIST_FILL TILE_RENDER <count> 0
     $LIST_FILL TILE_ALIASES <count> *
     BREAK
 
-@TILE_SET_ROW <index> <id> <type> <v1> <v2> <t> <state> <sprite> <entitysprite> <alias>
+@TILE_SET_ROW <index> <id> <type> <v1> <v2> <t> <state> <sprite> <tile> <entitysprite> <entitytile> <alias>
     LISTSET TILE_IDS <index> <id>
     LISTSET TILE_TYPES <index> <type>
     LISTSET TILE_VALUES1 <index> <v1>
@@ -24,10 +26,89 @@
     LISTSET TILE_TARGETS <index> <t>
     LISTSET TILE_STATES <index> <state>
     LISTSET TILE_SPRITES <index> <sprite>
+    LISTSET TILE_SPRITE_TILES <index> <tile>
     LISTSET TILE_ENTITYSPRITES <index> <entitysprite>
-    LISTSET TILE_RENDER <index> 0
+    LISTSET TILE_ENTITYSPRITE_TILES <index> <entitytile>
     LISTSET TILE_ALIASES <index> <alias>
     BREAK
+
+# Create/update entity render from TILE_STATES + SpriteDefault/Disabled.
+# state 0 -> SpriteDefault, state 1 -> SpriteDisabled (fallback default), state 2 -> none
+# types 0/1/6 never get an entity sprite
+# missing sprite = tile-missing fallback
+@TILE_REFRESH_ENTITY_RENDER <index>
+    DEFVAR _type 0 int
+    DEFVAR _state 0 int
+    LISTGET TILE_TYPES <index> _type
+    LISTGET TILE_STATES <index> _state
+
+    JUMPEQ _type 0 TILE_REFRESH_CLEAR
+    JUMPEQ _type 1 TILE_REFRESH_CLEAR
+    JUMPEQ _type 6 TILE_REFRESH_CLEAR
+    JUMPEQ _state 2 TILE_REFRESH_CLEAR
+
+    DEFVAR _sid * string
+    DEFVAR _tidx -1 int
+
+    JUMPEQ _state 1 TILE_REFRESH_DISABLED
+
+    LISTGET TILE_SPRITES <index> _sid
+    LISTGET TILE_SPRITE_TILES <index> _tidx
+    JUMP TILE_REFRESH_APPLY
+
+    >TILE_REFRESH_DISABLED
+        LISTGET TILE_ENTITYSPRITES <index> _sid
+        LISTGET TILE_ENTITYSPRITE_TILES <index> _tidx
+        
+        JUMPNEQ _sid "*" TILE_REFRESH_APPLY
+        LISTGET TILE_SPRITES <index> _sid
+        LISTGET TILE_SPRITE_TILES <index> _tidx
+        JUMP TILE_REFRESH_APPLY
+
+    >TILE_REFRESH_APPLY
+        JUMPEQ _sid "*" TILE_REFRESH_PLACEHOLDER
+        JUMP TILE_REFRESH_DRAW
+
+    >TILE_REFRESH_PLACEHOLDER
+        SETVAR _sid "tile-missing"
+        SETVAR _tidx -1
+
+    >TILE_REFRESH_DRAW
+        DEFVAR _rid 0 int
+        LISTGET TILE_RENDER <index> _rid
+        JUMPGT _rid 0 TILE_REFRESH_UPDATE
+
+        DEFVAR _gx 0 int
+        DEFVAR _gy 0 int
+        DEFVAR _px 0 int
+        DEFVAR _py 0 int
+        $LIST_XY <index> [[MAP_W]] _gx _gy
+        SETVAR _px [[_gx]]
+        SETVAR _py [[_gy]]
+        MUL _px [[GRID_SIZE]]
+        MUL _py [[GRID_SIZE]]
+
+        RENDER [[_px]] [[_py]] _rid -100 "overworld_map_tile"
+        EDIT [[_rid]] "SpriteID" [[_sid]]
+        EDIT [[_rid]] "TileIndex" [[_tidx]]
+        EDIT [[_rid]] "World" true
+        LISTSET TILE_RENDER <index> [[_rid]]
+        BREAK
+
+    >TILE_REFRESH_UPDATE
+        EDIT [[_rid]] "SpriteID" [[_sid]]
+        EDIT [[_rid]] "TileIndex" [[_tidx]]
+        BREAK
+
+    >TILE_REFRESH_CLEAR
+        DEFVAR _crid 0 int
+        LISTGET TILE_RENDER <index> _crid
+        JUMPLE _crid 0 TILE_REFRESH_CLEAR_END
+        REMOVERENDER [[_crid]]
+        LISTSET TILE_RENDER <index> 0
+
+        >TILE_REFRESH_CLEAR_END
+            BREAK
 
 @TILE_GET_ROW <index> <outId> <outType> <outV1> <outV2> <outTarget> <outState> <outAlias>
     LISTGET TILE_IDS <index> <outId>
