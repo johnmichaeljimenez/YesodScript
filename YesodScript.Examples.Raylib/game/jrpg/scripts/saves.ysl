@@ -1,11 +1,18 @@
 @_INIT
     DEFVAR NEWGAME true bool
 
+    DEFLIST SAVE_KEY_IDS string
+    DEFLIST SAVE_KEY_VALUES int
+
+    REGSAVEVAR "player" SAVE_KEY_IDS
+    REGSAVEVAR "player" SAVE_KEY_VALUES
+
 @SAVE:INIT
     $PARTY_CLEAR "ENEMY"
 
 @SAVE:NEWGAME
     $INVENTORY_CLEAR
+    $LIST_CLEAR2 SAVE_KEY_IDS SAVE_KEY_VALUES
     $PARTY_CLEAR "PLAYER"
 
     $PARTY_ADD "PLAYER" "david"
@@ -17,3 +24,15 @@
     DIV MAP_SAVE_CURRENT_X [[GRID_SIZE]]
     DIV MAP_SAVE_CURRENT_Y [[GRID_SIZE]]
     SAVEDATA "player" "slot-0"
+
+@SAVE:SETKEY <key> <value>
+    $KV_SET SAVE_KEY_IDS SAVE_KEY_VALUES <key> <value>
+
+@SAVE:GETKEY <key> <outvar>
+    $KV_GET SAVE_KEY_IDS SAVE_KEY_VALUES <key> <outvar> 0
+
+@SAVE:ADDKEY <key> <amt>
+    DEFVAR _amt 0 int
+    $KV_GET SAVE_KEY_IDS SAVE_KEY_VALUES <key> _amt 0
+    ADD _amt <amt>
+    $KV_SET SAVE_KEY_IDS SAVE_KEY_VALUES <key> _amt
