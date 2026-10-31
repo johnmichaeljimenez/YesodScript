@@ -9,8 +9,6 @@ public class RaylibHost
 	public const float hz = 1.0f / 60.0f;
 	private float accumulator = 0.0f;
 	public float HzAlpha => accumulator / hz;
-	const int screenWidth = 1280;
-	const int screenHeight = 720;
 	private GameVM vm;
 	private Renderer renderer;
 	private Assets assets;
@@ -26,10 +24,24 @@ public class RaylibHost
 	{
 		Instance = this;
 
-		Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
-		Raylib.InitWindow(screenWidth, screenHeight, GameContent.Title);
+		var flags = ConfigFlags.VSyncHint;
+		if (GameContent.Resizable)
+		{
+			flags |= ConfigFlags.ResizableWindow;
+		}
+		
+		if (GameContent.Transparent)
+		{
+			flags |= ConfigFlags.TransparentWindow;
+			flags |= ConfigFlags.UndecoratedWindow;
+		}
+
+		Raylib.SetConfigFlags(flags);
+		Raylib.InitWindow(GameContent.WindowWidth, GameContent.WindowHeight, GameContent.Title);
 		windowReady = true;
-		Raylib.MaximizeWindow();
+
+		if (GameContent.Maximized && GameContent.Resizable)
+			Raylib.MaximizeWindow();
 		Raylib.InitAudioDevice();
 		audioReady = true;
 		Raylib.SetExitKey(0);

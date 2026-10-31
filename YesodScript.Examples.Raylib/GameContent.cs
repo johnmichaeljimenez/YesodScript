@@ -20,6 +20,12 @@ public static class GameContent
 
 	public static bool PixelArt { get; private set; }
 
+	public static int WindowWidth { get; private set; } = 1280;
+	public static int WindowHeight { get; private set; } = 720;
+	public static bool Maximized { get; private set; } = true;
+	public static bool Resizable { get; private set; } = true;
+	public static bool Transparent { get; private set; } = false;
+
 	public static string CorePath { get; private set; } = Path.Combine(AppContext.BaseDirectory, "core");
 	public static string ScriptsPath => Path.Combine(Root, "scripts");
 	public static string AssetsPath => Path.Combine(Root, "assets");
@@ -183,6 +189,17 @@ public static class GameContent
 					VirtualResolution = new(manifest.VirtualWidth.Value, manifest.VirtualHeight.Value);
 				}
 			}
+
+			if (manifest.WindowWidth != null && manifest.WindowWidth > 0)
+				WindowWidth = (int)manifest.WindowWidth.Value;
+			if (manifest.WindowHeight != null && manifest.WindowHeight > 0)
+				WindowHeight = (int)manifest.WindowHeight.Value;
+			if (manifest.Maximized != null)
+				Maximized = manifest.Maximized.Value;
+			if (manifest.Resizable != null)
+				Resizable = manifest.Resizable.Value;
+			if (manifest.Transparent != null)
+				Transparent = manifest.Transparent.Value;
 		}
 		catch (Exception ex)
 		{
@@ -216,5 +233,11 @@ public static class GameContent
 
 		public bool? PixelArt { get; set; }
 		public string? DefaultFontName { get; set; }
+
+		public float? WindowWidth { get; set; }
+		public float? WindowHeight { get; set; }
+		public bool? Maximized { get; set; }
+		public bool? Resizable { get; set; }
+		public bool? Transparent { get; set; }
 	}
 }

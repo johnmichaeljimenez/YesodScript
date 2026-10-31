@@ -356,7 +356,7 @@ public class Renderer : IDisposable
 		var sourceRect = new Rectangle(0, 0, VirtualWidth, -VirtualHeight);
 		Raylib.BeginTextureMode(rt);
 		{
-			Raylib.ClearBackground(Color.Black);
+			Raylib.ClearBackground(GameContent.Transparent? Color.Blank : Color.Black);
 
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();
@@ -384,7 +384,7 @@ public class Renderer : IDisposable
 
 		Raylib.BeginDrawing();
 		{
-			Raylib.ClearBackground(Color.Black);
+			Raylib.ClearBackground(GameContent.Transparent? Color.Blank : Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 		}
 		Raylib.EndDrawing();
