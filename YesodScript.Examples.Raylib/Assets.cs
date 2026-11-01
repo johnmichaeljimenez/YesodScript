@@ -11,6 +11,7 @@ public class Assets : IDisposable
 	private readonly Dictionary<string, Texture2D> sprites = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, Sound> sounds = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, Font> fonts = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, Model> models = new(StringComparer.InvariantCultureIgnoreCase);
 
 	public Assets()
 	{
@@ -77,6 +78,23 @@ public class Assets : IDisposable
 		return font;
 	}
 
+	public void LoadModel(string id, string path)
+	{
+		if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+			throw new FileNotFoundException($"Model file not found for id '{id}': '{path}'", path);
+
+		var model = Raylib.LoadModel(path);
+		models[id] = model;
+	}
+
+	public Model GetModel(string id)
+	{
+		if (!models.TryGetValue(id, out var model))
+			throw new InvalidOperationException($"Model '{id}' not found. Load it first or check the asset id.");
+
+		return model;
+	}
+
 	public void Dispose()
 	{
 		foreach (var i in sprites.Values)
@@ -100,6 +118,13 @@ public class Assets : IDisposable
 		}
 
 		fonts.Clear();
+
+		foreach (var i in models.Values)
+		{
+			Raylib.UnloadModel(i);
+		}
+
+		models.Clear();
 	}
 }
 
@@ -114,6 +139,8 @@ public class LoadAssets : GameCommand
 	private List<string> sfxKeys;
 	private Dictionary<string, string> fontPaths;
 	private List<string> fontKeys;
+	private Dictionary<string, string> modelPaths;
+	private List<string> modelKeys;
 
 	public override void OnEnter()
 	{
@@ -125,6 +152,9 @@ public class LoadAssets : GameCommand
 
 		fontPaths = DirectoryExtractor.GetPaths(relativePath, "ttf", "otf");
 		fontKeys = fontPaths.Keys.ToList();
+
+		modelPaths = DirectoryExtractor.GetPaths(relativePath, "glb");
+		modelKeys = modelPaths.Keys.ToList();
 	}
 
 	public override bool OnTick(float deltaTime)
