@@ -262,6 +262,86 @@ public class Tween : GameCommand
 	}
 }
 
+public class Render3D : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private float z = 0f;
+	[CommandParameter] private string storeID;
+	[CommandParameter] private string group = "";
+
+	public override void OnEnter()
+	{
+		var data = Renderer.Instance.CreateRenderData3D(x, y, z);
+		data.Group = group;
+		if (string.IsNullOrEmpty(storeID))
+			return;
+
+		var storeVar = GameVM.GetVar(storeID, Instruction);
+		storeVar.Value = data.ID;
+	}
+}
+
+public class RemoveRender3D : GameCommand
+{
+	[CommandParameter]
+	private int id;
+
+	public override void OnEnter()
+	{
+		Renderer.Instance.RemoveRenderData3D(id);
+	}
+}
+
+public class Edit3D : EditPropertyCommand<RenderData3D>
+{
+	public override void OnEnter()
+	{
+		base.OnEnter();
+		instance.Sync();
+	}
+
+	protected override RenderData3D GetInstance(int id)
+	{
+		return Renderer.Instance.GetRenderData3D(id);
+	}
+
+	protected override IReadOnlyDictionary<string, PathMember> dataMembers => Renderer.RenderData3DMembers;
+}
+
+public class Tween3D : GameCommand
+{
+	[CommandParameter] private int id;
+	[CommandParameter] private string path;
+	[CommandParameter] private float from;
+	[CommandParameter] private float to;
+	[CommandParameter] private bool relative;
+	[CommandParameter] private float duration = 0.5f;
+	[CommandParameter] private string easing = "Linear";
+	[CommandParameter] private string tweenId = "";
+
+	public override void OnEnter()
+	{
+		var data = Renderer.Instance.GetRenderData3D(id);
+		if (!Renderer.RenderData3DMembers.TryGetValue(path, out var member))
+			throw new Exception($"Unknown path '{path}'");
+
+		Func<float> getter = () => (float)member.Get(data);
+		Action<float> setter = (v) => member.Set(data, v);
+
+		var _from = relative ? getter.Invoke() + from : from;
+		var _to = relative ? getter() + to : to;
+
+		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
+					SetFrom(_from).
+					SetEasing(TweenUtil.ResolveEasing(easing)).
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
+
+		data.activeTweens.Add(tween);
+		TweenManager.Add(tween);
+	}
+}
+
 public class PlaySound : GameCommand
 {
 	[CommandParameter]
@@ -309,6 +389,53 @@ public class TweenCam : GameCommand
 
 		Func<float> getter = () => (float)member.Get(Renderer.Instance.Camera);
 		Action<float> setter = v => member.Set(Renderer.Instance.Camera, v);
+
+		var _from = relative ? getter() + from : from;
+		var _to = relative ? getter() + to : to;
+
+		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
+					SetFrom(_from).
+					SetEasing(TweenUtil.ResolveEasing(easing)).
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
+
+		TweenManager.Add(tween);
+	}
+}
+
+public class Cam3D : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private float z;
+	[CommandParameter] private float fovy;
+
+	public override void OnEnter()
+	{
+		var cam = Renderer.Instance.Camera3D;
+		cam.X = x;
+		cam.Y = y;
+		cam.Z = z;
+		cam.Fovy = fovy;
+	}
+}
+
+public class TweenCam3D : GameCommand
+{
+	[CommandParameter] private string path;
+	[CommandParameter] private float from;
+	[CommandParameter] private float to;
+	[CommandParameter] private bool relative;
+	[CommandParameter] private float duration = 0.5f;
+	[CommandParameter] private string easing = "Linear";
+	[CommandParameter] private string tweenId = "";
+
+	public override void OnEnter()
+	{
+		if (!Renderer.Camera3DMembers.TryGetValue(path, out var member))
+			throw new Exception($"Unknown path '{path}'");
+
+		Func<float> getter = () => (float)member.Get(Renderer.Instance.Camera3D);
+		Action<float> setter = v => member.Set(Renderer.Instance.Camera3D, v);
 
 		var _from = relative ? getter() + from : from;
 		var _to = relative ? getter() + to : to;
