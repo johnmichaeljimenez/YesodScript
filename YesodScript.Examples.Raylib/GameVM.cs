@@ -404,18 +404,26 @@ public class TweenCam : GameCommand
 
 public class Cam3D : GameCommand
 {
-	[CommandParameter] private float x;
-	[CommandParameter] private float y;
-	[CommandParameter] private float z;
-	[CommandParameter] private float fovy;
+	[CommandParameter] private float fromX;
+	[CommandParameter] private float fromY;
+	[CommandParameter] private float fromZ;
+	[CommandParameter] private float toX;
+	[CommandParameter] private float toY;
+	[CommandParameter] private float toZ;
+	[CommandParameter] private float fovy = 45f;
+	[CommandParameter] private bool showGrid = true;
 
 	public override void OnEnter()
 	{
 		var cam = Renderer.Instance.Camera3D;
-		cam.X = x;
-		cam.Y = y;
-		cam.Z = z;
+		cam.FromX = fromX;
+		cam.FromY = fromY;
+		cam.FromZ = fromZ;
+		cam.ToX = toX;
+		cam.ToY = toY;
+		cam.ToZ = toZ;
 		cam.Fovy = fovy;
+		cam.ShowGrid = showGrid;
 	}
 }
 
