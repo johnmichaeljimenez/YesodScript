@@ -40,7 +40,7 @@ public class Camera3D
 	public float ToY;
 	public float ToZ;
 	public float Fovy = 45f;
-	public bool ShowGrid = true;
+	public bool ShowGrid = false;
 
 	public Camera3D() { }
 

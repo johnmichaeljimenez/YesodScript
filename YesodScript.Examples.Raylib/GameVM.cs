@@ -267,6 +267,7 @@ public class Render3D : GameCommand
 	[CommandParameter] private float x;
 	[CommandParameter] private float y;
 	[CommandParameter] private float z = 0f;
+	[CommandParameter] private string modelID;
 	[CommandParameter] private string storeID;
 	[CommandParameter] private string group = "";
 
@@ -274,6 +275,9 @@ public class Render3D : GameCommand
 	{
 		var data = Renderer.Instance.CreateRenderData3D(x, y, z);
 		data.Group = group;
+		data.ModelID = modelID;
+		data.Sync();
+
 		if (string.IsNullOrEmpty(storeID))
 			return;
 
@@ -411,7 +415,7 @@ public class Cam3D : GameCommand
 	[CommandParameter] private float toY;
 	[CommandParameter] private float toZ;
 	[CommandParameter] private float fovy = 45f;
-	[CommandParameter] private bool showGrid = true;
+	[CommandParameter] private bool showGrid = false;
 
 	public override void OnEnter()
 	{
