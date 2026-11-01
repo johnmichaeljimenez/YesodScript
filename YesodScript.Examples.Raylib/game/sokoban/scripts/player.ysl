@@ -1,0 +1,68 @@
+﻿@_INIT
+    DEFVAR character 0 int
+    DEFVAR face_deg 0 int
+    DEFVAR px 0 int
+    DEFVAR py 0 int
+    DEFVAR PLAYER_BLOCKED false bool
+    DEFVAR PLAYER_TILE 0 int
+    DEFVAR PLAYER_MOVING false bool
+
+@PLAYER_INIT
+    RENDER3D [[px]] [[py]] 1 "kaykit" character "player"
+    ANIM3D character "Idle_A" true
+    EDIT3D [[character]] "Rotation" [[face_deg]]
+
+@PLAYER_MOVE <to> <x> <y>
+    JUMPEQ PLAYER_MOVING true PLAYER_MOVE_BUSY
+
+    DEFVAR _toX [[px]] int
+    DEFVAR _toY [[py]] int
+    ADD _toX <x>
+    ADD _toY <y>
+
+    $LEVEL_STEP [[_toX]] [[_toY]] PLAYER_BLOCKED PLAYER_TILE
+    JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_CHECK_PUSH
+
+    # exit stub: log only
+    PRINT "TILE: [[PLAYER_TILE]]"
+    JUMPEQ PLAYER_TILE 3 PLAYER_MOVE_EXIT_STUB
+    JUMP PLAYER_MOVE_GO
+
+    >PLAYER_MOVE_EXIT_STUB
+        PRINT "EXIT stub @ [[_toX]],[[_toY]]"
+        JUMP PLAYER_MOVE_GO
+
+    >PLAYER_MOVE_CHECK_PUSH
+        JUMPEQ PLAYER_TILE 2 PLAYER_MOVE_TRY_PUSH
+        JUMP PLAYER_MOVE_BLOCKED
+
+    >PLAYER_MOVE_TRY_PUSH
+        DEFVAR _push_ok false bool
+        $LEVEL_PUSH [[_toX]] [[_toY]] <x> <y> _push_ok
+        JUMPEQ _push_ok false PLAYER_MOVE_BLOCKED
+        PRINT "PUSH box [[_toX]],[[_toY]]"
+        JUMP PLAYER_MOVE_GO
+
+    >PLAYER_MOVE_GO
+        SETVAR PLAYER_MOVING true
+
+        TWEEN3D [[character]] "X" [[px]] [[_toX]] false 0.12 "QUAD" "char_x" true
+        TWEEN3D [[character]] "Y" [[py]] [[_toY]] false 0.12 "QUAD" "char_y" true
+        SETVAR px [[_toX]]
+        SETVAR py [[_toY]]
+
+        JUMPEQ [[face_deg]] <to> PLAYER_MOVE_WAIT
+        TWEEN3D [[character]] "Rotation" [[face_deg]] <to> false 0.12 "QUAD" "char_rotate" true
+        SETVAR face_deg <to>
+
+        >PLAYER_MOVE_WAIT
+            WAIT 0.12
+            SETVAR PLAYER_MOVING false
+            BREAK
+
+    >PLAYER_MOVE_BLOCKED
+        PRINT "BLOCKED [[_toX]],[[_toY]] tile=[[PLAYER_TILE]]"
+        BREAK
+
+    >PLAYER_MOVE_BUSY
+        BREAK
