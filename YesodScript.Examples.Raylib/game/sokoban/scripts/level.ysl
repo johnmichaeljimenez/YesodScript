@@ -1,0 +1,53 @@
+﻿@_INIT
+    DEFVAR LEVEL_TEMP -1 int
+    DEFVAR LEVEL_W 0 int
+    DEFVAR LEVEL_H 0 int
+    DEFVAR LEVEL_NAME * string
+
+    DEFVAR LEVEL_HAS_SPAWN false bool
+    DEFVAR LEVEL_SPAWN_X 0 int
+    DEFVAR LEVEL_SPAWN_Y 0 int
+
+    DEFLIST TILE_TYPES int
+    # (0 = none)
+    DEFLIST TILE_FLOOR int
+    DEFLIST TILE_OBJ int
+
+@LEVEL_INIT <levelname>
+    $LEVEL_CLEAR
+    SETVAR LEVEL_NAME <levelname>
+
+    PRINT "LOADING LEVEL '<levelname>'"
+    CALL "LEVELDATA:<levelname>" LEVEL_INIT_MISSING
+    $LEVEL_BUILD_VISUALS
+
+    JUMPEQ LEVEL_HAS_SPAWN false LEVEL_INIT_NO_SPAWN
+    SETVAR px [[LEVEL_SPAWN_X]]
+    SETVAR py [[LEVEL_SPAWN_Y]]
+    JUMP LEVEL_INIT_CAM
+
+    >LEVEL_INIT_NO_SPAWN
+        SETVAR px 1
+        SETVAR py 1
+
+    >LEVEL_INIT_CAM
+        #aim camera at level center
+        DEFVAR _cx [[LEVEL_W]] int
+        DEFVAR _cy [[LEVEL_H]] int
+        DIV _cx 2
+        DIV _cy 2
+
+        DEFVAR _fromY [[_cy]] int
+        ADD _fromY 4
+        DEFVAR _fromZ 14 int
+
+        CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
+        JUMP LEVEL_INIT_END
+
+    >LEVEL_INIT_MISSING
+        PRINT "Missing level '<levelname>'"
+        BREAK
+
+    >LEVEL_INIT_END
+        PRINT "Loaded level '<levelname>' [[LEVEL_W]]x[[LEVEL_H]] spawn=[[px]],[[py]]"
+        BREAK

@@ -1,0 +1,97 @@
+﻿# Level queries (separate file so level.ysl can CALL them without self-ref)
+
+@LEVEL_STEP <x> <y> <blocked> <tile>
+    SETVAR <blocked> false
+    SETVAR <tile> 0
+
+    JUMPEQ LEVEL_W 0 LEVEL_STEP_END
+    JUMPEQ LEVEL_H 0 LEVEL_STEP_END
+
+    JUMPLT <x> 0 LEVEL_STEP_OOB
+    JUMPLT <y> 0 LEVEL_STEP_OOB
+    JUMPGE <x> [[LEVEL_W]] LEVEL_STEP_OOB
+    JUMPGE <y> [[LEVEL_H]] LEVEL_STEP_OOB
+
+    $LIST_1D <x> <y> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTGET TILE_TYPES [[LEVEL_TEMP]] <tile>
+
+    # 1 wall blocks
+    JUMPEQ <tile> 1 LEVEL_STEP_BLOCK
+    # 2 box: blocked here, player may push via LEVEL_PUSH
+    JUMPEQ <tile> 2 LEVEL_STEP_BLOCK
+    # 3 exit is walkable
+    JUMP LEVEL_STEP_END
+
+    >LEVEL_STEP_OOB
+        SETVAR <blocked> true
+        JUMP LEVEL_STEP_END
+
+    >LEVEL_STEP_BLOCK
+        SETVAR <blocked> true
+        JUMP LEVEL_STEP_END
+
+    >LEVEL_STEP_END
+        SETVAR LEVEL_TEMP -1
+        BREAK
+
+@LEVEL_GET <x> <y> <tile>
+    SETVAR <tile> 0
+    JUMPEQ LEVEL_W 0 LEVEL_GET_END
+    JUMPEQ LEVEL_H 0 LEVEL_GET_END
+    JUMPLT <x> 0 LEVEL_GET_END
+    JUMPLT <y> 0 LEVEL_GET_END
+    JUMPGE <x> [[LEVEL_W]] LEVEL_GET_END
+    JUMPGE <y> [[LEVEL_H]] LEVEL_GET_END
+
+    $LIST_1D <x> <y> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTGET TILE_TYPES [[LEVEL_TEMP]] <tile>
+
+    >LEVEL_GET_END
+        BREAK
+
+@LEVEL_PUSH <bx> <by> <dx> <dy> <ok>
+    SETVAR <ok> false
+
+    DEFVAR _tx <bx> int
+    DEFVAR _ty <by> int
+    ADD _tx <dx>
+    ADD _ty <dy>
+
+    JUMPLT _tx 0 LEVEL_PUSH_END
+    JUMPLT _ty 0 LEVEL_PUSH_END
+    JUMPGE _tx [[LEVEL_W]] LEVEL_PUSH_END
+    JUMPGE _ty [[LEVEL_H]] LEVEL_PUSH_END
+
+    DEFVAR _beyond 0 int
+    $LIST_1D [[_tx]] [[_ty]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTGET TILE_TYPES [[LEVEL_TEMP]] _beyond
+    JUMPNEQ _beyond 0 LEVEL_PUSH_END
+
+    DEFVAR _from 0 int
+    DEFVAR _rid 0 int
+    $LIST_1D <bx> <by> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTGET TILE_TYPES [[LEVEL_TEMP]] _from
+    JUMPNEQ _from 2 LEVEL_PUSH_END
+    LISTGET TILE_OBJ [[LEVEL_TEMP]] _rid
+
+    # vacate old cell
+    LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+    LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
+
+    # occupy destination
+    $LIST_1D [[_tx]] [[_ty]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
+    LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
+
+    # slide mesh with the player (same 0.12s ease)
+    JUMPLE _rid 0 LEVEL_PUSH_OK
+    TWEEN3D [[_rid]] "X" <bx> [[_tx]] false 0.12 "QUAD" "box_x" false
+    TWEEN3D [[_rid]] "Y" <by> [[_ty]] false 0.12 "QUAD" "box_y" false
+
+    >LEVEL_PUSH_OK
+        SETVAR <ok> true
+        JUMP LEVEL_PUSH_END
+
+    >LEVEL_PUSH_END
+        SETVAR LEVEL_TEMP -1
+        BREAK

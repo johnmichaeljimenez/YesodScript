@@ -1,0 +1,96 @@
+﻿# 0 - floor (walkable island tile)
+# 1 - wall  (collision only)
+# 2 - box   (pushable via LEVEL_PUSH)
+# 3 - exit  (stub)
+
+@_INIT
+    DEFVAR CUBE_SCALE 0.666666 float
+
+@LEVEL_CLEAR
+    CLEAR "level*"
+    LISTCLEAR TILE_TYPES
+    LISTCLEAR TILE_FLOOR
+    LISTCLEAR TILE_OBJ
+    SETVAR LEVEL_W 0
+    SETVAR LEVEL_H 0
+    SETVAR LEVEL_NAME *
+    SETVAR LEVEL_HAS_SPAWN false
+
+@LEVEL_FILL <w> <h>
+    SETVAR LEVEL_W <w>
+    SETVAR LEVEL_H <h>
+
+    DEFVAR _size <w> int
+    MUL _size <h>
+
+    PRINT "LEVEL SIZE [[_size]] ([[LEVEL_W]]x[[LEVEL_H]])"
+
+    $LIST_FILL TILE_TYPES [[_size]] 0
+    $LIST_FILL TILE_FLOOR [[_size]] 0
+    $LIST_FILL TILE_OBJ [[_size]] 0
+    BREAK
+
+@LEVEL_SET <x> <y> <type>
+    $LIST_1D <x> <y> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTSET TILE_TYPES [[LEVEL_TEMP]] <type>
+    BREAK
+
+@LEVEL_BUILD_VISUALS
+    DEFVAR _size [[LEVEL_W]] int
+    MUL _size [[LEVEL_H]]
+
+    DEFVAR _i 0 int
+    DEFVAR _x 0 int
+    DEFVAR _y 0 int
+    DEFVAR _type 0 int
+    DEFVAR _rid 0 int
+    DEFVAR _orid 0 int
+    DEFVAR _floors 0 int
+
+    >LEVEL_BUILD_LOOP
+        JUMPGE _i [[_size]] LEVEL_BUILD_DONE
+
+        LISTGET TILE_TYPES [[_i]] _type
+        # wall=no floor
+        JUMPEQ _type 1 LEVEL_BUILD_NEXT
+
+        $LIST_XY [[_i]] [[LEVEL_W]] _x _y
+
+        LISTGET TILE_FLOOR [[_i]] _rid
+        JUMPGT _rid 0 LEVEL_BUILD_FLOOR_READY
+
+        RENDER3D [[_x]] [[_y]] 0 "cube" _rid "level_floor"
+        EDIT3D [[_rid]] "Scale" [[CUBE_SCALE]]
+        LISTSET TILE_FLOOR [[_i]] [[_rid]]
+        ADD _floors 1
+
+        >LEVEL_BUILD_FLOOR_READY
+            # exit: green floor
+            JUMPNEQ _type 3 LEVEL_BUILD_BOX
+            EDIT3D [[_rid]] "Tint.R" 80
+            EDIT3D [[_rid]] "Tint.G" 220
+            EDIT3D [[_rid]] "Tint.B" 100
+            JUMP LEVEL_BUILD_NEXT
+
+        >LEVEL_BUILD_BOX
+            JUMPNEQ _type 2 LEVEL_BUILD_NEXT
+
+            LISTGET TILE_OBJ [[_i]] _orid
+            JUMPGT _orid 0 LEVEL_BUILD_BOX_TINT
+
+            RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_obj"
+            EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
+            LISTSET TILE_OBJ [[_i]] [[_orid]]
+
+            >LEVEL_BUILD_BOX_TINT
+                EDIT3D [[_orid]] "Tint.R" 255
+                EDIT3D [[_orid]] "Tint.G" 140
+                EDIT3D [[_orid]] "Tint.B" 40
+                JUMP LEVEL_BUILD_NEXT
+
+        >LEVEL_BUILD_NEXT
+            ADD _i 1
+            JUMP LEVEL_BUILD_LOOP
+
+    >LEVEL_BUILD_DONE
+        BREAK
