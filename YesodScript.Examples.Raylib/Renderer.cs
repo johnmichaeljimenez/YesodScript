@@ -30,10 +30,40 @@ public class Camera
 	};
 }
 
+
+public class Camera3D
+{
+	public float X;
+	public float Y;
+	public float Z = 10f;
+	public float Fovy = 45f;
+
+	public Camera3D() { }
+
+	public Camera3D(float x, float y, float z = 10f, float fovy = 45f)
+	{
+		X = x;
+		Y = y;
+		Z = z;
+		Fovy = fovy;
+	}
+
+	public Raylib_cs.Camera3D ToCamera3D() => new()
+	{
+		Position = new Vector3(X, Z, Y),
+		Target = new Vector3(X, 0f, Y),
+		Up = new Vector3(0f, 1f, 0f),
+		FovY = Fovy,
+		Projection = CameraProjection.Perspective
+	};
+}
+
 public class Renderer : IDisposable
 {
 	public static readonly IReadOnlyDictionary<string, PathMember> RenderDataMembers = PathMemberCache.Build<RenderData>();
 	public static readonly IReadOnlyDictionary<string, PathMember> CameraMembers = PathMemberCache.Build<Camera>();
+	public static readonly IReadOnlyDictionary<string, PathMember> RenderData3DMembers = PathMemberCache.Build<RenderData3D>();
+	public static readonly IReadOnlyDictionary<string, PathMember> Camera3DMembers = PathMemberCache.Build<Camera3D>();
 	public static Renderer Instance { get; private set; }
 
 	private int renderID = 1;   //0 means stale default data
@@ -41,12 +71,15 @@ public class Renderer : IDisposable
 	private readonly List<RenderData> sortedRenderList = new();
 	private bool sortDirty;
 
+	private readonly Dictionary<int, RenderData3D> renderList3D = new();
+
 	private int VirtualWidth;
 	private int VirtualHeight;
 
 	private RenderTexture2D rt;
 
 	public Camera Camera = new();
+	public Camera3D Camera3D = new();
 
 	public Renderer()
 	{
@@ -74,6 +107,8 @@ public class Renderer : IDisposable
 			renderList.Clear();
 			sortedRenderList.Clear();
 			sortDirty = false;
+
+			renderList3D.Clear();
 			return;
 		}
 
@@ -85,11 +120,25 @@ public class Renderer : IDisposable
 				sortedRenderList.Remove(i);
 			}
 		}
+
+		foreach (var i in renderList3D.Values.ToArray())
+		{
+			if (Utils.IsMatchWildcard(i.Group, filter))
+			{
+				renderList3D.Remove(i.ID);
+			}
+		}
 	}
 
 	public void SetRenderDataState(bool state, string filter = "*")
 	{
 		foreach (var i in renderList)
+		{
+			if (Utils.IsMatchWildcard(i.Value.Group, filter))
+				i.Value.Disabled = !state;
+		}
+
+		foreach (var i in renderList3D)
 		{
 			if (Utils.IsMatchWildcard(i.Value.Group, filter))
 				i.Value.Disabled = !state;
@@ -145,6 +194,46 @@ public class Renderer : IDisposable
 			i.prevX = i.X;
 			i.prevY = i.Y;
 		}
+
+		foreach (var i in renderList3D)
+		{
+			i.Value.prevX = i.Value.X;
+			i.Value.prevY = i.Value.Y;
+			i.Value.prevZ = i.Value.Z;
+		}
+	}
+
+	public RenderData3D CreateRenderData3D(float x, float y, float z = 0f)
+	{
+		var newID = renderID++;
+
+		if (renderList3D.ContainsKey(newID))
+			throw new InvalidOperationException($"RenderData3D with ID '{newID}' already exists.");
+
+		var r = new RenderData3D();
+		r.ID = newID;
+		r.X = x;
+		r.Y = y;
+		r.Z = z;
+		r.prevX = x;
+		r.prevY = y;
+		r.prevZ = z;
+
+		renderList3D[r.ID] = r;
+		return r;
+	}
+
+	public void RemoveRenderData3D(int id)
+	{
+		renderList3D.Remove(id);
+	}
+
+	public RenderData3D GetRenderData3D(int id)
+	{
+		if (!renderList3D.TryGetValue(id, out var data))
+			throw new InvalidOperationException($"RenderData3D id '{id}' not found.");
+
+		return data;
 	}
 
 	public RenderData GetRenderData(int id)
@@ -373,6 +462,17 @@ public class Renderer : IDisposable
 			}
 			Raylib.EndMode2D();
 
+			var cam3d = Camera3D.ToCamera3D();
+			Raylib.BeginMode3D(cam3d);
+			foreach (var item in renderList3D)
+			{
+				if (item.Value.Disabled)
+					continue;
+
+				DrawItem3D(item.Value, alpha);
+			}
+			Raylib.EndMode3D();
+
 			foreach (var item in sortedRenderList)
 			{
 				if (item.Disabled || item.World)
@@ -456,6 +556,26 @@ public class Renderer : IDisposable
 		var c2 = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
 		DrawMultilineText(font, i.Text, new Vector2(drawX, drawY), fontSize, 1f, c2, i.TextHAlign, i.TextVAlign);
 	}
+
+	private void DrawItem3D(RenderData3D i, float alpha)
+	{
+		if (i.Model.MeshCount == 0)
+			return;
+
+		var maxDist = 100f;
+		var drawX = Math.Abs(i.X - i.prevX) > maxDist ? i.X : i.prevX + (i.X - i.prevX) * alpha;
+		var drawY = Math.Abs(i.Y - i.prevY) > maxDist ? i.Y : i.prevY + (i.Y - i.prevY) * alpha;
+		var drawZ = Math.Abs(i.Z - i.prevZ) > maxDist ? i.Z : i.prevZ + (i.Z - i.prevZ) * alpha;
+
+		var pos = new Vector3(drawX, drawZ, drawY);
+		var tint = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
+		var scaleVec = new Vector3(i.Scale, i.Scale, i.Scale);
+
+		if (Math.Abs(i.Rotation) > 0.001f)
+			Raylib.DrawModelEx(i.Model, pos, new Vector3(0f, 1f, 0f), i.Rotation, scaleVec, tint);
+		else
+			Raylib.DrawModel(i.Model, pos, i.Scale, tint);
+	}
 }
 
 public enum TextHAlign
@@ -528,6 +648,47 @@ public class RenderData : IDisposable
 		}
 
 		Sprite = Assets.Instance.GetSprite(SpriteID);
+	}
+
+	public void Dispose()
+	{
+		foreach (var i in activeTweens)
+		{
+			TweenManager.Remove(i);
+		}
+	}
+}
+public class RenderData3D : IDisposable
+{
+	public int ID;
+	public bool Disabled;
+
+	public float X;
+	public float Y;
+	public float Z;
+	public float prevX, prevY, prevZ;
+
+	public float Scale = 1f;
+	public float Rotation; //degrees around Y (up)
+
+	public string ModelID;
+	public Model Model { get; private set; }
+
+	public string Group = "";
+	public float Opacity = 1;
+	public Color Tint = Color.White;
+
+	public List<TweenBase> activeTweens = new();
+
+	public void Sync()
+	{
+		if (string.IsNullOrEmpty(ModelID))
+		{
+			Model = default;
+			return;
+		}
+
+		Model = Assets.Instance.GetModel(ModelID);
 	}
 
 	public void Dispose()
