@@ -33,25 +33,35 @@ public class Camera
 
 public class Camera3D
 {
-	public float X;
-	public float Y;
-	public float Z = 10f;
+	public float FromX;
+	public float FromY;
+	public float FromZ = 10f;
+	public float ToX;
+	public float ToY;
+	public float ToZ;
 	public float Fovy = 45f;
+	public bool ShowGrid = true;
 
 	public Camera3D() { }
 
-	public Camera3D(float x, float y, float z = 10f, float fovy = 45f)
+	public Camera3D(
+		float fromX, float fromY, float fromZ = 10f,
+		float toX = 0f, float toY = 0f, float toZ = 0f,
+		float fovy = 45f)
 	{
-		X = x;
-		Y = y;
-		Z = z;
+		FromX = fromX;
+		FromY = fromY;
+		FromZ = fromZ;
+		ToX = toX;
+		ToY = toY;
+		ToZ = toZ;
 		Fovy = fovy;
 	}
 
 	public Raylib_cs.Camera3D ToCamera3D() => new()
 	{
-		Position = new Vector3(X, Z, Y),
-		Target = new Vector3(X, 0f, Y),
+		Position = new Vector3(FromX, FromZ, FromY),
+		Target = new Vector3(ToX, ToZ, ToY),
 		Up = new Vector3(0f, 1f, 0f),
 		FovY = Fovy,
 		Projection = CameraProjection.Perspective
@@ -464,6 +474,8 @@ public class Renderer : IDisposable
 
 			var cam3d = Camera3D.ToCamera3D();
 			Raylib.BeginMode3D(cam3d);
+			if (Camera3D.ShowGrid)
+				Raylib.DrawGrid(10, 1f);
 			foreach (var item in renderList3D)
 			{
 				if (item.Value.Disabled)
