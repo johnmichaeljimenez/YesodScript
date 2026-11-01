@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <!-- select game content pack. override with -p:GameId=pong -->
     <GameId Condition="'$(GameId)' == ''">pong</GameId>
