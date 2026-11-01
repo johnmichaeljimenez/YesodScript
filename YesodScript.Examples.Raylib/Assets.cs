@@ -12,6 +12,9 @@ public class Assets : IDisposable
 	private readonly Dictionary<string, Sound> sounds = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, Font> fonts = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, Model> models = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, ModelAnimation[]> modelAnimations = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, IntPtr> modelAnimationPtrs = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, int> modelAnimationCounts = new(StringComparer.InvariantCultureIgnoreCase);
 
 	public Assets()
 	{
@@ -85,6 +88,7 @@ public class Assets : IDisposable
 
 		var model = Raylib.LoadModel(path);
 		models[id] = model;
+		LoadModelAnimations(id, path);
 	}
 
 	public Model GetModel(string id)
@@ -93,6 +97,78 @@ public class Assets : IDisposable
 			throw new InvalidOperationException($"Model '{id}' not found. Load it first or check the asset id.");
 
 		return model;
+	}
+
+	public bool TryGetModelAnimation(string modelId, string animName, out ModelAnimation animation)
+	{
+		animation = default;
+
+		if (string.IsNullOrWhiteSpace(animName))
+			return false;
+
+		if (!modelAnimations.TryGetValue(modelId, out var anims) || anims.Length == 0)
+			return false;
+
+		foreach (var anim in anims)
+		{
+			if (anim.NameToString().Equals(animName, StringComparison.InvariantCultureIgnoreCase))
+			{
+				animation = anim;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public IReadOnlyList<string> GetModelAnimationNames(string modelId)
+	{
+		if (!modelAnimations.TryGetValue(modelId, out var anims) || anims.Length == 0)
+			return Array.Empty<string>();
+
+		var names = new string[anims.Length];
+		for (var i = 0; i < anims.Length; i++)
+			names[i] = anims[i].NameToString();
+
+		return names;
+	}
+
+	private unsafe void LoadModelAnimations(string id, string path)
+	{
+		var count = 0;
+		var ptr = Raylib.LoadModelAnimations(path, ref count);
+		if (ptr == null || count <= 0)
+		{
+			modelAnimations[id] = Array.Empty<ModelAnimation>();
+			return;
+		}
+
+		var anims = new ModelAnimation[count];
+		for (var i = 0; i < count; i++)
+			anims[i] = ptr[i];
+
+		modelAnimations[id] = anims;
+		modelAnimationPtrs[id] = (IntPtr)ptr;
+		modelAnimationCounts[id] = count;
+	}
+
+	private unsafe void UnloadAllModelAnimations()
+	{
+		foreach (var pair in modelAnimationPtrs)
+		{
+			if (!modelAnimationCounts.TryGetValue(pair.Key, out var count) || count <= 0)
+				continue;
+
+			var ptr = (ModelAnimation*)pair.Value.ToPointer();
+			if (ptr == null)
+				continue;
+
+			Raylib.UnloadModelAnimations(ptr, count);
+		}
+
+		modelAnimationPtrs.Clear();
+		modelAnimationCounts.Clear();
+		modelAnimations.Clear();
 	}
 
 	public void Dispose()
@@ -118,6 +194,8 @@ public class Assets : IDisposable
 		}
 
 		fonts.Clear();
+
+		UnloadAllModelAnimations();
 
 		foreach (var i in models.Values)
 		{

@@ -574,6 +574,8 @@ public class Renderer : IDisposable
 		if (i.Model.MeshCount == 0)
 			return;
 
+		i.UpdateAnimation(Raylib.GetFrameTime());
+
 		var maxDist = 100f;
 		var drawX = Math.Abs(i.X - i.prevX) > maxDist ? i.X : i.prevX + (i.X - i.prevX) * alpha;
 		var drawY = Math.Abs(i.Y - i.prevY) > maxDist ? i.Y : i.prevY + (i.Y - i.prevY) * alpha;
@@ -692,15 +694,94 @@ public class RenderData3D : IDisposable
 
 	public List<TweenBase> activeTweens = new();
 
+	public bool AnimPlaying { get; private set; }
+	public bool AnimLooping { get; private set; } = true;
+	public float AnimFrame { get; private set; }
+	public float AnimSpeed { get; set; } = 1f;
+	public string AnimName { get; private set; } = "";
+	private ModelAnimation currentAnim;
+
 	public void Sync()
 	{
 		if (string.IsNullOrEmpty(ModelID))
 		{
 			Model = default;
+			StopAnimation();
 			return;
 		}
 
 		Model = Assets.Instance.GetModel(ModelID);
+
+		if (!string.IsNullOrEmpty(AnimName) &&
+		    Assets.Instance.TryGetModelAnimation(ModelID, AnimName, out var anim) &&
+		    (Model.MeshCount == 0 || Raylib.IsModelAnimationValid(Model, anim)))
+		{
+			currentAnim = anim;
+			if (AnimPlaying || AnimFrame > 0f)
+				Raylib.UpdateModelAnimation(Model, currentAnim, AnimFrame);
+		}
+	}
+
+	public void PlayAnimation(string animName, bool looping = true)
+	{
+		if (string.IsNullOrWhiteSpace(animName))
+		{
+			StopAnimation();
+			return;
+		}
+
+		if (string.IsNullOrEmpty(ModelID))
+			throw new InvalidOperationException($"RenderData3D '{ID}' has no model assigned.");
+
+		if (!Assets.Instance.TryGetModelAnimation(ModelID, animName, out var anim))
+		{
+			var available = string.Join(", ", Assets.Instance.GetModelAnimationNames(ModelID));
+			throw new InvalidOperationException(
+				$"Animation '{animName}' not found on model '{ModelID}'. Available: [{available}]");
+		}
+
+		if (Model.MeshCount > 0 && !Raylib.IsModelAnimationValid(Model, anim))
+			throw new InvalidOperationException(
+				$"Animation '{animName}' skeleton does not match model '{ModelID}'.");
+
+		currentAnim = anim;
+		AnimName = anim.NameToString();
+		AnimLooping = looping;
+		AnimFrame = 0f;
+		AnimPlaying = true;
+		Raylib.UpdateModelAnimation(Model, currentAnim, AnimFrame);
+	}
+
+	public void StopAnimation()
+	{
+		AnimPlaying = false;
+		AnimName = "";
+		AnimFrame = 0f;
+		currentAnim = default;
+	}
+
+	public void UpdateAnimation(float deltaTime)
+	{
+		if (!AnimPlaying || currentAnim.KeyFrameCount <= 0 || Model.MeshCount == 0)
+			return;
+
+		AnimFrame += Math.Max(0f, deltaTime) * 60f * AnimSpeed;
+
+		var frameCount = currentAnim.KeyFrameCount;
+		if (AnimFrame >= frameCount)
+		{
+			if (AnimLooping)
+			{
+				AnimFrame %= frameCount;
+			}
+			else
+			{
+				AnimFrame = Math.Max(0, frameCount - 1);
+				AnimPlaying = false;
+			}
+		}
+
+		Raylib.UpdateModelAnimation(Model, currentAnim, AnimFrame);
 	}
 
 	public void Dispose()

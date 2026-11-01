@@ -346,6 +346,19 @@ public class Tween3D : GameCommand
 	}
 }
 
+public class Anim3D : GameCommand
+{
+	[CommandParameter] private int id;
+	[CommandParameter] private string animName;	//empty = stop
+	[CommandParameter] private bool looping = true;
+
+	public override void OnEnter()
+	{
+		var data = Renderer.Instance.GetRenderData3D(id);
+		data.PlayAnimation(animName, looping);
+	}
+}
+
 public class PlaySound : GameCommand
 {
 	[CommandParameter]
