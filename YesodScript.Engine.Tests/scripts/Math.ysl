@@ -14,4 +14,21 @@ PRINT "[[X]]"
 DIV X 5
 PRINT "[[X]]"
 
+DEFVAR A 0 float
+SIN A
+PRINT "[[A]]"
+
+DEFVAR B 0 float
+COS B
+PRINT "[[B]]"
+
+#pi/2 -> sin = ~1
+DEFVAR C [[PI_2]] float
+SIN C
+PRINT "[[C]]"
+
+DEFVAR D [[PI]] float
+COS D
+PRINT "[[D]]"
+
 BREAK

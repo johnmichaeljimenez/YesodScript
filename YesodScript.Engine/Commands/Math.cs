@@ -87,9 +87,11 @@ namespace YesodScript.Engine.Commands
 		protected override float Apply(float a, float b) => a / b;
 	}
 
-	public class Sqrt : Command
+	public abstract class UnaryVarMath : Command
 	{
 		[CommandParameter] private string key = "";
+
+		protected abstract float Apply(float a);
 
 		public override void OnEnter()
 		{
@@ -97,12 +99,27 @@ namespace YesodScript.Engine.Commands
 				?? throw new InvalidOperationException($"Var '{key}' was not found.");
 
 			if (v.Type != typeof(int) && v.Type != typeof(float))
-				throw new NotSupportedException($"Var '{key}' is of type '{v.Type.Name}'; SQRT requires int or float.");
+				throw new NotSupportedException($"Var '{key}' is of type '{v.Type.Name}'; {GetType().Name.ToUpper()} requires int or float.");
 
-			var result = MathF.Sqrt(Convert.ToSingle(v.Value, CultureInfo.InvariantCulture));
+			var result = Apply(Convert.ToSingle(v.Value, CultureInfo.InvariantCulture));
 			v.Value = v.Type == typeof(int)
 				? (object)(int)float.Truncate(result)
 				: result;
 		}
+	}
+
+	public class Sqrt : UnaryVarMath
+	{
+		protected override float Apply(float a) => MathF.Sqrt(a);
+	}
+
+	public class Sin : UnaryVarMath
+	{
+		protected override float Apply(float a) => MathF.Sin(a);
+	}
+
+	public class Cos : UnaryVarMath
+	{
+		protected override float Apply(float a) => MathF.Cos(a);
 	}
 }
