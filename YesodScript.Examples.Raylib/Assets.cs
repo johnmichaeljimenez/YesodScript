@@ -186,6 +186,15 @@ public class LoadAssets : GameCommand
 			return false;
 		}
 
+		if (modelKeys.Count > 0)
+		{
+			var key = modelKeys[0];
+			Assets.Instance.LoadModel(key, modelPaths[key]);
+			modelKeys.RemoveAt(0);
+
+			return false;
+		}
+
 		return true;
 	}
 }
