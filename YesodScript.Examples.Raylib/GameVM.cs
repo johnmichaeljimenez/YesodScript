@@ -239,6 +239,7 @@ public class Tween : GameCommand
 	[CommandParameter] private float duration = 0.5f;
 	[CommandParameter] private string easing = "Linear";
 	[CommandParameter] private string tweenId = "";
+	[CommandParameter] private bool angleWrap = false;
 
 	public override void OnEnter()
 	{
@@ -251,6 +252,8 @@ public class Tween : GameCommand
 
 		var _from = relative ? getter.Invoke() + from : from;
 		var _to = relative ? getter() + to : to;
+		if (angleWrap)
+			_to = _from + TweenUtil.ShortestAngleDelta(_from, _to);
 
 		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
 					SetFrom(_from).
@@ -323,6 +326,7 @@ public class Tween3D : GameCommand
 	[CommandParameter] private float duration = 0.5f;
 	[CommandParameter] private string easing = "Linear";
 	[CommandParameter] private string tweenId = "";
+	[CommandParameter] private bool angleWrap = false;
 
 	public override void OnEnter()
 	{
@@ -335,6 +339,8 @@ public class Tween3D : GameCommand
 
 		var _from = relative ? getter.Invoke() + from : from;
 		var _to = relative ? getter() + to : to;
+		if (angleWrap)
+			_to = _from + TweenUtil.ShortestAngleDelta(_from, _to);
 
 		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
 					SetFrom(_from).
@@ -525,4 +531,14 @@ internal static class TweenUtil
 		"SHAKE" => Easing.Shake(0.7f, 1.5f),
 		_ => Easing.Linear
 	};
+
+	public static float ShortestAngleDelta(float from, float to)
+	{
+		float delta = (to - from) % 360f;
+		if (delta > 180f)
+			delta -= 360f;
+		else if (delta <= -180f)
+			delta += 360f;
+		return delta;
+	}
 }
