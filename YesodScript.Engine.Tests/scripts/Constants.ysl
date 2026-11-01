@@ -1,0 +1,12 @@
+@_INIT
+    PRINT "[[PI]]"
+    PRINT "[[PI_2]]"
+    PRINT "[[TAU]]"
+    PRINT "[[RAD2DEG]]"
+    PRINT "[[DEG2RAD]]"
+
+    DEFVAR ang 90 float
+    MUL ang [[DEG2RAD]]
+    SIN ang
+    PRINT "[[ang]]"
+    BREAK

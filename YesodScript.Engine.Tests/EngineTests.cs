@@ -82,7 +82,14 @@ public partial class EngineTests
     public void Test_Math()
     {
         var vm = Utils.Test(out var output, "Math.ysl");
-        output.Should().Be("15\n12\n48\n9");
+        output.Should().Be("15\n12\n48\n9\n0\n1\n1\n-1");
+    }
+
+    [Fact]
+    public void Test_Constants()
+    {
+        var vm = Utils.Test(out var output, "Constants.ysl");
+        output.Should().Be("3.1415927\n1.5707964\n6.2831855\n57.29578\n0.017453292\n1");
     }
 
     [Fact]
@@ -135,7 +142,7 @@ public partial class EngineTests
     public void Test_Lists()
     {
         var vm = Utils.Test(out var output, "Lists.ysl");
-            output.Should().Be("apple\nbanana\ncherry\n5\n10\n40\nSUM: 55\n1\n-1\n2");
+        output.Should().Be("apple\nbanana\ncherry\n5\n10\n40\nSUM: 55\n1\n-1\n2");
     }
 
     [Fact]

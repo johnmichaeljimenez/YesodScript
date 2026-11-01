@@ -121,10 +121,18 @@ public class VirtualMachine : IDisposable
 			ValidateSyncCallGraph();
 
 		OnInitialize();
+
+		FireTrigger("_BOOT");
+		foreach (var boot in runningCommands.ToArray())
+		{
+			if (boot.IsRunning)
+				RunInline(boot, 0);
+		}
+
 		FireTrigger("_INIT");
 		Tick(0);
 	}
-	
+
 	public void ValidateSyncCallGraph()
 	{
 		var edges = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
@@ -258,7 +266,7 @@ public class VirtualMachine : IDisposable
 					if (v != null)
 					{
 						var mangled = $"_inj_{callerPrefix}_{part.TrimStart('_')}";
-						
+
 						var unique = mangled;
 						int n = 1;
 						while (injectMap.ContainsKey(unique))
