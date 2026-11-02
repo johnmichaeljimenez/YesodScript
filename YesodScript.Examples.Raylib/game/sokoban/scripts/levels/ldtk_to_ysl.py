@@ -4,7 +4,8 @@ Export LDtk level-data.ldtk -> level-data.ysl LEVELDATA sections.
 
 Sokoban layout (see level.ysl):
   $LEVEL_FILL w h
-  SETVAR LEVEL_SPAWN_X/Y + LEVEL_HAS_SPAWN
+  LISTADD LEVEL_SPAWN_XS/YS/HEROES for each Player_Start
+  SETVAR LEVEL_SPAWN_X/Y/HERO + LEVEL_HAS_SPAWN (first start, legacy)
   $LEVEL_SET x y type
 
 Tile types:
@@ -15,7 +16,8 @@ Tile types:
   4 switch (Switch entity) — walkable pressure plate
   5 gate   (Gate entity) — blocks until all switches are held
 
-Player_Start sets spawn coordinates and HeroType (not a tile type).
+Player_Start entities set multi-hero spawns (HeroType) — not tile types.
+Inactive heroes become box tiles at runtime; press X to switch.
 Entity stamps overwrite IntGrid blockers on the same cell.
 """
 
@@ -49,30 +51,38 @@ def grid_size(level: dict[str, Any]) -> tuple[int, int]:
     return level["pxWid"] // TILE_SIZE, level["pxHei"] // TILE_SIZE
 
 
-def find_player_start(level: dict[str, Any]) -> tuple[int, int, int] | None:
+def find_player_starts(level: dict[str, Any]) -> list[tuple[int, int, int]]:
+    """Collect every Player_Start (multi-hero levels supported)."""
+    starts: list[tuple[int, int, int]] = []
     for layer in level["layerInstances"]:
         if layer.get("__type") != "Entities":
             continue
         for entity in layer.get("entityInstances", []):
             ident = entity.get("__identifier") or ""
             # accept Player_Start / PlayerStart
-            if ident in ("Player_Start", "PlayerStart"):
-                gx, gy = entity["__grid"]
-                hero_name = next(
-                    (
-                        field.get("__value")
-                        for field in entity.get("fieldInstances", [])
-                        if field.get("__identifier") == "HeroType"
-                    ),
-                    "Warrior",
+            if ident not in ("Player_Start", "PlayerStart"):
+                continue
+            gx, gy = entity["__grid"]
+            hero_name = next(
+                (
+                    field.get("__value")
+                    for field in entity.get("fieldInstances", [])
+                    if field.get("__identifier") == "HeroType"
+                ),
+                "Warrior",
+            )
+            if hero_name not in HERO_TYPE_VALUE:
+                raise ValueError(
+                    f"unsupported HeroType '{hero_name}' on Player_Start "
+                    f"in level '{level['identifier']}'"
                 )
-                if hero_name not in HERO_TYPE_VALUE:
-                    raise ValueError(
-                        f"unsupported HeroType '{hero_name}' on Player_Start "
-                        f"in level '{level['identifier']}'"
-                    )
-                return int(gx), int(gy), HERO_TYPE_VALUE[hero_name]
-    return None
+            starts.append((int(gx), int(gy), HERO_TYPE_VALUE[hero_name]))
+    return starts
+
+
+def find_player_start(level: dict[str, Any]) -> tuple[int, int, int] | None:
+    starts = find_player_starts(level)
+    return starts[0] if starts else None
 
 
 def is_gameplay_intgrid_layer(layer: dict[str, Any]) -> bool:
@@ -135,13 +145,18 @@ def generate_leveldata(level: dict[str, Any]) -> str:
         f"\t$LEVEL_FILL {gw} {gh}",
     ]
 
-    spawn = find_player_start(level)
-    if spawn is not None:
-        sx, sy, hero_type = spawn
+    starts = find_player_starts(level)
+    if starts:
+        # first start kept as scalars for older tooling / debug prints
+        sx, sy, hero_type = starts[0]
         lines.append(f"\tSETVAR LEVEL_SPAWN_X {sx}")
         lines.append(f"\tSETVAR LEVEL_SPAWN_Y {sy}")
         lines.append(f"\tSETVAR LEVEL_SPAWN_HERO {hero_type}")
         lines.append("\tSETVAR LEVEL_HAS_SPAWN true")
+        for sx, sy, hero_type in starts:
+            lines.append(f"\tLISTADD LEVEL_SPAWN_XS {sx}")
+            lines.append(f"\tLISTADD LEVEL_SPAWN_YS {sy}")
+            lines.append(f"\tLISTADD LEVEL_SPAWN_HEROES {hero_type}")
     else:
         lines.append("\t# no Player_Start found")
 
