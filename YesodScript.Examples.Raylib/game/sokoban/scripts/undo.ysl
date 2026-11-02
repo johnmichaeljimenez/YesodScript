@@ -1,0 +1,409 @@
+# Session-scoped only
+# Clear on level entry/advance, push before committed moves and restart
+# Death does not push as the fatal move already did (undo undoes that move)
+
+@_INIT
+    DEFVAR UNDO_DEPTH 0 int
+    DEFVAR UNDO_CELL_STRIDE 0 int
+    DEFVAR UNDO_HERO_STRIDE 0 int
+    DEFVAR UNDO_TEMP 0 int
+    DEFVAR UNDO_BASE 0 int
+    DEFVAR UNDO_I 0 int
+    DEFVAR UNDO_N 0 int
+    DEFVAR UNDO_V 0 int
+    DEFVAR UNDO_CELL 0 int
+    DEFVAR UNDO_HX 0 int
+    DEFVAR UNDO_HY 0 int
+    DEFVAR UNDO_RID 0 int
+    DEFVAR UNDO_HAS_HERO false bool
+    DEFVAR UNDO_X 0 int
+    DEFVAR UNDO_Y 0 int
+    DEFVAR UNDO_TYPE 0 int
+    DEFVAR UNDO_ORID 0 int
+    DEFVAR UNDO_SWITCH_I -1 int
+    DEFVAR UNDO_EXIT_I -1 int
+    DEFVAR UNDO_GATE_I -1 int
+
+    DEFLIST UNDO_TILES int
+    DEFLIST UNDO_HERO_XS int
+    DEFLIST UNDO_HERO_YS int
+    DEFLIST UNDO_HERO_TYPES int
+    DEFLIST UNDO_HERO_FACES int
+    DEFLIST UNDO_HERO_ACTIVE int
+    DEFLIST UNDO_GATE_Y int
+    DEFLIST UNDO_GATE_P int
+
+# Reset history for a new level session (Continue/Level Select/Next)
+@UNDO_CLEAR
+    LISTCLEAR UNDO_TILES
+    LISTCLEAR UNDO_HERO_XS
+    LISTCLEAR UNDO_HERO_YS
+    LISTCLEAR UNDO_HERO_TYPES
+    LISTCLEAR UNDO_HERO_FACES
+    LISTCLEAR UNDO_HERO_ACTIVE
+    LISTCLEAR UNDO_GATE_Y
+    LISTCLEAR UNDO_GATE_P
+    SETVAR UNDO_DEPTH 0
+
+    SETVAR UNDO_CELL_STRIDE [[LEVEL_W]]
+    MUL UNDO_CELL_STRIDE [[LEVEL_H]]
+    SETVAR UNDO_HERO_STRIDE [[HERO_COUNT]]
+    BREAK
+
+# Snapshot current logical state (call only when a reversible action is about to apply).
+@UNDO_PUSH
+    JUMPLE UNDO_CELL_STRIDE 0 UNDO_PUSH_END
+    JUMPLE UNDO_HERO_STRIDE 0 UNDO_PUSH_END
+
+    LISTSET HERO_XS [[HERO_ACTIVE]] [[px]]
+    LISTSET HERO_YS [[HERO_ACTIVE]] [[py]]
+    LISTSET HERO_FACES [[HERO_ACTIVE]] [[face_deg]]
+    LISTSET HERO_TYPES [[HERO_ACTIVE]] [[HERO_TYPE]]
+
+    SETVAR UNDO_I 0
+    >UNDO_PUSH_TILES
+        JUMPGE UNDO_I [[UNDO_CELL_STRIDE]] UNDO_PUSH_HEROES
+        LISTGET TILE_TYPES [[UNDO_I]] UNDO_V
+        LISTADD UNDO_TILES [[UNDO_V]]
+        ADD UNDO_I 1
+        JUMP UNDO_PUSH_TILES
+
+    >UNDO_PUSH_HEROES
+        SETVAR UNDO_I 0
+        >UNDO_PUSH_HEROES_LOOP
+            JUMPGE UNDO_I [[UNDO_HERO_STRIDE]] UNDO_PUSH_META
+            LISTGET HERO_XS [[UNDO_I]] UNDO_V
+            LISTADD UNDO_HERO_XS [[UNDO_V]]
+            LISTGET HERO_YS [[UNDO_I]] UNDO_V
+            LISTADD UNDO_HERO_YS [[UNDO_V]]
+            LISTGET HERO_TYPES [[UNDO_I]] UNDO_V
+            LISTADD UNDO_HERO_TYPES [[UNDO_V]]
+            LISTGET HERO_FACES [[UNDO_I]] UNDO_V
+            LISTADD UNDO_HERO_FACES [[UNDO_V]]
+            ADD UNDO_I 1
+            JUMP UNDO_PUSH_HEROES_LOOP
+
+    >UNDO_PUSH_META
+        LISTADD UNDO_HERO_ACTIVE [[HERO_ACTIVE]]
+        SETVAR UNDO_V 0
+        JUMPEQ GATES_YELLOW_OPEN true UNDO_PUSH_GY_ON
+        JUMP UNDO_PUSH_GY_STORE
+        >UNDO_PUSH_GY_ON
+            SETVAR UNDO_V 1
+        >UNDO_PUSH_GY_STORE
+            LISTADD UNDO_GATE_Y [[UNDO_V]]
+
+        SETVAR UNDO_V 0
+        JUMPEQ GATES_PURPLE_OPEN true UNDO_PUSH_GP_ON
+        JUMP UNDO_PUSH_GP_STORE
+        >UNDO_PUSH_GP_ON
+            SETVAR UNDO_V 1
+        >UNDO_PUSH_GP_STORE
+            LISTADD UNDO_GATE_P [[UNDO_V]]
+
+        ADD UNDO_DEPTH 1
+
+    >UNDO_PUSH_END
+        BREAK
+
+# Discard the last snapshot without restoring (failed move after speculative push).
+@UNDO_DROP
+    JUMPLE UNDO_DEPTH 0 UNDO_DROP_END
+    SUB UNDO_DEPTH 1
+
+    SETVAR UNDO_N [[UNDO_DEPTH]]
+    MUL UNDO_N [[UNDO_CELL_STRIDE]]
+    >UNDO_DROP_TRIM_TILES
+        LISTCOUNT UNDO_TILES UNDO_TEMP
+        JUMPLE UNDO_TEMP [[UNDO_N]] UNDO_DROP_TRIM_HEROES
+        LISTREMOVE UNDO_TILES -1
+        JUMP UNDO_DROP_TRIM_TILES
+
+    >UNDO_DROP_TRIM_HEROES
+        SETVAR UNDO_N [[UNDO_DEPTH]]
+        MUL UNDO_N [[UNDO_HERO_STRIDE]]
+        >UNDO_DROP_TRIM_HEROES_LOOP
+            LISTCOUNT UNDO_HERO_XS UNDO_TEMP
+            JUMPLE UNDO_TEMP [[UNDO_N]] UNDO_DROP_TRIM_META
+            LISTREMOVE UNDO_HERO_XS -1
+            LISTREMOVE UNDO_HERO_YS -1
+            LISTREMOVE UNDO_HERO_TYPES -1
+            LISTREMOVE UNDO_HERO_FACES -1
+            JUMP UNDO_DROP_TRIM_HEROES_LOOP
+
+    >UNDO_DROP_TRIM_META
+        >UNDO_DROP_TRIM_META_LOOP
+            LISTCOUNT UNDO_HERO_ACTIVE UNDO_TEMP
+            JUMPLE UNDO_TEMP [[UNDO_DEPTH]] UNDO_DROP_END
+            LISTREMOVE UNDO_HERO_ACTIVE -1
+            LISTREMOVE UNDO_GATE_Y -1
+            LISTREMOVE UNDO_GATE_P -1
+            JUMP UNDO_DROP_TRIM_META_LOOP
+
+    >UNDO_DROP_END
+        BREAK
+
+@UNDO_POP
+    JUMPEQ PLAYER_MOVING true UNDO_POP_BUSY
+    JUMPLE UNDO_DEPTH 0 UNDO_POP_EMPTY
+    JUMPLE UNDO_CELL_STRIDE 0 UNDO_POP_EMPTY
+    JUMPLE UNDO_HERO_STRIDE 0 UNDO_POP_EMPTY
+
+    SUB UNDO_DEPTH 1
+
+    SETVAR UNDO_BASE [[UNDO_DEPTH]]
+    MUL UNDO_BASE [[UNDO_CELL_STRIDE]]
+    SETVAR UNDO_I 0
+    >UNDO_POP_TILES
+        JUMPGE UNDO_I [[UNDO_CELL_STRIDE]] UNDO_POP_HEROES
+        SETVAR UNDO_TEMP [[UNDO_BASE]]
+        ADD UNDO_TEMP [[UNDO_I]]
+        LISTGET UNDO_TILES [[UNDO_TEMP]] UNDO_V
+        LISTSET TILE_TYPES [[UNDO_I]] [[UNDO_V]]
+        ADD UNDO_I 1
+        JUMP UNDO_POP_TILES
+
+    >UNDO_POP_HEROES
+        SETVAR UNDO_BASE [[UNDO_DEPTH]]
+        MUL UNDO_BASE [[UNDO_HERO_STRIDE]]
+        SETVAR UNDO_I 0
+        >UNDO_POP_HEROES_LOOP
+            JUMPGE UNDO_I [[UNDO_HERO_STRIDE]] UNDO_POP_META
+            SETVAR UNDO_TEMP [[UNDO_BASE]]
+            ADD UNDO_TEMP [[UNDO_I]]
+            LISTGET UNDO_HERO_XS [[UNDO_TEMP]] UNDO_V
+            LISTSET HERO_XS [[UNDO_I]] [[UNDO_V]]
+            LISTGET UNDO_HERO_YS [[UNDO_TEMP]] UNDO_V
+            LISTSET HERO_YS [[UNDO_I]] [[UNDO_V]]
+            LISTGET UNDO_HERO_TYPES [[UNDO_TEMP]] UNDO_V
+            LISTSET HERO_TYPES [[UNDO_I]] [[UNDO_V]]
+            LISTGET UNDO_HERO_FACES [[UNDO_TEMP]] UNDO_V
+            LISTSET HERO_FACES [[UNDO_I]] [[UNDO_V]]
+            ADD UNDO_I 1
+            JUMP UNDO_POP_HEROES_LOOP
+
+    >UNDO_POP_META
+        LISTGET UNDO_HERO_ACTIVE [[UNDO_DEPTH]] HERO_ACTIVE
+        LISTGET UNDO_GATE_Y [[UNDO_DEPTH]] UNDO_V
+        SETVAR GATES_YELLOW_OPEN false
+        JUMPNEQ UNDO_V 1 UNDO_POP_GP
+        SETVAR GATES_YELLOW_OPEN true
+
+        >UNDO_POP_GP
+            LISTGET UNDO_GATE_P [[UNDO_DEPTH]] UNDO_V
+            SETVAR GATES_PURPLE_OPEN false
+            JUMPNEQ UNDO_V 1 UNDO_POP_TRIM
+            SETVAR GATES_PURPLE_OPEN true
+
+    >UNDO_POP_TRIM
+        SETVAR UNDO_N [[UNDO_DEPTH]]
+        MUL UNDO_N [[UNDO_CELL_STRIDE]]
+        >UNDO_TRIM_TILES
+            LISTCOUNT UNDO_TILES UNDO_TEMP
+            JUMPLE UNDO_TEMP [[UNDO_N]] UNDO_TRIM_HEROES
+            LISTREMOVE UNDO_TILES -1
+            JUMP UNDO_TRIM_TILES
+
+        >UNDO_TRIM_HEROES
+            SETVAR UNDO_N [[UNDO_DEPTH]]
+            MUL UNDO_N [[UNDO_HERO_STRIDE]]
+            >UNDO_TRIM_HEROES_LOOP
+                LISTCOUNT UNDO_HERO_XS UNDO_TEMP
+                JUMPLE UNDO_TEMP [[UNDO_N]] UNDO_TRIM_META
+                LISTREMOVE UNDO_HERO_XS -1
+                LISTREMOVE UNDO_HERO_YS -1
+                LISTREMOVE UNDO_HERO_TYPES -1
+                LISTREMOVE UNDO_HERO_FACES -1
+                JUMP UNDO_TRIM_HEROES_LOOP
+
+        >UNDO_TRIM_META
+            >UNDO_TRIM_META_LOOP
+                LISTCOUNT UNDO_HERO_ACTIVE UNDO_TEMP
+                JUMPLE UNDO_TEMP [[UNDO_DEPTH]] UNDO_POP_REBUILD
+                LISTREMOVE UNDO_HERO_ACTIVE -1
+                LISTREMOVE UNDO_GATE_Y -1
+                LISTREMOVE UNDO_GATE_P -1
+                JUMP UNDO_TRIM_META_LOOP
+
+    >UNDO_POP_REBUILD
+        SETVAR HERO_COUNT [[UNDO_HERO_STRIDE]]
+        SETVAR GATES_LETHAL false
+        SETVAR PLAYER_MOVING false
+
+        CLEAR "level*"
+        CLEAR "player*"
+
+        SETVAR UNDO_I 0
+        >UNDO_ZERO_TILE_RIDS
+            JUMPGE UNDO_I [[UNDO_CELL_STRIDE]] UNDO_ZERO_GATE_Y
+            LISTSET TILE_FLOOR [[UNDO_I]] 0
+            LISTSET TILE_OBJ [[UNDO_I]] 0
+            ADD UNDO_I 1
+            JUMP UNDO_ZERO_TILE_RIDS
+
+        >UNDO_ZERO_GATE_Y
+            LISTCOUNT GATE_YELLOW_RIDS UNDO_N
+            SETVAR UNDO_I 0
+            >UNDO_ZERO_GATE_Y_LOOP
+                JUMPGE UNDO_I [[UNDO_N]] UNDO_ZERO_GATE_P
+                LISTSET GATE_YELLOW_RIDS [[UNDO_I]] 0
+                ADD UNDO_I 1
+                JUMP UNDO_ZERO_GATE_Y_LOOP
+
+        >UNDO_ZERO_GATE_P
+            LISTCOUNT GATE_PURPLE_RIDS UNDO_N
+            SETVAR UNDO_I 0
+            >UNDO_ZERO_GATE_P_LOOP
+                JUMPGE UNDO_I [[UNDO_N]] UNDO_REBUILD_ACTIVE_POSE
+                LISTSET GATE_PURPLE_RIDS [[UNDO_I]] 0
+                ADD UNDO_I 1
+                JUMP UNDO_ZERO_GATE_P_LOOP
+
+        >UNDO_REBUILD_ACTIVE_POSE
+            LISTGET HERO_XS [[HERO_ACTIVE]] px
+            LISTGET HERO_YS [[HERO_ACTIVE]] py
+            LISTGET HERO_TYPES [[HERO_ACTIVE]] HERO_TYPE
+            LISTGET HERO_FACES [[HERO_ACTIVE]] face_deg
+            SETVAR UNDO_I 0
+
+        >UNDO_BUILD_LOOP
+            JUMPGE UNDO_I [[UNDO_CELL_STRIDE]] UNDO_BUILD_GATES_Y
+            LISTGET TILE_TYPES [[UNDO_I]] UNDO_TYPE
+            JUMPEQ UNDO_TYPE 1 UNDO_BUILD_NEXT
+
+            $LIST_XY [[UNDO_I]] [[LEVEL_W]] UNDO_X UNDO_Y
+            RENDER3D [[UNDO_X]] [[UNDO_Y]] 0 "cube" UNDO_RID "level_floor"
+            EDIT3D [[UNDO_RID]] "Scale" [[CUBE_SCALE]]
+            LISTSET TILE_FLOOR [[UNDO_I]] [[UNDO_RID]]
+
+            LISTFIND SWITCH_YELLOW_CELLS [[UNDO_I]] UNDO_SWITCH_I
+            JUMPLT UNDO_SWITCH_I 0 UNDO_BUILD_SWITCH_PURPLE
+            EDIT3D [[UNDO_RID]] "Tint.R" 240
+            EDIT3D [[UNDO_RID]] "Tint.G" 200
+            EDIT3D [[UNDO_RID]] "Tint.B" 40
+            JUMP UNDO_BUILD_AFTER_FLOOR
+
+            >UNDO_BUILD_SWITCH_PURPLE
+                LISTFIND SWITCH_PURPLE_CELLS [[UNDO_I]] UNDO_SWITCH_I
+                JUMPLT UNDO_SWITCH_I 0 UNDO_BUILD_EXIT
+                EDIT3D [[UNDO_RID]] "Tint.R" 170
+                EDIT3D [[UNDO_RID]] "Tint.G" 70
+                EDIT3D [[UNDO_RID]] "Tint.B" 230
+                JUMP UNDO_BUILD_AFTER_FLOOR
+
+            >UNDO_BUILD_EXIT
+                LISTFIND EXIT_CELLS [[UNDO_I]] UNDO_EXIT_I
+                JUMPLT UNDO_EXIT_I 0 UNDO_BUILD_AFTER_FLOOR
+                EDIT3D [[UNDO_RID]] "Tint.R" 80
+                EDIT3D [[UNDO_RID]] "Tint.G" 220
+                EDIT3D [[UNDO_RID]] "Tint.B" 100
+
+            >UNDO_BUILD_AFTER_FLOOR
+                JUMPNEQ UNDO_TYPE 2 UNDO_BUILD_NEXT
+                SETVAR UNDO_HAS_HERO false
+                SETVAR UNDO_GATE_I 0
+                >UNDO_BUILD_HERO_SCAN
+                    JUMPGE UNDO_GATE_I [[HERO_COUNT]] UNDO_BUILD_BOX_CHECK
+                    JUMPEQ UNDO_GATE_I [[HERO_ACTIVE]] UNDO_BUILD_HERO_SCAN_NEXT
+                    LISTGET HERO_XS [[UNDO_GATE_I]] UNDO_HX
+                    LISTGET HERO_YS [[UNDO_GATE_I]] UNDO_HY
+                    $LIST_1D [[UNDO_HX]] [[UNDO_HY]] [[LEVEL_W]] [[LEVEL_H]] UNDO_CELL
+                    JUMPNEQ UNDO_CELL [[UNDO_I]] UNDO_BUILD_HERO_SCAN_NEXT
+                    SETVAR UNDO_HAS_HERO true
+                    JUMP UNDO_BUILD_BOX_CHECK
+
+                    >UNDO_BUILD_HERO_SCAN_NEXT
+                        ADD UNDO_GATE_I 1
+                        JUMP UNDO_BUILD_HERO_SCAN
+
+                >UNDO_BUILD_BOX_CHECK
+                    JUMPEQ UNDO_HAS_HERO true UNDO_BUILD_NEXT
+                    RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_obj"
+                    EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
+                    EDIT3D [[UNDO_ORID]] "Tint.R" 255
+                    EDIT3D [[UNDO_ORID]] "Tint.G" 140
+                    EDIT3D [[UNDO_ORID]] "Tint.B" 40
+                    LISTSET TILE_OBJ [[UNDO_I]] [[UNDO_ORID]]
+
+            >UNDO_BUILD_NEXT
+                ADD UNDO_I 1
+                JUMP UNDO_BUILD_LOOP
+
+        >UNDO_BUILD_GATES_Y
+            LISTCOUNT GATE_YELLOW_CELLS UNDO_N
+            SETVAR UNDO_I 0
+            >UNDO_BUILD_GATES_Y_LOOP
+                JUMPGE UNDO_I [[UNDO_N]] UNDO_BUILD_GATES_P
+                LISTGET GATE_YELLOW_CELLS [[UNDO_I]] UNDO_CELL
+                $LIST_XY [[UNDO_CELL]] [[LEVEL_W]] UNDO_X UNDO_Y
+                RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_gate"
+                EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
+                EDIT3D [[UNDO_ORID]] "Tint.R" 240
+                EDIT3D [[UNDO_ORID]] "Tint.G" 190
+                EDIT3D [[UNDO_ORID]] "Tint.B" 30
+                LISTSET GATE_YELLOW_RIDS [[UNDO_I]] [[UNDO_ORID]]
+                LISTGET TILE_TYPES [[UNDO_CELL]] UNDO_V
+                JUMPNEQ UNDO_V 5 UNDO_BUILD_GATES_Y_HIDE
+                EDIT3D [[UNDO_ORID]] "Disabled" false
+                JUMP UNDO_BUILD_GATES_Y_NEXT
+                >UNDO_BUILD_GATES_Y_HIDE
+                    EDIT3D [[UNDO_ORID]] "Disabled" true
+                >UNDO_BUILD_GATES_Y_NEXT
+                    ADD UNDO_I 1
+                    JUMP UNDO_BUILD_GATES_Y_LOOP
+
+        >UNDO_BUILD_GATES_P
+            LISTCOUNT GATE_PURPLE_CELLS UNDO_N
+            SETVAR UNDO_I 0
+            >UNDO_BUILD_GATES_P_LOOP
+                JUMPGE UNDO_I [[UNDO_N]] UNDO_BUILD_HEROES
+                LISTGET GATE_PURPLE_CELLS [[UNDO_I]] UNDO_CELL
+                $LIST_XY [[UNDO_CELL]] [[LEVEL_W]] UNDO_X UNDO_Y
+                RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_gate"
+                EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
+                EDIT3D [[UNDO_ORID]] "Tint.R" 180
+                EDIT3D [[UNDO_ORID]] "Tint.G" 50
+                EDIT3D [[UNDO_ORID]] "Tint.B" 220
+                LISTSET GATE_PURPLE_RIDS [[UNDO_I]] [[UNDO_ORID]]
+                LISTGET TILE_TYPES [[UNDO_CELL]] UNDO_V
+                JUMPNEQ UNDO_V 7 UNDO_BUILD_GATES_P_HIDE
+                EDIT3D [[UNDO_ORID]] "Disabled" false
+                JUMP UNDO_BUILD_GATES_P_NEXT
+                >UNDO_BUILD_GATES_P_HIDE
+                    EDIT3D [[UNDO_ORID]] "Disabled" true
+                >UNDO_BUILD_GATES_P_NEXT
+                    ADD UNDO_I 1
+                    JUMP UNDO_BUILD_GATES_P_LOOP
+
+        >UNDO_BUILD_HEROES
+            LISTCLEAR HERO_RIDS
+            SETVAR UNDO_I 0
+            >UNDO_BUILD_HEROES_LOOP
+                JUMPGE UNDO_I [[HERO_COUNT]] UNDO_BUILD_ACTIVATE
+                LISTGET HERO_XS [[UNDO_I]] UNDO_HX
+                LISTGET HERO_YS [[UNDO_I]] UNDO_HY
+                LISTGET HERO_TYPES [[UNDO_I]] UNDO_V
+                LISTGET HERO_FACES [[UNDO_I]] UNDO_TEMP
+                RENDER3D [[UNDO_HX]] [[UNDO_HY]] 1 "kaykit" UNDO_RID "player"
+                ANIM3D UNDO_RID "Idle_A" true
+                EDIT3D [[UNDO_RID]] "Rotation" [[UNDO_TEMP]]
+                $HERO_APPLY_TINT [[UNDO_RID]] [[UNDO_V]] false
+                LISTADD HERO_RIDS [[UNDO_RID]]
+                JUMPEQ UNDO_I [[HERO_ACTIVE]] UNDO_BUILD_HEROES_NEXT
+                $HERO_PLACE_INACTIVE [[UNDO_I]]
+                >UNDO_BUILD_HEROES_NEXT
+                    ADD UNDO_I 1
+                    JUMP UNDO_BUILD_HEROES_LOOP
+
+            >UNDO_BUILD_ACTIVATE
+                $HERO_ACTIVATE [[HERO_ACTIVE]] false
+                SETVAR GATES_LETHAL true
+                PRINT "Undo"
+                BREAK
+
+    >UNDO_POP_EMPTY
+        PRINT "Nothing to undo"
+        BREAK
+
+    >UNDO_POP_BUSY
+        BREAK

@@ -1,4 +1,4 @@
-﻿@_INIT
+@_INIT
     DEFVAR character 0 int
     DEFVAR face_deg 0 int
     DEFVAR px 0 int
@@ -17,6 +17,7 @@
     DEFVAR HERO_COUNT 0 int
     DEFVAR HERO_ACTIVE 0 int
 
+# Move flow: decide -> UNDO_PUSH (pre-mutation) -> mutate board -> animate hero.
 @PLAYER_MOVE <to> <x> <y>
     JUMPEQ PLAYER_MOVING true PLAYER_MOVE_BUSY
 
@@ -25,6 +26,8 @@
     DEFVAR _toY [[py]] int
     ADD _toX <x>
     ADD _toY <y>
+
+    $HERO_SYNC_INACTIVE
 
     JUMPEQ HERO_TYPE 2 PLAYER_MOVE_WIZARD_RAY
     JUMP PLAYER_MOVE_STEP
@@ -36,26 +39,31 @@
         $LEVEL_FIND_BOX_RAY [[_toX]] [[_toY]] <x> <y> _swapX _swapY _swap_found
         JUMPEQ _swap_found false PLAYER_MOVE_STEP
 
+        $UNDO_PUSH
         DEFVAR _swap_ok false bool
         $LEVEL_SWAP [[_swapX]] [[_swapY]] [[px]] [[py]] _swap_ok
-        JUMPEQ _swap_ok false END
-        SETVAR _toX [[_swapX]]
-        SETVAR _toY [[_swapY]]
-        SETVAR PLAYER_BLOCKED false
-        SETVAR PLAYER_TILE 2
-        JUMP PLAYER_MOVE_READY
+        JUMPEQ _swap_ok true PLAYER_MOVE_WIZARD_OK
+        $UNDO_DROP
+        JUMP END
+
+        >PLAYER_MOVE_WIZARD_OK
+            SETVAR _toX [[_swapX]]
+            SETVAR _toY [[_swapY]]
+            SETVAR PLAYER_BLOCKED false
+            SETVAR PLAYER_TILE 2
+            JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_STEP
         $LEVEL_STEP [[_toX]] [[_toY]] PLAYER_BLOCKED PLAYER_TILE
 
     >PLAYER_MOVE_READY
         JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_BLOCKED_CASE
-        # free move
+        # free walk (thief may also pull)
+        $UNDO_PUSH
         JUMPEQ HERO_TYPE 1 PLAYER_MOVE_THIEF_PULL
         JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_THIEF_PULL
-        # pull box from behind if present
         DEFVAR _bx [[px]] int
         DEFVAR _by [[py]] int
         SUB _bx <x>
@@ -70,15 +78,19 @@
 
     >PLAYER_MOVE_ON_BOX
         JUMPEQ HERO_TYPE 0 PLAYER_MOVE_WARRIOR_PUSH
-        # thief cannot push
         JUMP END
 
     >PLAYER_MOVE_WARRIOR_PUSH
+        $UNDO_PUSH
         DEFVAR _push_ok false bool
         $LEVEL_PUSH [[_toX]] [[_toY]] <x> <y> _push_ok
-        JUMPEQ _push_ok false END
-        PRINT "PUSH"
-        JUMP PLAYER_MOVE_GO
+        JUMPEQ _push_ok true PLAYER_MOVE_WARRIOR_OK
+        $UNDO_DROP
+        JUMP END
+
+        >PLAYER_MOVE_WARRIOR_OK
+            PRINT "PUSH"
+            JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_GO
         $HERO_SYNC_INACTIVE
@@ -100,14 +112,11 @@
         >PLAYER_MOVE_WAIT
             WAIT 0.12
             SETVAR PLAYER_MOVING false
-            # switches / gates react after the move settles
             $LEVEL_UPDATE_GATES
             DEFVAR _dead false bool
             $HERO_CHECK_GATE_DEATH _dead
             JUMPEQ _dead true TO_DEATH
-            # re-read tile in case a gate opened under / near the player
             $LEVEL_GET [[px]] [[py]] PLAYER_TILE
-            # win only when every hero is on an exit
             $HERO_CHECK_ALL_ON_EXIT _exit
             JUMP END
 

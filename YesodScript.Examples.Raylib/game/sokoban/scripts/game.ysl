@@ -5,6 +5,8 @@
     >LOOP
         JUMPKEYPRESS "Escape" END
         JUMPKEYPRESS "R" RESTART
+        JUMPKEYPRESS "Z" UNDO
+        JUMPKEYPRESS "U" UNDO
         JUMPKEYPRESS "X" SWITCH_HERO
         JUMPKEYPRESS "One" SELECT_WARRIOR
         JUMPKEYPRESS "Two" SELECT_THIEF
@@ -17,8 +19,13 @@
         JUMP AFTER
 
     >RESTART
+        $UNDO_PUSH
         $LEVEL_INIT [[LEVEL_NAME]]
         PRINT "Restarted level"
+        JUMP AFTER
+
+    >UNDO
+        $UNDO_POP
         JUMP AFTER
 
     >SWITCH_HERO
