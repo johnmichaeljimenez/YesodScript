@@ -1,0 +1,43 @@
+@PLAYER_SWITCH_HERO
+    ADD HERO_TYPE 1
+    JUMPLT HERO_TYPE 3 PLAYER_APPLY_TINT
+    SETVAR HERO_TYPE 0
+    JUMP PLAYER_APPLY_TINT
+
+@PLAYER_UPDATE_POS
+    EDIT3D [[character]] "X" [[px]]
+    EDIT3D [[character]] "Y" [[py]]
+    EDIT3D [[character]] "prevX" [[px]]
+    EDIT3D [[character]] "prevY" [[py]]
+    EDIT3D [[character]] "Rotation" [[face_deg]]
+    BREAK
+
+@PLAYER_APPLY_TINT
+    JUMPEQ HERO_TYPE 0 TINT_WARRIOR
+    JUMPEQ HERO_TYPE 1 TINT_THIEF
+    JUMPEQ HERO_TYPE 2 TINT_WIZARD
+    JUMP TINT_DONE
+
+    >TINT_WARRIOR
+        EDIT3D [[character]] "Tint.R" 255
+        EDIT3D [[character]] "Tint.G" 80
+        EDIT3D [[character]] "Tint.B" 80
+        PRINT "Hero: WARRIOR (push)"
+        JUMP TINT_DONE
+
+    >TINT_THIEF
+        EDIT3D [[character]] "Tint.R" 80
+        EDIT3D [[character]] "Tint.G" 220
+        EDIT3D [[character]] "Tint.B" 80
+        PRINT "Hero: THIEF (pull)"
+        JUMP TINT_DONE
+
+    >TINT_WIZARD
+        EDIT3D [[character]] "Tint.R" 80
+        EDIT3D [[character]] "Tint.G" 10
+        EDIT3D [[character]] "Tint.B" 255
+        PRINT "Hero: WIZARD (swap)"
+        JUMP TINT_DONE
+
+    >TINT_DONE
+        BREAK

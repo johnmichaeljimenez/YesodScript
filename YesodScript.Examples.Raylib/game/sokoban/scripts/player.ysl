@@ -6,11 +6,14 @@
     DEFVAR PLAYER_BLOCKED false bool
     DEFVAR PLAYER_TILE 0 int
     DEFVAR PLAYER_MOVING false bool
+    DEFVAR HERO_TYPE 0 int
+    # 0 = warrior (push), 1 = thief (pull), 2 = wizard (swap)
 
 @PLAYER_INIT
     RENDER3D [[px]] [[py]] 1 "kaykit" character "player"
     ANIM3D character "Idle_A" true
     EDIT3D [[character]] "Rotation" [[face_deg]]
+    $PLAYER_APPLY_TINT
 
 @PLAYER_MOVE <to> <x> <y>
     JUMPEQ PLAYER_MOVING true PLAYER_MOVE_BUSY
@@ -21,26 +24,44 @@
     ADD _toY <y>
 
     $LEVEL_STEP [[_toX]] [[_toY]] PLAYER_BLOCKED PLAYER_TILE
-    JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_CHECK_PUSH
 
-    # exit stub: log only
-    PRINT "TILE: [[PLAYER_TILE]]"
-    JUMPEQ PLAYER_TILE 3 PLAYER_MOVE_EXIT_STUB
+    JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_BLOCKED_CASE
+    # free move
+    JUMPEQ HERO_TYPE 1 PLAYER_MOVE_THIEF_PULL
     JUMP PLAYER_MOVE_GO
 
-    >PLAYER_MOVE_EXIT_STUB
-        PRINT "EXIT stub @ [[_toX]],[[_toY]]"
+    >PLAYER_MOVE_THIEF_PULL
+        # pull box from behind if present
+        DEFVAR _bx [[px]] int
+        DEFVAR _by [[py]] int
+        SUB _bx <x>
+        SUB _by <y>
+        DEFVAR _pull_ok false bool
+        $LEVEL_PULL [[_bx]] [[_by]] [[px]] [[py]] _pull_ok
         JUMP PLAYER_MOVE_GO
 
-    >PLAYER_MOVE_CHECK_PUSH
-        JUMPEQ PLAYER_TILE 2 PLAYER_MOVE_TRY_PUSH
+    >PLAYER_MOVE_BLOCKED_CASE
+        JUMPEQ PLAYER_TILE 2 PLAYER_MOVE_ON_BOX
         JUMP PLAYER_MOVE_BLOCKED
 
-    >PLAYER_MOVE_TRY_PUSH
+    >PLAYER_MOVE_ON_BOX
+        JUMPEQ HERO_TYPE 0 PLAYER_MOVE_WARRIOR_PUSH
+        JUMPEQ HERO_TYPE 2 PLAYER_MOVE_WIZARD_SWAP
+        # thief cannot push
+        JUMP PLAYER_MOVE_BLOCKED
+
+    >PLAYER_MOVE_WARRIOR_PUSH
         DEFVAR _push_ok false bool
         $LEVEL_PUSH [[_toX]] [[_toY]] <x> <y> _push_ok
         JUMPEQ _push_ok false PLAYER_MOVE_BLOCKED
-        PRINT "PUSH box [[_toX]],[[_toY]]"
+        PRINT "PUSH"
+        JUMP PLAYER_MOVE_GO
+
+    >PLAYER_MOVE_WIZARD_SWAP
+        DEFVAR _swap_ok false bool
+        $LEVEL_SWAP [[_toX]] [[_toY]] [[px]] [[py]] _swap_ok
+        JUMPEQ _swap_ok false PLAYER_MOVE_BLOCKED
+        PRINT "SWAP"
         JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_GO
@@ -58,6 +79,17 @@
         >PLAYER_MOVE_WAIT
             WAIT 0.12
             SETVAR PLAYER_MOVING false
+            # check exit
+            JUMPEQ PLAYER_TILE 3 PLAYER_ON_EXIT
+            JUMP PLAYER_MOVE_DONE
+
+        >PLAYER_ON_EXIT
+            PRINT "EXIT!"
+            WAIT 0.5
+            $LEVEL_NEXT
+            JUMP PLAYER_MOVE_DONE
+
+        >PLAYER_MOVE_DONE
             BREAK
 
     >PLAYER_MOVE_BLOCKED
