@@ -1,0 +1,47 @@
+﻿@GAME:START
+    SETVAR LEVEL_INDEX [[LATEST_CONTINUE_LEVEL]]
+    $LEVEL_LOAD_CURRENT
+
+    >LOOP
+        JUMPKEYPRESS "Escape" END
+        JUMPKEYPRESS "R" RESTART
+        JUMPKEYPRESS "X" SWITCH_HERO
+        JUMPKEYPRESS "W" FACE_N
+        JUMPKEYPRESS "S" FACE_S
+        JUMPKEYPRESS "A" FACE_W
+        JUMPKEYPRESS "D" FACE_E
+
+        JUMP AFTER
+
+    >RESTART
+        $LEVEL_INIT [[LEVEL_NAME]]
+        PRINT "Restarted level"
+        JUMP AFTER
+
+    >SWITCH_HERO
+        $PLAYER_SWITCH
+        JUMP AFTER
+
+    >FACE_N
+        $PLAYER_MOVE -180 0 -1
+        JUMP AFTER
+
+    >FACE_E
+        $PLAYER_MOVE 90 1 0
+        JUMP AFTER
+
+    >FACE_S
+        $PLAYER_MOVE 0 0 1
+        JUMP AFTER
+
+    >FACE_W
+        $PLAYER_MOVE -90 -1 0
+        JUMP AFTER
+
+    >AFTER
+        WAITFRAME
+        JUMP LOOP
+
+    >END
+        CLEAR
+        BREAK

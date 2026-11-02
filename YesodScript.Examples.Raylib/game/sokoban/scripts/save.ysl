@@ -1,0 +1,17 @@
+@_INIT
+    DEFVAR LATEST_CONTINUE_LEVEL 1 int
+    DEFVAR LATEST_UNLOCKED_LEVEL 1 int
+
+    REGSAVEVAR "player" LATEST_CONTINUE_LEVEL
+    REGSAVEVAR "player" LATEST_UNLOCKED_LEVEL
+
+@SAVE <continue> <unlocked>
+    SETVAR LATEST_CONTINUE_LEVEL <continue>
+    JUMPLE <unlocked> LATEST_UNLOCKED_LEVEL SAVEEND
+    SETVAR LATEST_UNLOCKED_LEVEL <unlocked>
+
+    >SAVEEND
+        SAVEDATA "player" "save"
+
+@LOAD
+    LOADDATA "player" "save"

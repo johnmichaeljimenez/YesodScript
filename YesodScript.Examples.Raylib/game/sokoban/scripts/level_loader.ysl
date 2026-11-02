@@ -5,6 +5,7 @@
     SUB _level_index 1
     DEFVAR _level_name * string
     LISTGET LEVEL_NAMES [[_level_index]] _level_name
+    $SAVE [[LEVEL_INDEX]] [[LEVEL_INDEX]]
     $LEVEL_INIT [[_level_name]]
     JUMP LEVEL_LOAD_CURRENT_END
 
