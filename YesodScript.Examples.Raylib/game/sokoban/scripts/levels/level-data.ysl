@@ -2,6 +2,13 @@
 # Source: level-data.ldtk
 # Tile types: 0 floor, 1 wall, 2 box, 3 exit
 
+@LEVELDATA:metadata
+	SETVAR LEVEL_COUNT 2
+	LISTCLEAR LEVEL_NAMES
+	LISTADD LEVEL_NAMES "level_1"
+	LISTADD LEVEL_NAMES "level_2"
+	BREAK
+
 @LEVELDATA:level_1
 	$LEVEL_FILL 8 5
 	SETVAR LEVEL_SPAWN_X 1

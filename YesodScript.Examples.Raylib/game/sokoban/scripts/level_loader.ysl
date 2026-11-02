@@ -1,0 +1,15 @@
+@LEVEL_LOAD_CURRENT
+    CALL "LEVELDATA:metadata" LEVEL_LOAD_METADATA_MISSING
+
+    DEFVAR _level_index [[LEVEL_INDEX]] int
+    SUB _level_index 1
+    DEFVAR _level_name * string
+    LISTGET LEVEL_NAMES [[_level_index]] _level_name
+    $LEVEL_INIT [[_level_name]]
+    JUMP LEVEL_LOAD_CURRENT_END
+
+    >LEVEL_LOAD_METADATA_MISSING
+        PRINT "Missing level metadata"
+
+    >LEVEL_LOAD_CURRENT_END
+        BREAK

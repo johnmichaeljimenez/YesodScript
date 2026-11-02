@@ -185,22 +185,16 @@
 
 
 @LEVEL_NEXT
-    JUMPEQ LEVEL_NAME "level_1" LEVEL_NEXT_2
-    JUMPEQ LEVEL_NAME "level_2" LEVEL_NEXT_WIN
-    # fallback
-    $LEVEL_INIT "level_1"
-    $PLAYER_UPDATE_POS
-    JUMP LEVEL_NEXT_DONE
+    ADD LEVEL_INDEX 1
+    JUMPGT LEVEL_INDEX LEVEL_COUNT LEVEL_NEXT_WIN
 
-    >LEVEL_NEXT_2
-        $LEVEL_INIT "level_2"
-        $PLAYER_UPDATE_POS
-        PRINT "Next level!"
-        JUMP LEVEL_NEXT_DONE
+    $LEVEL_LOAD_CURRENT
+    $PLAYER_UPDATE_POS
+    PRINT "Next level!"
+    JUMP LEVEL_NEXT_DONE
 
     >LEVEL_NEXT_WIN
         PRINT "All levels complete! Victory!"
-        JUMP LEVEL_NEXT_DONE
 
     >LEVEL_NEXT_DONE
         BREAK
