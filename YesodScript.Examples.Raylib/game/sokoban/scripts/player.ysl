@@ -18,6 +18,7 @@
 @PLAYER_MOVE <to> <x> <y>
     JUMPEQ PLAYER_MOVING true PLAYER_MOVE_BUSY
 
+    DEFVAR _exit false bool
     DEFVAR _toX [[px]] int
     DEFVAR _toY [[py]] int
     ADD _toX <x>
@@ -42,25 +43,25 @@
 
     >PLAYER_MOVE_BLOCKED_CASE
         JUMPEQ PLAYER_TILE 2 PLAYER_MOVE_ON_BOX
-        JUMP PLAYER_MOVE_BLOCKED
+        JUMP END
 
     >PLAYER_MOVE_ON_BOX
         JUMPEQ HERO_TYPE 0 PLAYER_MOVE_WARRIOR_PUSH
         JUMPEQ HERO_TYPE 2 PLAYER_MOVE_WIZARD_SWAP
         # thief cannot push
-        JUMP PLAYER_MOVE_BLOCKED
+        JUMP END
 
     >PLAYER_MOVE_WARRIOR_PUSH
         DEFVAR _push_ok false bool
         $LEVEL_PUSH [[_toX]] [[_toY]] <x> <y> _push_ok
-        JUMPEQ _push_ok false PLAYER_MOVE_BLOCKED
+        JUMPEQ _push_ok false END
         PRINT "PUSH"
         JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_WIZARD_SWAP
         DEFVAR _swap_ok false bool
         $LEVEL_SWAP [[_toX]] [[_toY]] [[px]] [[py]] _swap_ok
-        JUMPEQ _swap_ok false PLAYER_MOVE_BLOCKED
+        JUMPEQ _swap_ok false END
         PRINT "SWAP"
         JUMP PLAYER_MOVE_GO
 
@@ -81,20 +82,16 @@
             SETVAR PLAYER_MOVING false
             # check exit
             JUMPEQ PLAYER_TILE 3 PLAYER_ON_EXIT
-            JUMP PLAYER_MOVE_DONE
+            JUMP END
 
         >PLAYER_ON_EXIT
-            PRINT "EXIT!"
-            WAIT 0.5
-            $LEVEL_NEXT
-            JUMP PLAYER_MOVE_DONE
+            SETVAR _exit true
+            JUMP END
 
-        >PLAYER_MOVE_DONE
-            BREAK
-
-    >PLAYER_MOVE_BLOCKED
-        PRINT "BLOCKED [[_toX]],[[_toY]] tile=[[PLAYER_TILE]]"
+    >END
+        JUMPEQ _exit true TO_EXIT
         BREAK
 
-    >PLAYER_MOVE_BUSY
-        BREAK
+    >TO_EXIT
+        WAITFRAME
+        $LEVEL_NEXT
