@@ -1326,8 +1326,8 @@
 						1,
 						1,
 						1,
-						0,
-						0,
+						1,
+						1,
 						0,
 						0,
 						0,
@@ -1335,7 +1335,7 @@
 						0,
 						1,
 						1,
-						0,
+						1,
 						1,
 						0,
 						0,
@@ -1396,7 +1396,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "93578368-e429-41c3-b1b4-81c11cea6245", "dir": "w" }, { "levelIid": "09aa0485-a3c8-4f17-a413-a24c620ec163", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_5",
@@ -1877,8 +1877,8 @@
 						1,
 						1,
 						1,
-						0,
-						0,
+						1,
+						1,
 						0,
 						0,
 						0,
@@ -1886,7 +1886,7 @@
 						0,
 						1,
 						1,
-						0,
+						1,
 						1,
 						0,
 						0,
@@ -1947,7 +1947,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "09aa0485-a3c8-4f17-a413-a24c620ec163", "dir": "w" }, { "levelIid": "a16e7101-12ef-4273-8f71-934b5180d958", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_7",
@@ -2650,8 +2650,8 @@
 						1,
 						1,
 						1,
-						0,
-						0,
+						1,
+						1,
 						0,
 						0,
 						0,
@@ -2659,7 +2659,7 @@
 						0,
 						1,
 						1,
-						0,
+						1,
 						1,
 						0,
 						0,
@@ -2720,7 +2720,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "67306afb-e181-460b-b764-b6f49d157f8d", "dir": "w" }, { "levelIid": "9a9c64d0-4199-4eea-ad45-def2802e72d7", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_10",
