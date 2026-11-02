@@ -1,0 +1,102 @@
+﻿@LEVEL_UPDATE_GATES_COLOR <switches> <gates> <rids> <open_flag> <gate_type> <was_open>
+    DEFVAR _all_on true bool
+    DEFVAR _si 0 int
+    DEFVAR _sn 0 int
+    DEFVAR _cell 0 int
+    DEFVAR _tile 0 int
+    DEFVAR _sx 0 int
+    DEFVAR _sy 0 int
+    DEFVAR _gi 0 int
+    DEFVAR _gn 0 int
+    DEFVAR _rid 0 int
+    DEFVAR _orid 0 int
+    DEFVAR _was_open <was_open> bool
+
+    LISTCOUNT <switches> _sn
+    JUMPEQ _sn 0 LEVEL_UPDATE_GATES_COLOR_EVAL
+
+    >LEVEL_UPDATE_GATES_COLOR_SWITCH_LOOP
+        JUMPGE _si [[_sn]] LEVEL_UPDATE_GATES_COLOR_EVAL
+        LISTGET <switches> [[_si]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+
+        # box / inactive hero on switch
+        JUMPEQ _tile 2 LEVEL_UPDATE_GATES_COLOR_SWITCH_NEXT
+
+        # active player on switch
+        $LIST_XY [[_cell]] [[LEVEL_W]] _sx _sy
+        JUMPNEQ px [[_sx]] LEVEL_UPDATE_GATES_COLOR_SWITCH_OFF
+        JUMPNEQ py [[_sy]] LEVEL_UPDATE_GATES_COLOR_SWITCH_OFF
+        JUMP LEVEL_UPDATE_GATES_COLOR_SWITCH_NEXT
+
+        >LEVEL_UPDATE_GATES_COLOR_SWITCH_OFF
+            SETVAR _all_on false
+            JUMP LEVEL_UPDATE_GATES_COLOR_EVAL
+
+        >LEVEL_UPDATE_GATES_COLOR_SWITCH_NEXT
+            ADD _si 1
+            JUMP LEVEL_UPDATE_GATES_COLOR_SWITCH_LOOP
+
+    >LEVEL_UPDATE_GATES_COLOR_EVAL
+        SETVAR <open_flag> [[_all_on]]
+        LISTCOUNT <gates> _gn
+        SETVAR _gi 0
+
+        JUMPEQ _all_on true LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
+        JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_LOOP
+
+    >LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
+        JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_COLOR_END
+        LISTGET <gates> [[_gi]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+        JUMPNEQ _tile <gate_type> LEVEL_UPDATE_GATES_COLOR_OPEN_VIS
+        LISTSET TILE_TYPES [[_cell]] 0
+
+        >LEVEL_UPDATE_GATES_COLOR_OPEN_VIS
+            LISTGET <rids> [[_gi]] _rid
+            JUMPLE _rid 0 LEVEL_UPDATE_GATES_COLOR_OPEN_NEXT
+            EDIT3D [[_rid]] "Disabled" true
+
+        >LEVEL_UPDATE_GATES_COLOR_OPEN_NEXT
+            ADD _gi 1
+            JUMP LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
+
+    >LEVEL_UPDATE_GATES_COLOR_CLOSE_LOOP
+        JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_COLOR_END
+        LISTGET <gates> [[_gi]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+        # seal empty open cells under the active player (or vacant floor)
+        JUMPEQ _tile 0 LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
+        # crush boxes / inactive heroes only when gates just transitioned open -> closed
+        JUMPEQ GATES_LETHAL false LEVEL_UPDATE_GATES_COLOR_CLOSE_VIS
+        JUMPEQ _was_open false LEVEL_UPDATE_GATES_COLOR_CLOSE_VIS
+        JUMPNEQ _tile 2 LEVEL_UPDATE_GATES_COLOR_CLOSE_VIS
+        LISTGET TILE_OBJ [[_cell]] _orid
+        JUMPLE _orid 0 LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
+        # hide crushed box / inactive hero mesh
+        EDIT3D [[_orid]] "Disabled" true
+        LISTSET TILE_OBJ [[_cell]] 0
+        JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
+
+        >LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
+            LISTSET TILE_TYPES [[_cell]] <gate_type>
+
+        >LEVEL_UPDATE_GATES_COLOR_CLOSE_VIS
+            LISTGET <rids> [[_gi]] _rid
+            JUMPLE _rid 0 LEVEL_UPDATE_GATES_COLOR_CLOSE_NEXT
+            # show barrier only when the cell is actually a closed gate
+            LISTGET TILE_TYPES [[_cell]] _tile
+            JUMPNEQ _tile <gate_type> LEVEL_UPDATE_GATES_COLOR_CLOSE_HIDE
+            EDIT3D [[_rid]] "Disabled" false
+            JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_NEXT
+
+        >LEVEL_UPDATE_GATES_COLOR_CLOSE_HIDE
+            EDIT3D [[_rid]] "Disabled" true
+
+        >LEVEL_UPDATE_GATES_COLOR_CLOSE_NEXT
+            ADD _gi 1
+            JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_LOOP
+
+    >LEVEL_UPDATE_GATES_COLOR_END
+        SETVAR LEVEL_TEMP -1
+        BREAK

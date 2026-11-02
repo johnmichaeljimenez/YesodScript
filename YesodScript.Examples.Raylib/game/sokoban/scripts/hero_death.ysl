@@ -1,4 +1,4 @@
-# Hero dies if they share a tile with a closed gate (type 5).
+# Hero dies if they share a tile with a closed gate (type 5 yellow / 7 purple).
 @HERO_RID_INDEX <rid> <index>
     SETVAR <index> -1
     DEFVAR _i 0 int
@@ -34,9 +34,13 @@
         LISTGET HERO_YS [[_i]] _hy
         $LIST_1D [[_hx]] [[_hy]] [[LEVEL_W]] [[LEVEL_H]] _cell
         LISTGET TILE_TYPES [[_cell]] _tile
-        JUMPNEQ _tile 5 HERO_CHECK_GATE_DEATH_NEXT
-        SETVAR <dead> true
-        JUMP HERO_CHECK_GATE_DEATH_END
+        JUMPEQ _tile 5 HERO_CHECK_GATE_DEATH_HIT
+        JUMPEQ _tile 7 HERO_CHECK_GATE_DEATH_HIT
+        JUMP HERO_CHECK_GATE_DEATH_NEXT
+
+        >HERO_CHECK_GATE_DEATH_HIT
+            SETVAR <dead> true
+            JUMP HERO_CHECK_GATE_DEATH_END
 
         >HERO_CHECK_GATE_DEATH_NEXT
             ADD _i 1

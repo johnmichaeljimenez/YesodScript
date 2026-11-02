@@ -17,8 +17,9 @@
     JUMPEQ <tile> 1 LEVEL_STEP_BLOCK
     # 2 box: blocked here, player may push via LEVEL_PUSH
     JUMPEQ <tile> 2 LEVEL_STEP_BLOCK
-    # 5 closed gate blocks
+    # 5 yellow closed gate / 7 purple closed gate block
     JUMPEQ <tile> 5 LEVEL_STEP_BLOCK
+    JUMPEQ <tile> 7 LEVEL_STEP_BLOCK
     # 0 floor / 3 exit are walkable
     JUMP LEVEL_STEP_END
 
@@ -146,6 +147,7 @@
         LISTGET TILE_TYPES [[LEVEL_TEMP]] _rayTile
         JUMPEQ _rayTile 1 LEVEL_FIND_BOX_RAY_END
         JUMPEQ _rayTile 5 LEVEL_FIND_BOX_RAY_END
+        JUMPEQ _rayTile 7 LEVEL_FIND_BOX_RAY_END
         JUMPEQ _rayTile 2 LEVEL_FIND_BOX_RAY_FOUND
 
         ADD _rayX <dx>

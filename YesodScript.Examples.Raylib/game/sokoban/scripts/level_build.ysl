@@ -2,8 +2,10 @@
 # 1 - wall  (collision only)
 # 2 - box   (pushable via LEVEL_PUSH)
 # 3 - exit  (walkable goal)
-# 4 - switch (pressure plate, stored in SWITCH_CELLS, tile becomes floor)
-# 5 - gate  (closed barrier, opens when every switch is held)
+# 4 - yellow switch (pressure plate, tile becomes floor)
+# 5 - yellow gate  (closed barrier, opens when every yellow switch is held)
+# 6 - purple switch (pressure plate, tile becomes floor)
+# 7 - purple gate  (closed barrier, opens when every purple switch is held)
 
 @_INIT
     DEFVAR CUBE_SCALE 0.666666 float
@@ -15,13 +17,17 @@
     LISTCLEAR EXIT_CELLS
     LISTCLEAR TILE_FLOOR
     LISTCLEAR TILE_OBJ
-    LISTCLEAR SWITCH_CELLS
-    LISTCLEAR GATE_CELLS
-    LISTCLEAR GATE_RIDS
+    LISTCLEAR SWITCH_YELLOW_CELLS
+    LISTCLEAR SWITCH_PURPLE_CELLS
+    LISTCLEAR GATE_YELLOW_CELLS
+    LISTCLEAR GATE_YELLOW_RIDS
+    LISTCLEAR GATE_PURPLE_CELLS
+    LISTCLEAR GATE_PURPLE_RIDS
     LISTCLEAR LEVEL_SPAWN_XS
     LISTCLEAR LEVEL_SPAWN_YS
     LISTCLEAR LEVEL_SPAWN_HEROES
-    SETVAR GATES_OPEN false
+    SETVAR GATES_YELLOW_OPEN false
+    SETVAR GATES_PURPLE_OPEN false
     SETVAR GATES_LETHAL false
     SETVAR LEVEL_W 0
     SETVAR LEVEL_H 0
@@ -48,10 +54,14 @@
 @LEVEL_SET <x> <y> <type>
     $LIST_1D <x> <y> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
 
-    # switch: keep as walkable floor, track cell separately so boxes can sit on it
-    JUMPEQ <type> 4 LEVEL_SET_SWITCH
-    # gate: closed barrier tile + tracked cell
-    JUMPEQ <type> 5 LEVEL_SET_GATE
+    # yellow switch: walkable floor + tracked cell
+    JUMPEQ <type> 4 LEVEL_SET_SWITCH_YELLOW
+    # yellow gate: closed barrier tile + tracked cell
+    JUMPEQ <type> 5 LEVEL_SET_GATE_YELLOW
+    # purple switch: walkable floor + tracked cell
+    JUMPEQ <type> 6 LEVEL_SET_SWITCH_PURPLE
+    # purple gate: closed barrier tile + tracked cell
+    JUMPEQ <type> 7 LEVEL_SET_GATE_PURPLE
 
     LISTSET TILE_TYPES [[LEVEL_TEMP]] <type>
     JUMPEQ <type> 3 LEVEL_SET_EXIT
@@ -61,15 +71,26 @@
         LISTADD EXIT_CELLS [[LEVEL_TEMP]]
         BREAK
 
-    >LEVEL_SET_SWITCH
+    >LEVEL_SET_SWITCH_YELLOW
         LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
-        LISTADD SWITCH_CELLS [[LEVEL_TEMP]]
+        LISTADD SWITCH_YELLOW_CELLS [[LEVEL_TEMP]]
         BREAK
 
-    >LEVEL_SET_GATE
+    >LEVEL_SET_GATE_YELLOW
         LISTSET TILE_TYPES [[LEVEL_TEMP]] 5
-        LISTADD GATE_CELLS [[LEVEL_TEMP]]
-        LISTADD GATE_RIDS 0
+        LISTADD GATE_YELLOW_CELLS [[LEVEL_TEMP]]
+        LISTADD GATE_YELLOW_RIDS 0
+        BREAK
+
+    >LEVEL_SET_SWITCH_PURPLE
+        LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+        LISTADD SWITCH_PURPLE_CELLS [[LEVEL_TEMP]]
+        BREAK
+
+    >LEVEL_SET_GATE_PURPLE
+        LISTSET TILE_TYPES [[LEVEL_TEMP]] 7
+        LISTADD GATE_PURPLE_CELLS [[LEVEL_TEMP]]
+        LISTADD GATE_PURPLE_RIDS 0
         BREAK
 
 @LEVEL_BUILD_VISUALS
@@ -105,12 +126,20 @@
         ADD _floors 1
 
         >LEVEL_BUILD_FLOOR_READY
-            # switch plate tint (cell may already be floor/box after load)
-            LISTFIND SWITCH_CELLS [[_i]] _switch_i
+            # yellow switch plate
+            LISTFIND SWITCH_YELLOW_CELLS [[_i]] _switch_i
+            JUMPLT _switch_i 0 LEVEL_BUILD_SWITCH_PURPLE
+            EDIT3D [[_rid]] "Tint.R" 240
+            EDIT3D [[_rid]] "Tint.G" 200
+            EDIT3D [[_rid]] "Tint.B" 40
+            JUMP LEVEL_BUILD_AFTER_FLOOR
+
+        >LEVEL_BUILD_SWITCH_PURPLE
+            LISTFIND SWITCH_PURPLE_CELLS [[_i]] _switch_i
             JUMPLT _switch_i 0 LEVEL_BUILD_EXIT
-            EDIT3D [[_rid]] "Tint.R" 40
-            EDIT3D [[_rid]] "Tint.G" 180
-            EDIT3D [[_rid]] "Tint.B" 255
+            EDIT3D [[_rid]] "Tint.R" 170
+            EDIT3D [[_rid]] "Tint.G" 70
+            EDIT3D [[_rid]] "Tint.B" 230
             JUMP LEVEL_BUILD_AFTER_FLOOR
 
         >LEVEL_BUILD_EXIT
@@ -122,22 +151,44 @@
             EDIT3D [[_rid]] "Tint.B" 100
 
         >LEVEL_BUILD_AFTER_FLOOR
-            # closed gate barrier
-            JUMPNEQ _type 5 LEVEL_BUILD_BOX
+            # yellow closed gate barrier
+            JUMPEQ _type 5 LEVEL_BUILD_GATE_YELLOW
+            # purple closed gate barrier
+            JUMPEQ _type 7 LEVEL_BUILD_GATE_PURPLE
+            JUMP LEVEL_BUILD_BOX
 
-            LISTFIND GATE_CELLS [[_i]] _gate_i
+        >LEVEL_BUILD_GATE_YELLOW
+            LISTFIND GATE_YELLOW_CELLS [[_i]] _gate_i
             JUMPLT _gate_i 0 LEVEL_BUILD_NEXT
 
-            LISTGET GATE_RIDS [[_gate_i]] _orid
-            JUMPGT _orid 0 LEVEL_BUILD_GATE_TINT
+            LISTGET GATE_YELLOW_RIDS [[_gate_i]] _orid
+            JUMPGT _orid 0 LEVEL_BUILD_GATE_YELLOW_TINT
 
             RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_gate"
             EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
-            LISTSET GATE_RIDS [[_gate_i]] [[_orid]]
+            LISTSET GATE_YELLOW_RIDS [[_gate_i]] [[_orid]]
 
-            >LEVEL_BUILD_GATE_TINT
-                EDIT3D [[_orid]] "Tint.R" 200
-                EDIT3D [[_orid]] "Tint.G" 60
+            >LEVEL_BUILD_GATE_YELLOW_TINT
+                EDIT3D [[_orid]] "Tint.R" 240
+                EDIT3D [[_orid]] "Tint.G" 190
+                EDIT3D [[_orid]] "Tint.B" 30
+                EDIT3D [[_orid]] "Disabled" false
+                JUMP LEVEL_BUILD_NEXT
+
+        >LEVEL_BUILD_GATE_PURPLE
+            LISTFIND GATE_PURPLE_CELLS [[_i]] _gate_i
+            JUMPLT _gate_i 0 LEVEL_BUILD_NEXT
+
+            LISTGET GATE_PURPLE_RIDS [[_gate_i]] _orid
+            JUMPGT _orid 0 LEVEL_BUILD_GATE_PURPLE_TINT
+
+            RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_gate"
+            EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
+            LISTSET GATE_PURPLE_RIDS [[_gate_i]] [[_orid]]
+
+            >LEVEL_BUILD_GATE_PURPLE_TINT
+                EDIT3D [[_orid]] "Tint.R" 180
+                EDIT3D [[_orid]] "Tint.G" 50
                 EDIT3D [[_orid]] "Tint.B" 220
                 EDIT3D [[_orid]] "Disabled" false
                 JUMP LEVEL_BUILD_NEXT

@@ -17,16 +17,22 @@
     DEFLIST LEVEL_SPAWN_HEROES int
 
     DEFLIST TILE_TYPES int
-    # (0 floor, 1 wall, 2 box, 3 exit, 4 switch marker during load, 5 closed gate)
+    # 0 floor, 1 wall, 2 box, 3 exit
+    # 4 yellow switch (load), 5 yellow gate (closed)
+    # 6 purple switch (load), 7 purple gate (closed)
     DEFLIST TILE_FLOOR int
     DEFLIST TILE_OBJ int
 
-    # linear cell indices for exits, switches and gates
+    # linear cell indices for exits, switches and gates (per color)
     DEFLIST EXIT_CELLS int
-    DEFLIST SWITCH_CELLS int
-    DEFLIST GATE_CELLS int
-    DEFLIST GATE_RIDS int
-    DEFVAR GATES_OPEN false bool
+    DEFLIST SWITCH_YELLOW_CELLS int
+    DEFLIST SWITCH_PURPLE_CELLS int
+    DEFLIST GATE_YELLOW_CELLS int
+    DEFLIST GATE_YELLOW_RIDS int
+    DEFLIST GATE_PURPLE_CELLS int
+    DEFLIST GATE_PURPLE_RIDS int
+    DEFVAR GATES_YELLOW_OPEN false bool
+    DEFVAR GATES_PURPLE_OPEN false bool
     DEFVAR GATES_LETHAL false bool
 
 @LEVEL_INIT <levelname>
