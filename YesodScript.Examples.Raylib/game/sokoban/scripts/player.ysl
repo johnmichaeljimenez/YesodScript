@@ -7,7 +7,7 @@
     DEFVAR PLAYER_TILE 0 int
     DEFVAR PLAYER_MOVING false bool
     DEFVAR HERO_TYPE 0 int
-    # 0 = warrior (push), 1 = thief (pull), 2 = wizard (swap)
+    # 0 = warrior (multi-box push), 1 = thief (pull), 2 = wizard (swap)
 
 @PLAYER_INIT
     RENDER3D [[px]] [[py]] 1 "kaykit" character "player"
@@ -24,12 +24,33 @@
     ADD _toX <x>
     ADD _toY <y>
 
-    $LEVEL_STEP [[_toX]] [[_toY]] PLAYER_BLOCKED PLAYER_TILE
+    JUMPEQ HERO_TYPE 2 PLAYER_MOVE_WIZARD_RAY
+    JUMP PLAYER_MOVE_STEP
 
-    JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_BLOCKED_CASE
-    # free move
-    JUMPEQ HERO_TYPE 1 PLAYER_MOVE_THIEF_PULL
-    JUMP PLAYER_MOVE_GO
+    >PLAYER_MOVE_WIZARD_RAY
+        DEFVAR _swap_found false bool
+        DEFVAR _swapX [[_toX]] int
+        DEFVAR _swapY [[_toY]] int
+        $LEVEL_FIND_BOX_RAY [[_toX]] [[_toY]] <x> <y> _swapX _swapY _swap_found
+        JUMPEQ _swap_found false PLAYER_MOVE_STEP
+
+        DEFVAR _swap_ok false bool
+        $LEVEL_SWAP [[_swapX]] [[_swapY]] [[px]] [[py]] _swap_ok
+        JUMPEQ _swap_ok false END
+        SETVAR _toX [[_swapX]]
+        SETVAR _toY [[_swapY]]
+        SETVAR PLAYER_BLOCKED false
+        SETVAR PLAYER_TILE 2
+        JUMP PLAYER_MOVE_READY
+
+    >PLAYER_MOVE_STEP
+        $LEVEL_STEP [[_toX]] [[_toY]] PLAYER_BLOCKED PLAYER_TILE
+
+    >PLAYER_MOVE_READY
+        JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_BLOCKED_CASE
+        # free move
+        JUMPEQ HERO_TYPE 1 PLAYER_MOVE_THIEF_PULL
+        JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_THIEF_PULL
         # pull box from behind if present
@@ -47,7 +68,6 @@
 
     >PLAYER_MOVE_ON_BOX
         JUMPEQ HERO_TYPE 0 PLAYER_MOVE_WARRIOR_PUSH
-        JUMPEQ HERO_TYPE 2 PLAYER_MOVE_WIZARD_SWAP
         # thief cannot push
         JUMP END
 
@@ -56,13 +76,6 @@
         $LEVEL_PUSH [[_toX]] [[_toY]] <x> <y> _push_ok
         JUMPEQ _push_ok false END
         PRINT "PUSH"
-        JUMP PLAYER_MOVE_GO
-
-    >PLAYER_MOVE_WIZARD_SWAP
-        DEFVAR _swap_ok false bool
-        $LEVEL_SWAP [[_toX]] [[_toY]] [[px]] [[py]] _swap_ok
-        JUMPEQ _swap_ok false END
-        PRINT "SWAP"
         JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_GO

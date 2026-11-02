@@ -22,7 +22,7 @@
         EDIT3D [[character]] "Tint.R" 255
         EDIT3D [[character]] "Tint.G" 80
         EDIT3D [[character]] "Tint.B" 80
-        PRINT "Hero: WARRIOR (push)"
+        PRINT "Hero: WARRIOR (multi-box push)"
         JUMP TINT_DONE
 
     >TINT_THIEF

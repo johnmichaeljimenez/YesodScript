@@ -50,47 +50,107 @@
 @LEVEL_PUSH <bx> <by> <dx> <dy> <ok>
     SETVAR <ok> false
 
-    DEFVAR _tx <bx> int
-    DEFVAR _ty <by> int
-    ADD _tx <dx>
-    ADD _ty <dy>
+    DEFVAR _scanX <bx> int
+    DEFVAR _scanY <by> int
+    DEFVAR _scanType 0 int
+    DEFVAR _boxCount 0 int
 
-    JUMPLT _tx 0 LEVEL_PUSH_END
-    JUMPLT _ty 0 LEVEL_PUSH_END
-    JUMPGE _tx [[LEVEL_W]] LEVEL_PUSH_END
-    JUMPGE _ty [[LEVEL_H]] LEVEL_PUSH_END
+    >LEVEL_PUSH_SCAN
+        JUMPLT _scanX 0 LEVEL_PUSH_END
+        JUMPLT _scanY 0 LEVEL_PUSH_END
+        JUMPGE _scanX [[LEVEL_W]] LEVEL_PUSH_END
+        JUMPGE _scanY [[LEVEL_H]] LEVEL_PUSH_END
 
-    DEFVAR _beyond 0 int
-    $LIST_1D [[_tx]] [[_ty]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTGET TILE_TYPES [[LEVEL_TEMP]] _beyond
-    JUMPNEQ _beyond 0 LEVEL_PUSH_END
+        $LIST_1D [[_scanX]] [[_scanY]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+        LISTGET TILE_TYPES [[LEVEL_TEMP]] _scanType
+        JUMPNEQ _scanType 2 LEVEL_PUSH_SCAN_DONE
+        ADD _boxCount 1
+        ADD _scanX <dx>
+        ADD _scanY <dy>
+        JUMP LEVEL_PUSH_SCAN
 
-    DEFVAR _from 0 int
-    DEFVAR _rid 0 int
-    $LIST_1D <bx> <by> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTGET TILE_TYPES [[LEVEL_TEMP]] _from
-    JUMPNEQ _from 2 LEVEL_PUSH_END
-    LISTGET TILE_OBJ [[LEVEL_TEMP]] _rid
+    >LEVEL_PUSH_SCAN_DONE
+        # The whole line moves only if its far end is empty.
+        JUMPNEQ _boxCount 0 LEVEL_PUSH_CHECK_END
+        JUMP LEVEL_PUSH_END
 
-    # vacate old cell
-    LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
-    LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
+    >LEVEL_PUSH_CHECK_END
+        JUMPNEQ _scanType 0 LEVEL_PUSH_END
 
-    # occupy destination
-    $LIST_1D [[_tx]] [[_ty]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
-    LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
+        DEFVAR _boxX [[_scanX]] int
+        DEFVAR _boxY [[_scanY]] int
+        SUB _boxX <dx>
+        SUB _boxY <dy>
+        DEFVAR _destX 0 int
+        DEFVAR _destY 0 int
+        DEFVAR _from 0 int
+        DEFVAR _rid 0 int
 
-    # slide mesh with the player (same 0.12s ease)
-    JUMPLE _rid 0 LEVEL_PUSH_OK
-    TWEEN3D [[_rid]] "X" <bx> [[_tx]] false 0.12 "QUAD" "box_x" false
-    TWEEN3D [[_rid]] "Y" <by> [[_ty]] false 0.12 "QUAD" "box_y" false
+        >LEVEL_PUSH_SHIFT
+            JUMPGT _boxCount 0 LEVEL_PUSH_SHIFT_BOX
+            JUMP LEVEL_PUSH_OK
+
+        >LEVEL_PUSH_SHIFT_BOX
+            $LIST_1D [[_boxX]] [[_boxY]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+            LISTGET TILE_TYPES [[LEVEL_TEMP]] _from
+            JUMPNEQ _from 2 LEVEL_PUSH_END
+            LISTGET TILE_OBJ [[LEVEL_TEMP]] _rid
+            LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+            LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
+
+            SETVAR _destX [[_boxX]]
+            SETVAR _destY [[_boxY]]
+            ADD _destX <dx>
+            ADD _destY <dy>
+            $LIST_1D [[_destX]] [[_destY]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+            LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
+            LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
+
+            JUMPLE _rid 0 LEVEL_PUSH_SHIFT_NEXT
+            TWEEN3D [[_rid]] "X" [[_boxX]] [[_destX]] false 0.12 "QUAD"
+            TWEEN3D [[_rid]] "Y" [[_boxY]] [[_destY]] false 0.12 "QUAD"
+
+        >LEVEL_PUSH_SHIFT_NEXT
+            SUB _boxX <dx>
+            SUB _boxY <dy>
+            SUB _boxCount 1
+            JUMP LEVEL_PUSH_SHIFT
 
     >LEVEL_PUSH_OK
         SETVAR <ok> true
         JUMP LEVEL_PUSH_END
 
     >LEVEL_PUSH_END
+        SETVAR LEVEL_TEMP -1
+        BREAK
+
+@LEVEL_FIND_BOX_RAY <x> <y> <dx> <dy> <targetx> <targety> <found>
+    SETVAR <found> false
+    DEFVAR _rayX <x> int
+    DEFVAR _rayY <y> int
+    DEFVAR _rayTile 0 int
+
+    >LEVEL_FIND_BOX_RAY_LOOP
+        JUMPLT _rayX 0 LEVEL_FIND_BOX_RAY_END
+        JUMPLT _rayY 0 LEVEL_FIND_BOX_RAY_END
+        JUMPGE _rayX [[LEVEL_W]] LEVEL_FIND_BOX_RAY_END
+        JUMPGE _rayY [[LEVEL_H]] LEVEL_FIND_BOX_RAY_END
+
+        $LIST_1D [[_rayX]] [[_rayY]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+        LISTGET TILE_TYPES [[LEVEL_TEMP]] _rayTile
+        JUMPEQ _rayTile 1 LEVEL_FIND_BOX_RAY_END
+        JUMPEQ _rayTile 2 LEVEL_FIND_BOX_RAY_FOUND
+
+        ADD _rayX <dx>
+        ADD _rayY <dy>
+        JUMP LEVEL_FIND_BOX_RAY_LOOP
+
+    >LEVEL_FIND_BOX_RAY_FOUND
+        SETVAR <targetx> [[_rayX]]
+        SETVAR <targety> [[_rayY]]
+        SETVAR <found> true
+
+    >LEVEL_FIND_BOX_RAY_END
         SETVAR LEVEL_TEMP -1
         BREAK
 
