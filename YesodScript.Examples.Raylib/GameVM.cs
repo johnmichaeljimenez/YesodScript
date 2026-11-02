@@ -10,6 +10,7 @@ namespace YesodScript.Examples;
 public class GameVM : VirtualMachine
 {
 	public bool mouseClicked;
+	private Var screenWidth, screenHeight, screenWidthHalf, screenHeightHalf;
 	private Var mouseX, mouseY;
 	private Var hoveredId, clickedId;
 	private Var logString;
@@ -64,6 +65,12 @@ public class GameVM : VirtualMachine
 		mouseX = AddGlobalVar("SYS:MOUSE_X", typeof(int), 0);
 		mouseY = AddGlobalVar("SYS:MOUSE_Y", typeof(int), 0);
 		AddGlobalVar("SYS:REQ_EXIT", typeof(bool), 0);
+
+		screenWidth = AddGlobalVar("SYS:SCREEN_WIDTH", typeof(int), GameContent.VirtualResolution.X);
+		screenHeight = AddGlobalVar("SYS:SCREEN_HEIGHT", typeof(int), GameContent.VirtualResolution.Y);
+
+		screenWidthHalf = AddGlobalVar("SYS:SCREEN_WIDTH_HALF", typeof(int), GameContent.VirtualResolution.X / 2);
+		screenHeightHalf = AddGlobalVar("SYS:SCREEN_HEIGHT_HALF", typeof(int), GameContent.VirtualResolution.Y / 2);
 
 		hoveredId = AddGlobalVar("SYS:HOVERED", typeof(int), -1);
 		clickedId = AddGlobalVar("SYS:CLICKED", typeof(int), -1);
@@ -355,7 +362,7 @@ public class Tween3D : GameCommand
 public class Anim3D : GameCommand
 {
 	[CommandParameter] private int id;
-	[CommandParameter] private string animName;	//empty = stop
+	[CommandParameter] private string animName; //empty = stop
 	[CommandParameter] private bool looping = true;
 
 	public override void OnEnter()

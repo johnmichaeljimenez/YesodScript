@@ -12,7 +12,7 @@
 	LISTCOUNT <list> _count
 	JUMPLE _count 0 MENU_LIST_ABORT
 
-	SETVAR _startY 180
+	SETVAR _startY [[SYS:SCREEN_HEIGHT_HALF]]
 	SETVAR _i [[_count]]
 	MUL _i [[_line]]
 	DIV _i 2
@@ -24,7 +24,7 @@
 		JUMPGE _i [[_count]] MENU_LIST_BUILT
 
 		LISTGET <list> [[_i]] _label
-		RENDER 320 [[_y]] _id 1000 "MENU"
+		RENDER [[SYS:SCREEN_WIDTH_HALF]] [[_y]] _id 1000 "MENU"
 		EDIT [[_id]] "Text" [[_label]]
 		EDIT [[_id]] "FontSize" 18
 		EDIT [[_id]] "TextHAlign" 0
