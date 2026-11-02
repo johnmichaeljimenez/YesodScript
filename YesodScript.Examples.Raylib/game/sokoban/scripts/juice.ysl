@@ -56,14 +56,23 @@
 
     >ON_HERO_SPAWN_WARRIOR
         EDIT3D <rid> "ModelID" "fuwawa"
+        EDIT3D <rid> "Tint.R" 150
+        EDIT3D <rid> "Tint.G" 150
+        EDIT3D <rid> "Tint.B" 150
         JUMP ON_HERO_SPAWN_DONE
 
     >ON_HERO_SPAWN_THIEF
         EDIT3D <rid> "ModelID" "mococo"
+        EDIT3D <rid> "Tint.R" 150
+        EDIT3D <rid> "Tint.G" 150
+        EDIT3D <rid> "Tint.B" 150
         JUMP ON_HERO_SPAWN_DONE
 
     >ON_HERO_SPAWN_WIZARD
         EDIT3D <rid> "ModelID" "bijou"
+        EDIT3D <rid> "Tint.R" 150
+        EDIT3D <rid> "Tint.G" 150
+        EDIT3D <rid> "Tint.B" 150
 
     >ON_HERO_SPAWN_DONE
         PRINT "ON_HERO_SPAWN type=<type> <rid> @ <x>,<y>"
@@ -81,9 +90,35 @@
     PRINT "ON_UNDO_EMPTY"
     BREAK
 
-@ON_HERO_SELECT <type> <index>
-    PRINT "ON_HERO_SELECT type=<type> index=<index>"
+@ON_HERO_SELECT <type> <index> <rid>
+    TWEEN3D <rid> "Z" 1 1.1 false 0.2 "SHAKE" "hero_select"
+    PRINT "ON_HERO_SELECT type=<type> index=<index> rid=<rid>"
     BREAK
+
+@ON_HERO_SELECT_ALL <selected_index>
+    DEFVAR _tint_i 0 int
+    DEFVAR _tint_rid 0 int
+
+    >ON_HERO_TINT_LOOP
+        JUMPGE _tint_i [[HERO_COUNT]] ON_HERO_TINT_DONE
+        LISTGET HERO_RIDS [[_tint_i]] _tint_rid
+        JUMPEQ _tint_i <selected_index> ON_HERO_TINT_SELECTED
+        EDIT3D [[_tint_rid]] "Tint.R" 150
+        EDIT3D [[_tint_rid]] "Tint.G" 150
+        EDIT3D [[_tint_rid]] "Tint.B" 150
+        JUMP ON_HERO_TINT_NEXT
+
+        >ON_HERO_TINT_SELECTED
+            EDIT3D [[_tint_rid]] "Tint.R" 255
+            EDIT3D [[_tint_rid]] "Tint.G" 255
+            EDIT3D [[_tint_rid]] "Tint.B" 255
+
+        >ON_HERO_TINT_NEXT
+            ADD _tint_i 1
+            JUMP ON_HERO_TINT_LOOP
+
+    >ON_HERO_TINT_DONE
+        BREAK
 
 @ON_HERO_DEATH
     PRINT "ON_HERO_DEATH"

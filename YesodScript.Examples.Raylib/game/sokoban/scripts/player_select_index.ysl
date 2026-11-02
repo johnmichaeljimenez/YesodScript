@@ -8,10 +8,14 @@
     LISTSET HERO_YS [[HERO_ACTIVE]] [[py]]
     LISTSET HERO_FACES [[HERO_ACTIVE]] [[face_deg]]
 
+    DEFVAR _rid 0 int
+    LISTGET HERO_RIDS <index> _rid
+
     $HERO_PLACE_INACTIVE [[HERO_ACTIVE]]
     $HERO_LIFT_INACTIVE <index>
     CALL "HERO_ACTIVATE <index> true"
-    CALL "ON_HERO_SELECT [[HERO_TYPE]] <index>"
+    CALL "ON_HERO_SELECT [[HERO_TYPE]] <index> [[_rid]]"
+    CALL "ON_HERO_SELECT_ALL <index>"
     CALL "LEVEL_UPDATE_GATES"
 
     DEFVAR _dead false bool

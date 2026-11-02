@@ -69,6 +69,7 @@
 
             >HEROES_INIT_ACTIVATE
                 CALL "HERO_ACTIVATE [[HERO_ACTIVE]] true"
+                CALL "ON_HERO_SELECT_ALL [[HERO_ACTIVE]]"
                 CALL "LEVEL_UPDATE_GATES"
                 
                 SETVAR GATES_LETHAL true

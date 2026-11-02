@@ -371,8 +371,8 @@
                 LISTGET HERO_YS [[UNDO_I]] UNDO_HY
                 LISTGET HERO_TYPES [[UNDO_I]] UNDO_V
                 LISTGET HERO_FACES [[UNDO_I]] UNDO_TEMP
-                RENDER3D [[UNDO_HX]] [[UNDO_HY]] 1 "kaykit" UNDO_RID "player"
-                ANIM3D UNDO_RID "Idle_A" true
+                RENDER3D [[UNDO_HX]] [[UNDO_HY]] 1 * UNDO_RID "player"
+                # ANIM3D UNDO_RID "Idle_A" true
                 EDIT3D [[UNDO_RID]] "Rotation" [[UNDO_TEMP]]
                 CALL "ON_HERO_SPAWN [[UNDO_RID]] [[UNDO_V]] [[UNDO_HX]] [[UNDO_HY]]"
                 LISTADD HERO_RIDS [[UNDO_RID]]
@@ -384,6 +384,7 @@
 
             >UNDO_BUILD_ACTIVATE
                 CALL "HERO_ACTIVATE [[HERO_ACTIVE]] false"
+                CALL "ON_HERO_SELECT_ALL [[HERO_ACTIVE]]"
                 SETVAR GATES_LETHAL true
                 CALL "ON_UNDO"
                 BREAK
