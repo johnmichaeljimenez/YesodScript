@@ -5,7 +5,3 @@
     EDIT3D [[character]] "prevY" [[py]]
     EDIT3D [[character]] "Rotation" [[face_deg]]
     BREAK
-
-@PLAYER_APPLY_TINT
-    CALL "HERO_APPLY_TINT [[character]] [[HERO_TYPE]] true"
-    BREAK

@@ -38,8 +38,8 @@
             LISTGET LEVEL_SPAWN_YS [[_i]] _sy
             LISTGET LEVEL_SPAWN_HEROES [[_i]] _stype
 
-            RENDER3D [[_sx]] [[_sy]] 1 "kaykit" _rid "player"
-            ANIM3D _rid "Idle_A" true
+            RENDER3D [[_sx]] [[_sy]] 1 "fuwawa" _rid "player"
+            # ANIM3D _rid "Idle_A" true
             EDIT3D [[_rid]] "Rotation" 0
             CALL "ON_HERO_SPAWN [[_rid]] [[_stype]] [[_sx]] [[_sy]]"
 

@@ -87,8 +87,40 @@ public class Assets : IDisposable
 			throw new FileNotFoundException($"Model file not found for id '{id}': '{path}'", path);
 
 		var model = Raylib.LoadModel(path);
+		NormalizeModelMaterials(model);
 		models[id] = model;
 		LoadModelAnimations(id, path);
+	}
+
+	/// <summary>
+	/// Sketchfab (and similar) GLBs often ship black baseColorFactor with the
+	/// actual unlit colors in the emissive map. Raylib's default model shader
+	/// multiplies albedo texture by albedo color and ignores emission, so those
+	/// models draw as black silhouettes. Promote emission → albedo when needed.
+	/// </summary>
+	private static unsafe void NormalizeModelMaterials(Model model)
+	{
+		if (model.MaterialCount <= 0 || model.Materials == null)
+			return;
+
+		for (var i = 0; i < model.MaterialCount; i++)
+		{
+			var maps = model.Materials[i].Maps;
+			if (maps == null)
+				continue;
+
+			ref var albedo = ref maps[(int)MaterialMapIndex.Albedo];
+			ref var emission = ref maps[(int)MaterialMapIndex.Emission];
+
+			var albedoBlack = albedo.Color.R == 0 && albedo.Color.G == 0 && albedo.Color.B == 0;
+			if (!albedoBlack)
+				continue;
+
+			if (emission.Texture.Id != 0)
+				albedo.Texture = emission.Texture;
+
+			albedo.Color = Color.White;
+		}
 	}
 
 	public Model GetModel(string id)

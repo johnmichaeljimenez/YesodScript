@@ -6,5 +6,4 @@
     LISTGET HERO_FACES <index> face_deg
     SETVAR HERO_ACTIVE <index>
     $PLAYER_UPDATE_POS
-    CALL "HERO_APPLY_TINT [[character]] [[HERO_TYPE]] <announce>"
     BREAK

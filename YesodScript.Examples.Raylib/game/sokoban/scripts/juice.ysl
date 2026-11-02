@@ -1,36 +1,3 @@
-@HERO_APPLY_TINT <rid> <type> <announce>
-    JUMPEQ <type> 0 HERO_TINT_WARRIOR
-    JUMPEQ <type> 1 HERO_TINT_THIEF
-    JUMPEQ <type> 2 HERO_TINT_WIZARD
-    JUMP HERO_TINT_DONE
-
-    >HERO_TINT_WARRIOR
-        EDIT3D <rid> "Tint.R" 255
-        EDIT3D <rid> "Tint.G" 80
-        EDIT3D <rid> "Tint.B" 80
-        JUMPEQ <announce> false HERO_TINT_DONE
-        PRINT "Hero: WARRIOR (multi-box push)"
-        JUMP HERO_TINT_DONE
-
-    >HERO_TINT_THIEF
-        EDIT3D <rid> "Tint.R" 80
-        EDIT3D <rid> "Tint.G" 220
-        EDIT3D <rid> "Tint.B" 80
-        JUMPEQ <announce> false HERO_TINT_DONE
-        PRINT "Hero: THIEF (pull)"
-        JUMP HERO_TINT_DONE
-
-    >HERO_TINT_WIZARD
-        EDIT3D <rid> "Tint.R" 80
-        EDIT3D <rid> "Tint.G" 10
-        EDIT3D <rid> "Tint.B" 255
-        JUMPEQ <announce> false HERO_TINT_DONE
-        PRINT "Hero: WIZARD (swap)"
-        JUMP HERO_TINT_DONE
-
-    >HERO_TINT_DONE
-        BREAK
-
 @ON_TILE_FLOOR <rid> <x> <y>
     PRINT "ON_TILE_FLOOR <rid> @ <x>,<y>"
     BREAK
@@ -88,21 +55,15 @@
     JUMP ON_HERO_SPAWN_DONE
 
     >ON_HERO_SPAWN_WARRIOR
-        EDIT3D <rid> "Tint.R" 255
-        EDIT3D <rid> "Tint.G" 80
-        EDIT3D <rid> "Tint.B" 80
+        EDIT3D <rid> "ModelID" "fuwawa"
         JUMP ON_HERO_SPAWN_DONE
 
     >ON_HERO_SPAWN_THIEF
-        EDIT3D <rid> "Tint.R" 80
-        EDIT3D <rid> "Tint.G" 220
-        EDIT3D <rid> "Tint.B" 80
+        EDIT3D <rid> "ModelID" "mococo"
         JUMP ON_HERO_SPAWN_DONE
 
     >ON_HERO_SPAWN_WIZARD
-        EDIT3D <rid> "Tint.R" 80
-        EDIT3D <rid> "Tint.G" 10
-        EDIT3D <rid> "Tint.B" 255
+        EDIT3D <rid> "ModelID" "bijou"
 
     >ON_HERO_SPAWN_DONE
         PRINT "ON_HERO_SPAWN type=<type> <rid> @ <x>,<y>"
