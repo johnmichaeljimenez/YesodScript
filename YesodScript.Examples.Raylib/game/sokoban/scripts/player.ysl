@@ -9,11 +9,13 @@
     DEFVAR HERO_TYPE 0 int
     # 0 = warrior (multi-box push), 1 = thief (pull), 2 = wizard (swap)
 
-@PLAYER_INIT
-    RENDER3D [[px]] [[py]] 1 "kaykit" character "player"
-    ANIM3D character "Idle_A" true
-    EDIT3D [[character]] "Rotation" [[face_deg]]
-    $PLAYER_APPLY_TINT
+    DEFLIST HERO_XS int
+    DEFLIST HERO_YS int
+    DEFLIST HERO_TYPES int
+    DEFLIST HERO_RIDS int
+    DEFLIST HERO_FACES int
+    DEFVAR HERO_COUNT 0 int
+    DEFVAR HERO_ACTIVE 0 int
 
 @PLAYER_MOVE <to> <x> <y>
     JUMPEQ PLAYER_MOVING true PLAYER_MOVE_BUSY
@@ -79,16 +81,21 @@
         JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_GO
+        $HERO_SYNC_INACTIVE
+
         SETVAR PLAYER_MOVING true
 
         TWEEN3D [[character]] "X" [[px]] [[_toX]] false 0.12 "QUAD" "char_x" true
         TWEEN3D [[character]] "Y" [[py]] [[_toY]] false 0.12 "QUAD" "char_y" true
         SETVAR px [[_toX]]
         SETVAR py [[_toY]]
+        LISTSET HERO_XS [[HERO_ACTIVE]] [[px]]
+        LISTSET HERO_YS [[HERO_ACTIVE]] [[py]]
 
         JUMPEQ [[face_deg]] <to> PLAYER_MOVE_WAIT
         TWEEN3D [[character]] "Rotation" [[face_deg]] <to> false 0.12 "QUAD" "char_rotate" true
         SETVAR face_deg <to>
+        LISTSET HERO_FACES [[HERO_ACTIVE]] [[face_deg]]
 
         >PLAYER_MOVE_WAIT
             WAIT 0.12
@@ -97,12 +104,8 @@
             $LEVEL_UPDATE_GATES
             # re-read tile in case a gate opened under / near the player
             $LEVEL_GET [[px]] [[py]] PLAYER_TILE
-            # check exit
-            JUMPEQ PLAYER_TILE 3 PLAYER_ON_EXIT
-            JUMP END
-
-        >PLAYER_ON_EXIT
-            SETVAR _exit true
+            # win only when every hero is on an exit
+            $HERO_CHECK_ALL_ON_EXIT _exit
             JUMP END
 
     >END
@@ -110,5 +113,9 @@
         BREAK
 
     >TO_EXIT
+        PRINT "All heroes on exits!"
         WAITFRAME
         $LEVEL_NEXT
+
+    >PLAYER_MOVE_BUSY
+        BREAK

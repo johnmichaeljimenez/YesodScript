@@ -1,0 +1,28 @@
+﻿@PLAYER_SWITCH
+    JUMPEQ PLAYER_MOVING true PLAYER_SWITCH_END
+    JUMPLE HERO_COUNT 1 PLAYER_SWITCH_END
+
+    LISTSET HERO_XS [[HERO_ACTIVE]] [[px]]
+    LISTSET HERO_YS [[HERO_ACTIVE]] [[py]]
+    LISTSET HERO_FACES [[HERO_ACTIVE]] [[face_deg]]
+
+    $HERO_PLACE_INACTIVE [[HERO_ACTIVE]]
+
+    DEFVAR _next [[HERO_ACTIVE]] int
+    ADD _next 1
+    JUMPLT _next [[HERO_COUNT]] PLAYER_SWITCH_LIFT
+    SETVAR _next 0
+
+    >PLAYER_SWITCH_LIFT
+        $HERO_LIFT_INACTIVE [[_next]]
+        $HERO_ACTIVATE [[_next]] true
+        $LEVEL_UPDATE_GATES
+        
+        DEFVAR _all_exit false bool
+        $HERO_CHECK_ALL_ON_EXIT _all_exit
+        JUMPEQ _all_exit false PLAYER_SWITCH_END
+        PRINT "All heroes on exits!"
+        $LEVEL_NEXT
+
+    >PLAYER_SWITCH_END
+        BREAK

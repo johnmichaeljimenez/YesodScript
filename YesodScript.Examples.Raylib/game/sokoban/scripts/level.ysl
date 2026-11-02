@@ -12,6 +12,10 @@
     DEFVAR LEVEL_SPAWN_Y 0 int
     DEFVAR LEVEL_SPAWN_HERO 0 int
 
+    DEFLIST LEVEL_SPAWN_XS int
+    DEFLIST LEVEL_SPAWN_YS int
+    DEFLIST LEVEL_SPAWN_HEROES int
+
     DEFLIST TILE_TYPES int
     # (0 floor, 1 wall, 2 box, 3 exit, 4 switch marker during load, 5 closed gate)
     DEFLIST TILE_FLOOR int
@@ -32,36 +36,25 @@
     CALL "LEVELDATA:<levelname>" LEVEL_INIT_MISSING
     $LEVEL_BUILD_VISUALS
 
-    SETVAR HERO_TYPE [[LEVEL_SPAWN_HERO]]
-    JUMPEQ LEVEL_HAS_SPAWN false LEVEL_INIT_NO_SPAWN
-    SETVAR px [[LEVEL_SPAWN_X]]
-    SETVAR py [[LEVEL_SPAWN_Y]]
-    JUMP LEVEL_INIT_CAM
+    #aim camera at level center
+    DEFVAR _cx [[LEVEL_W]] int
+    DEFVAR _cy [[LEVEL_H]] int
+    DIV _cx 2
+    DIV _cy 2
 
-    >LEVEL_INIT_NO_SPAWN
-        SETVAR px 1
-        SETVAR py 1
+    DEFVAR _fromY [[_cy]] int
+    ADD _fromY 4
+    DEFVAR _fromZ 14 int
 
-    >LEVEL_INIT_CAM
-        #aim camera at level center
-        DEFVAR _cx [[LEVEL_W]] int
-        DEFVAR _cy [[LEVEL_H]] int
-        DIV _cx 2
-        DIV _cy 2
+    CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
 
-        DEFVAR _fromY [[_cy]] int
-        ADD _fromY 4
-        DEFVAR _fromZ 14 int
-
-        CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
-        # spawn may sit on a switch — resolve gates with final player pos
-        $LEVEL_UPDATE_GATES
-        JUMP LEVEL_INIT_END
+    $HEROES_INIT
+    JUMP LEVEL_INIT_END
 
     >LEVEL_INIT_MISSING
         PRINT "Missing level '<levelname>'"
         BREAK
 
     >LEVEL_INIT_END
-        PRINT "Loaded level '<levelname>' [[LEVEL_W]]x[[LEVEL_H]] spawn=[[px]],[[py]]"
+        PRINT "Loaded level '<levelname>' [[LEVEL_W]]x[[LEVEL_H]] heroes=[[HERO_COUNT]] active=[[px]],[[py]]"
         BREAK

@@ -1,0 +1,10 @@
+﻿@HERO_ACTIVATE <index> <announce>
+    LISTGET HERO_XS <index> px
+    LISTGET HERO_YS <index> py
+    LISTGET HERO_TYPES <index> HERO_TYPE
+    LISTGET HERO_RIDS <index> character
+    LISTGET HERO_FACES <index> face_deg
+    SETVAR HERO_ACTIVE <index>
+    $PLAYER_UPDATE_POS
+    $HERO_APPLY_TINT [[character]] [[HERO_TYPE]] <announce>
+    BREAK

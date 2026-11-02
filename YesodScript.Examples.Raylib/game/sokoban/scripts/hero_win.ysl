@@ -1,0 +1,27 @@
+﻿#all heroes must on exit to win
+@HERO_CHECK_ALL_ON_EXIT <ok>
+    SETVAR <ok> true
+    JUMPEQ HERO_COUNT 0 HERO_CHECK_ALL_ON_EXIT_END
+
+    DEFVAR _i 0 int
+    DEFVAR _hx 0 int
+    DEFVAR _hy 0 int
+    DEFVAR _cell 0 int
+    DEFVAR _exit_i -1 int
+
+    >HERO_CHECK_ALL_ON_EXIT_LOOP
+        JUMPGE _i [[HERO_COUNT]] HERO_CHECK_ALL_ON_EXIT_END
+        LISTGET HERO_XS [[_i]] _hx
+        LISTGET HERO_YS [[_i]] _hy
+        $LIST_1D [[_hx]] [[_hy]] [[LEVEL_W]] [[LEVEL_H]] _cell
+        LISTFIND EXIT_CELLS [[_cell]] _exit_i
+        JUMPLT _exit_i 0 HERO_CHECK_ALL_ON_EXIT_MISS
+        ADD _i 1
+        JUMP HERO_CHECK_ALL_ON_EXIT_LOOP
+
+    >HERO_CHECK_ALL_ON_EXIT_MISS
+        SETVAR <ok> false
+
+    >HERO_CHECK_ALL_ON_EXIT_END
+        SETVAR LEVEL_TEMP -1
+        BREAK

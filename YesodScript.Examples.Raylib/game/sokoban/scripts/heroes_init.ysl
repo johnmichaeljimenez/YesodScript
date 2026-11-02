@@ -1,0 +1,77 @@
+﻿@HEROES_INIT
+    CLEAR "player*"
+    LISTCLEAR HERO_XS
+    LISTCLEAR HERO_YS
+    LISTCLEAR HERO_TYPES
+    LISTCLEAR HERO_RIDS
+    LISTCLEAR HERO_FACES
+    SETVAR HERO_COUNT 0
+    SETVAR HERO_ACTIVE 0
+
+    DEFVAR _spawn_n 0 int
+    LISTCOUNT LEVEL_SPAWN_XS _spawn_n
+    JUMPGT _spawn_n 0 HEROES_INIT_FROM_LIST
+
+    JUMPEQ LEVEL_HAS_SPAWN false HEROES_INIT_DEFAULT
+    LISTADD LEVEL_SPAWN_XS [[LEVEL_SPAWN_X]]
+    LISTADD LEVEL_SPAWN_YS [[LEVEL_SPAWN_Y]]
+    LISTADD LEVEL_SPAWN_HEROES [[LEVEL_SPAWN_HERO]]
+    SETVAR _spawn_n 1
+    JUMP HEROES_INIT_FROM_LIST
+
+    >HEROES_INIT_DEFAULT
+        LISTADD LEVEL_SPAWN_XS 1
+        LISTADD LEVEL_SPAWN_YS 1
+        LISTADD LEVEL_SPAWN_HEROES 0
+        SETVAR _spawn_n 1
+
+    >HEROES_INIT_FROM_LIST
+        DEFVAR _i 0 int
+        DEFVAR _sx 0 int
+        DEFVAR _sy 0 int
+        DEFVAR _stype 0 int
+        DEFVAR _rid 0 int
+
+        >HEROES_INIT_SPAWN_LOOP
+            JUMPGE _i [[_spawn_n]] HEROES_INIT_SPAWN_DONE
+            LISTGET LEVEL_SPAWN_XS [[_i]] _sx
+            LISTGET LEVEL_SPAWN_YS [[_i]] _sy
+            LISTGET LEVEL_SPAWN_HEROES [[_i]] _stype
+
+            RENDER3D [[_sx]] [[_sy]] 1 "kaykit" _rid "player"
+            ANIM3D _rid "Idle_A" true
+            EDIT3D [[_rid]] "Rotation" 0
+            $HERO_APPLY_TINT [[_rid]] [[_stype]] false
+
+            LISTADD HERO_XS [[_sx]]
+            LISTADD HERO_YS [[_sy]]
+            LISTADD HERO_TYPES [[_stype]]
+            LISTADD HERO_RIDS [[_rid]]
+            LISTADD HERO_FACES 0
+            ADD HERO_COUNT 1
+            ADD _i 1
+            JUMP HEROES_INIT_SPAWN_LOOP
+
+        >HEROES_INIT_SPAWN_DONE
+            SETVAR HERO_ACTIVE 0
+            SETVAR _i 0
+            >HEROES_INIT_PARK_LOOP
+                JUMPGE _i [[HERO_COUNT]] HEROES_INIT_ACTIVATE
+                JUMPNEQ _i [[HERO_ACTIVE]] HEROES_INIT_PARK_ONE
+                JUMP HEROES_INIT_PARK_NEXT
+
+                >HEROES_INIT_PARK_ONE
+                    $HERO_PLACE_INACTIVE [[_i]]
+
+                >HEROES_INIT_PARK_NEXT
+                    ADD _i 1
+                    JUMP HEROES_INIT_PARK_LOOP
+
+            >HEROES_INIT_ACTIVATE
+                $HERO_ACTIVATE [[HERO_ACTIVE]] true
+                $LEVEL_UPDATE_GATES
+                JUMPLE HERO_COUNT 1 HEROES_INIT_END
+                PRINT "Press X to switch heroes (inactive = pushable blocks)"
+
+            >HEROES_INIT_END
+                BREAK

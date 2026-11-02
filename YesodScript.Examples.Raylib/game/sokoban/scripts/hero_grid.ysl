@@ -1,0 +1,69 @@
+﻿@HERO_PLACE_INACTIVE <index>
+    DEFVAR _hx 0 int
+    DEFVAR _hy 0 int
+    DEFVAR _hrid 0 int
+    LISTGET HERO_XS <index> _hx
+    LISTGET HERO_YS <index> _hy
+    LISTGET HERO_RIDS <index> _hrid
+
+    $LIST_1D [[_hx]] [[_hy]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
+    LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_hrid]]
+    BREAK
+
+@HERO_LIFT_INACTIVE <index>
+    DEFVAR _hx 0 int
+    DEFVAR _hy 0 int
+    DEFVAR _hrid 0 int
+    DEFVAR _orid 0 int
+    LISTGET HERO_XS <index> _hx
+    LISTGET HERO_YS <index> _hy
+    LISTGET HERO_RIDS <index> _hrid
+
+    $LIST_1D [[_hx]] [[_hy]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+    LISTGET TILE_OBJ [[LEVEL_TEMP]] _orid
+    JUMPNEQ _orid [[_hrid]] HERO_LIFT_INACTIVE_END
+    $LEVEL_RESTORE_GROUND [[_hx]] [[_hy]]
+    LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
+
+    >HERO_LIFT_INACTIVE_END
+        BREAK
+
+@HERO_SYNC_INACTIVE
+    DEFVAR _i 0 int
+    DEFVAR _rid 0 int
+    DEFVAR _cell 0 int
+    DEFVAR _size [[LEVEL_W]] int
+    MUL _size [[LEVEL_H]]
+    DEFVAR _orid 0 int
+    DEFVAR _sx 0 int
+    DEFVAR _sy 0 int
+
+    >HERO_SYNC_INACTIVE_LOOP
+        JUMPGE _i [[HERO_COUNT]] HERO_SYNC_INACTIVE_END
+        JUMPNEQ _i [[HERO_ACTIVE]] HERO_SYNC_INACTIVE_ONE
+        JUMP HERO_SYNC_INACTIVE_NEXT
+
+        >HERO_SYNC_INACTIVE_ONE
+            LISTGET HERO_RIDS [[_i]] _rid
+            SETVAR _cell 0
+            >HERO_SYNC_INACTIVE_SCAN
+                JUMPGE _cell [[_size]] HERO_SYNC_INACTIVE_NEXT
+                LISTGET TILE_OBJ [[_cell]] _orid
+                JUMPNEQ _orid [[_rid]] HERO_SYNC_INACTIVE_SCAN_NEXT
+                $LIST_XY [[_cell]] [[LEVEL_W]] _sx _sy
+                LISTSET HERO_XS [[_i]] [[_sx]]
+                LISTSET HERO_YS [[_i]] [[_sy]]
+                JUMP HERO_SYNC_INACTIVE_NEXT
+
+                >HERO_SYNC_INACTIVE_SCAN_NEXT
+                    ADD _cell 1
+                    JUMP HERO_SYNC_INACTIVE_SCAN
+
+        >HERO_SYNC_INACTIVE_NEXT
+            ADD _i 1
+            JUMP HERO_SYNC_INACTIVE_LOOP
+
+    >HERO_SYNC_INACTIVE_END
+        SETVAR LEVEL_TEMP -1
+        BREAK
