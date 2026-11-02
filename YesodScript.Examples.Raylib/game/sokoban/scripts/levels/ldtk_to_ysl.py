@@ -13,7 +13,7 @@ Tile types:
   2 box    (Box entity) — gameplay stub
   3 exit   (Exit entity) — gameplay stub
 
-Player_Start sets spawn only (not a tile type).
+Player_Start sets spawn coordinates and HeroType (not a tile type).
 Entity stamps overwrite IntGrid blockers on the same cell.
 """
 
@@ -33,11 +33,19 @@ ENTITY_TILE_TYPE = {
     "Exit": 3,
 }
 
+# Keep these values in sync with HERO_TYPE checks in player.ysl.
+HERO_TYPE_VALUE = {
+    "Warrior": 0,
+    "Thief": 1,
+    "Wizard": 2,
+}
+
+
 def grid_size(level: dict[str, Any]) -> tuple[int, int]:
     return level["pxWid"] // TILE_SIZE, level["pxHei"] // TILE_SIZE
 
 
-def find_player_start(level: dict[str, Any]) -> tuple[int, int] | None:
+def find_player_start(level: dict[str, Any]) -> tuple[int, int, int] | None:
     for layer in level["layerInstances"]:
         if layer.get("__type") != "Entities":
             continue
@@ -46,7 +54,20 @@ def find_player_start(level: dict[str, Any]) -> tuple[int, int] | None:
             # accept Player_Start / PlayerStart
             if ident in ("Player_Start", "PlayerStart"):
                 gx, gy = entity["__grid"]
-                return int(gx), int(gy)
+                hero_name = next(
+                    (
+                        field.get("__value")
+                        for field in entity.get("fieldInstances", [])
+                        if field.get("__identifier") == "HeroType"
+                    ),
+                    "Warrior",
+                )
+                if hero_name not in HERO_TYPE_VALUE:
+                    raise ValueError(
+                        f"unsupported HeroType '{hero_name}' on Player_Start "
+                        f"in level '{level['identifier']}'"
+                    )
+                return int(gx), int(gy), HERO_TYPE_VALUE[hero_name]
     return None
 
 
@@ -112,9 +133,10 @@ def generate_leveldata(level: dict[str, Any]) -> str:
 
     spawn = find_player_start(level)
     if spawn is not None:
-        sx, sy = spawn
+        sx, sy, hero_type = spawn
         lines.append(f"\tSETVAR LEVEL_SPAWN_X {sx}")
         lines.append(f"\tSETVAR LEVEL_SPAWN_Y {sy}")
+        lines.append(f"\tSETVAR LEVEL_SPAWN_HERO {hero_type}")
         lines.append("\tSETVAR LEVEL_HAS_SPAWN true")
     else:
         lines.append("\t# no Player_Start found")
