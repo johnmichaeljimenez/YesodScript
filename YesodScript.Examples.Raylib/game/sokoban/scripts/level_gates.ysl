@@ -1,0 +1,91 @@
+# All gates open only while every switch is held by a box or the player.
+# Opening clears closed-gate tiles (5 -> 0). Closing restores empty open cells (0 -> 5).
+# A box sitting on an open gate keeps type 2 until it leaves; then close can apply.
+@LEVEL_UPDATE_GATES
+    DEFVAR _all_on true bool
+    DEFVAR _si 0 int
+    DEFVAR _sn 0 int
+    DEFVAR _cell 0 int
+    DEFVAR _tile 0 int
+    DEFVAR _sx 0 int
+    DEFVAR _sy 0 int
+    DEFVAR _gi 0 int
+    DEFVAR _gn 0 int
+    DEFVAR _rid 0 int
+
+    LISTCOUNT SWITCH_CELLS _sn
+    JUMPEQ _sn 0 LEVEL_UPDATE_GATES_EVAL
+
+    >LEVEL_UPDATE_GATES_SWITCH_LOOP
+        JUMPGE _si [[_sn]] LEVEL_UPDATE_GATES_EVAL
+        LISTGET SWITCH_CELLS [[_si]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+
+        # box on switch
+        JUMPEQ _tile 2 LEVEL_UPDATE_GATES_SWITCH_NEXT
+
+        # player on switch
+        $LIST_XY [[_cell]] [[LEVEL_W]] _sx _sy
+        JUMPNEQ px [[_sx]] LEVEL_UPDATE_GATES_SWITCH_OFF
+        JUMPNEQ py [[_sy]] LEVEL_UPDATE_GATES_SWITCH_OFF
+        JUMP LEVEL_UPDATE_GATES_SWITCH_NEXT
+
+        >LEVEL_UPDATE_GATES_SWITCH_OFF
+            SETVAR _all_on false
+            JUMP LEVEL_UPDATE_GATES_EVAL
+
+        >LEVEL_UPDATE_GATES_SWITCH_NEXT
+            ADD _si 1
+            JUMP LEVEL_UPDATE_GATES_SWITCH_LOOP
+
+    >LEVEL_UPDATE_GATES_EVAL
+        SETVAR GATES_OPEN [[_all_on]]
+        LISTCOUNT GATE_CELLS _gn
+        SETVAR _gi 0
+
+        JUMPEQ _all_on true LEVEL_UPDATE_GATES_OPEN_LOOP
+        JUMP LEVEL_UPDATE_GATES_CLOSE_LOOP
+
+    >LEVEL_UPDATE_GATES_OPEN_LOOP
+        JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_END
+        LISTGET GATE_CELLS [[_gi]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+        JUMPNEQ _tile 5 LEVEL_UPDATE_GATES_OPEN_VIS
+        LISTSET TILE_TYPES [[_cell]] 0
+
+        >LEVEL_UPDATE_GATES_OPEN_VIS
+            LISTGET GATE_RIDS [[_gi]] _rid
+            JUMPLE _rid 0 LEVEL_UPDATE_GATES_OPEN_NEXT
+            EDIT3D [[_rid]] "Disabled" true
+
+        >LEVEL_UPDATE_GATES_OPEN_NEXT
+            ADD _gi 1
+            JUMP LEVEL_UPDATE_GATES_OPEN_LOOP
+
+    >LEVEL_UPDATE_GATES_CLOSE_LOOP
+        JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_END
+        LISTGET GATE_CELLS [[_gi]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+        # only seal empty open cells, leave boxes (and anything else) alone
+        JUMPNEQ _tile 0 LEVEL_UPDATE_GATES_CLOSE_VIS
+        LISTSET TILE_TYPES [[_cell]] 5
+
+        >LEVEL_UPDATE_GATES_CLOSE_VIS
+            LISTGET GATE_RIDS [[_gi]] _rid
+            JUMPLE _rid 0 LEVEL_UPDATE_GATES_CLOSE_NEXT
+            # show barrier only when the cell is actually a closed gate
+            LISTGET TILE_TYPES [[_cell]] _tile
+            JUMPNEQ _tile 5 LEVEL_UPDATE_GATES_CLOSE_HIDE
+            EDIT3D [[_rid]] "Disabled" false
+            JUMP LEVEL_UPDATE_GATES_CLOSE_NEXT
+
+        >LEVEL_UPDATE_GATES_CLOSE_HIDE
+            EDIT3D [[_rid]] "Disabled" true
+
+        >LEVEL_UPDATE_GATES_CLOSE_NEXT
+            ADD _gi 1
+            JUMP LEVEL_UPDATE_GATES_CLOSE_LOOP
+
+    >LEVEL_UPDATE_GATES_END
+        SETVAR LEVEL_TEMP -1
+        BREAK

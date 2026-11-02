@@ -93,6 +93,10 @@
         >PLAYER_MOVE_WAIT
             WAIT 0.12
             SETVAR PLAYER_MOVING false
+            # switches / gates react after the move settles
+            $LEVEL_UPDATE_GATES
+            # re-read tile in case a gate opened under / near the player
+            $LEVEL_GET [[px]] [[py]] PLAYER_TILE
             # check exit
             JUMPEQ PLAYER_TILE 3 PLAYER_ON_EXIT
             JUMP END

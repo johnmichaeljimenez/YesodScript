@@ -13,9 +13,15 @@
     DEFVAR LEVEL_SPAWN_HERO 0 int
 
     DEFLIST TILE_TYPES int
-    # (0 = none)
+    # (0 floor, 1 wall, 2 box, 3 exit, 4 switch marker during load, 5 closed gate)
     DEFLIST TILE_FLOOR int
     DEFLIST TILE_OBJ int
+
+    # linear cell indices for switches / gates (gates keep a matching render id)
+    DEFLIST SWITCH_CELLS int
+    DEFLIST GATE_CELLS int
+    DEFLIST GATE_RIDS int
+    DEFVAR GATES_OPEN false bool
 
 @LEVEL_INIT <levelname>
     $LEVEL_CLEAR
@@ -47,6 +53,8 @@
         DEFVAR _fromZ 14 int
 
         CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
+        # spawn may sit on a switch — resolve gates with final player pos
+        $LEVEL_UPDATE_GATES
         JUMP LEVEL_INIT_END
 
     >LEVEL_INIT_MISSING

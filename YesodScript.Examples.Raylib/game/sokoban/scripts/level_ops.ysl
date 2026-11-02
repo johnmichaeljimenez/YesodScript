@@ -17,7 +17,9 @@
     JUMPEQ <tile> 1 LEVEL_STEP_BLOCK
     # 2 box: blocked here, player may push via LEVEL_PUSH
     JUMPEQ <tile> 2 LEVEL_STEP_BLOCK
-    # 3 exit is walkable
+    # 5 closed gate blocks
+    JUMPEQ <tile> 5 LEVEL_STEP_BLOCK
+    # 0 floor / 3 exit are walkable
     JUMP LEVEL_STEP_END
 
     >LEVEL_STEP_OOB
@@ -70,11 +72,12 @@
         JUMP LEVEL_PUSH_SCAN
 
     >LEVEL_PUSH_SCAN_DONE
-        # The whole line moves only if its far end is empty.
+        # The whole line moves only if its far end is empty floor/exit (not gate).
         JUMPNEQ _boxCount 0 LEVEL_PUSH_CHECK_END
         JUMP LEVEL_PUSH_END
 
     >LEVEL_PUSH_CHECK_END
+        # empty floor only, closed gates (5) and other tiles block the chain
         JUMPNEQ _scanType 0 LEVEL_PUSH_END
 
         DEFVAR _boxX [[_scanX]] int
@@ -139,6 +142,7 @@
         $LIST_1D [[_rayX]] [[_rayY]] [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
         LISTGET TILE_TYPES [[LEVEL_TEMP]] _rayTile
         JUMPEQ _rayTile 1 LEVEL_FIND_BOX_RAY_END
+        JUMPEQ _rayTile 5 LEVEL_FIND_BOX_RAY_END
         JUMPEQ _rayTile 2 LEVEL_FIND_BOX_RAY_FOUND
 
         ADD _rayX <dx>

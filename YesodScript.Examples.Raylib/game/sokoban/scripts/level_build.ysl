@@ -1,7 +1,9 @@
 ﻿# 0 - floor (walkable island tile)
 # 1 - wall  (collision only)
 # 2 - box   (pushable via LEVEL_PUSH)
-# 3 - exit  (stub)
+# 3 - exit  (walkable goal)
+# 4 - switch (pressure plate, stored in SWITCH_CELLS, tile becomes floor)
+# 5 - gate  (closed barrier, opens when every switch is held)
 
 @_INIT
     DEFVAR CUBE_SCALE 0.666666 float
@@ -11,6 +13,10 @@
     LISTCLEAR TILE_TYPES
     LISTCLEAR TILE_FLOOR
     LISTCLEAR TILE_OBJ
+    LISTCLEAR SWITCH_CELLS
+    LISTCLEAR GATE_CELLS
+    LISTCLEAR GATE_RIDS
+    SETVAR GATES_OPEN false
     SETVAR LEVEL_W 0
     SETVAR LEVEL_H 0
     SETVAR LEVEL_NAME *
@@ -33,8 +39,25 @@
 
 @LEVEL_SET <x> <y> <type>
     $LIST_1D <x> <y> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+
+    # switch: keep as walkable floor, track cell separately so boxes can sit on it
+    JUMPEQ <type> 4 LEVEL_SET_SWITCH
+    # gate: closed barrier tile + tracked cell
+    JUMPEQ <type> 5 LEVEL_SET_GATE
+
     LISTSET TILE_TYPES [[LEVEL_TEMP]] <type>
     BREAK
+
+    >LEVEL_SET_SWITCH
+        LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+        LISTADD SWITCH_CELLS [[LEVEL_TEMP]]
+        BREAK
+
+    >LEVEL_SET_GATE
+        LISTSET TILE_TYPES [[LEVEL_TEMP]] 5
+        LISTADD GATE_CELLS [[LEVEL_TEMP]]
+        LISTADD GATE_RIDS 0
+        BREAK
 
 @LEVEL_BUILD_VISUALS
     DEFVAR _size [[LEVEL_W]] int
@@ -47,6 +70,8 @@
     DEFVAR _rid 0 int
     DEFVAR _orid 0 int
     DEFVAR _floors 0 int
+    DEFVAR _switch_i -1 int
+    DEFVAR _gate_i -1 int
 
     >LEVEL_BUILD_LOOP
         JUMPGE _i [[_size]] LEVEL_BUILD_DONE
@@ -66,12 +91,41 @@
         ADD _floors 1
 
         >LEVEL_BUILD_FLOOR_READY
+            # switch plate tint (cell may already be floor/box after load)
+            LISTFIND SWITCH_CELLS [[_i]] _switch_i
+            JUMPLT _switch_i 0 LEVEL_BUILD_EXIT
+            EDIT3D [[_rid]] "Tint.R" 40
+            EDIT3D [[_rid]] "Tint.G" 180
+            EDIT3D [[_rid]] "Tint.B" 255
+            JUMP LEVEL_BUILD_AFTER_FLOOR
+
+        >LEVEL_BUILD_EXIT
             # exit: green floor
-            JUMPNEQ _type 3 LEVEL_BUILD_BOX
+            JUMPNEQ _type 3 LEVEL_BUILD_AFTER_FLOOR
             EDIT3D [[_rid]] "Tint.R" 80
             EDIT3D [[_rid]] "Tint.G" 220
             EDIT3D [[_rid]] "Tint.B" 100
-            JUMP LEVEL_BUILD_NEXT
+
+        >LEVEL_BUILD_AFTER_FLOOR
+            # closed gate barrier
+            JUMPNEQ _type 5 LEVEL_BUILD_BOX
+
+            LISTFIND GATE_CELLS [[_i]] _gate_i
+            JUMPLT _gate_i 0 LEVEL_BUILD_NEXT
+
+            LISTGET GATE_RIDS [[_gate_i]] _orid
+            JUMPGT _orid 0 LEVEL_BUILD_GATE_TINT
+
+            RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_gate"
+            EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
+            LISTSET GATE_RIDS [[_gate_i]] [[_orid]]
+
+            >LEVEL_BUILD_GATE_TINT
+                EDIT3D [[_orid]] "Tint.R" 200
+                EDIT3D [[_orid]] "Tint.G" 60
+                EDIT3D [[_orid]] "Tint.B" 220
+                EDIT3D [[_orid]] "Disabled" false
+                JUMP LEVEL_BUILD_NEXT
 
         >LEVEL_BUILD_BOX
             JUMPNEQ _type 2 LEVEL_BUILD_NEXT
@@ -94,4 +148,5 @@
             JUMP LEVEL_BUILD_LOOP
 
     >LEVEL_BUILD_DONE
+        $LEVEL_UPDATE_GATES
         BREAK
