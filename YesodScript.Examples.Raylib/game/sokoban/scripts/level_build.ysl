@@ -11,6 +11,7 @@
 @LEVEL_CLEAR
     CLEAR "level*"
     LISTCLEAR TILE_TYPES
+    LISTCLEAR EXIT_CELLS
     LISTCLEAR TILE_FLOOR
     LISTCLEAR TILE_OBJ
     LISTCLEAR SWITCH_CELLS
@@ -46,7 +47,12 @@
     JUMPEQ <type> 5 LEVEL_SET_GATE
 
     LISTSET TILE_TYPES [[LEVEL_TEMP]] <type>
+    JUMPEQ <type> 3 LEVEL_SET_EXIT
     BREAK
+
+    >LEVEL_SET_EXIT
+        LISTADD EXIT_CELLS [[LEVEL_TEMP]]
+        BREAK
 
     >LEVEL_SET_SWITCH
         LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
@@ -71,6 +77,7 @@
     DEFVAR _orid 0 int
     DEFVAR _floors 0 int
     DEFVAR _switch_i -1 int
+    DEFVAR _exit_i -1 int
     DEFVAR _gate_i -1 int
 
     >LEVEL_BUILD_LOOP
@@ -100,8 +107,9 @@
             JUMP LEVEL_BUILD_AFTER_FLOOR
 
         >LEVEL_BUILD_EXIT
-            # exit: green floor
-            JUMPNEQ _type 3 LEVEL_BUILD_AFTER_FLOOR
+            # Keep the exit visible even when a box starts on it.
+            LISTFIND EXIT_CELLS [[_i]] _exit_i
+            JUMPLT _exit_i 0 LEVEL_BUILD_AFTER_FLOOR
             EDIT3D [[_rid]] "Tint.R" 80
             EDIT3D [[_rid]] "Tint.G" 220
             EDIT3D [[_rid]] "Tint.B" 100

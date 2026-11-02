@@ -77,9 +77,12 @@
         JUMP LEVEL_PUSH_END
 
     >LEVEL_PUSH_CHECK_END
-        # empty floor only, closed gates (5) and other tiles block the chain
-        JUMPNEQ _scanType 0 LEVEL_PUSH_END
+        # Only empty floor or an exit can hold the far end of the chain.
+        JUMPEQ _scanType 0 LEVEL_PUSH_SHIFT_START
+        JUMPEQ _scanType 3 LEVEL_PUSH_SHIFT_START
+        JUMP LEVEL_PUSH_END
 
+    >LEVEL_PUSH_SHIFT_START
         DEFVAR _boxX [[_scanX]] int
         DEFVAR _boxY [[_scanY]] int
         SUB _boxX <dx>
@@ -98,7 +101,7 @@
             LISTGET TILE_TYPES [[LEVEL_TEMP]] _from
             JUMPNEQ _from 2 LEVEL_PUSH_END
             LISTGET TILE_OBJ [[LEVEL_TEMP]] _rid
-            LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+            $LEVEL_RESTORE_GROUND [[_boxX]] [[_boxY]]
             LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
 
             SETVAR _destX [[_boxX]]
@@ -178,25 +181,27 @@
     JUMPNEQ _from 2 LEVEL_PULL_END
     LISTGET TILE_OBJ [[LEVEL_TEMP]] _rid
 
-    # dest must be empty (player is vacating it)
+    # dest must be empty or an exit (player is vacating it)
     DEFVAR _to 0 int
     $LIST_1D <tx> <ty> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
     LISTGET TILE_TYPES [[LEVEL_TEMP]] _to
-    JUMPNEQ _to 0 LEVEL_PULL_END
+    JUMPEQ _to 0 LEVEL_PULL_DEST_READY
+    JUMPNEQ _to 3 LEVEL_PULL_END
 
-    # vacate box cell
-    $LIST_1D <bx> <by> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
-    LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
+    >LEVEL_PULL_DEST_READY
+        # vacate box cell
+        $LIST_1D <bx> <by> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+        $LEVEL_RESTORE_GROUND <bx> <by>
+        LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
 
-    # occupy dest
-    $LIST_1D <tx> <ty> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
-    LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
+        # occupy dest
+        $LIST_1D <tx> <ty> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
+        LISTSET TILE_TYPES [[LEVEL_TEMP]] 2
+        LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
 
-    JUMPLE _rid 0 LEVEL_PULL_OK
-    TWEEN3D [[_rid]] "X" <bx> <tx> false 0.12 "QUAD" "box_pull_x" false
-    TWEEN3D [[_rid]] "Y" <by> <ty> false 0.12 "QUAD" "box_pull_y" false
+        JUMPLE _rid 0 LEVEL_PULL_OK
+        TWEEN3D [[_rid]] "X" <bx> <tx> false 0.12 "QUAD" "box_pull_x" false
+        TWEEN3D [[_rid]] "Y" <by> <ty> false 0.12 "QUAD" "box_pull_y" false
 
     >LEVEL_PULL_OK
         SETVAR <ok> true
@@ -227,7 +232,7 @@
 
     # vacate box cell (player will occupy it)
     $LIST_1D <bx> <by> [[LEVEL_W]] [[LEVEL_H]] LEVEL_TEMP
-    LISTSET TILE_TYPES [[LEVEL_TEMP]] 0
+    $LEVEL_RESTORE_GROUND <bx> <by>
     LISTSET TILE_OBJ [[LEVEL_TEMP]] 0
 
     # place box at player old cell

@@ -17,7 +17,8 @@
     DEFLIST TILE_FLOOR int
     DEFLIST TILE_OBJ int
 
-    # linear cell indices for switches / gates (gates keep a matching render id)
+    # linear cell indices for exits, switches and gates
+    DEFLIST EXIT_CELLS int
     DEFLIST SWITCH_CELLS int
     DEFLIST GATE_CELLS int
     DEFLIST GATE_RIDS int
