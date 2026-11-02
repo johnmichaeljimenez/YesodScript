@@ -42,8 +42,25 @@
         LISTCOUNT <gates> _gn
         SETVAR _gi 0
 
-        JUMPEQ _all_on true LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
-        JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_LOOP
+        DEFVAR _juice_color 0 int
+        JUMPEQ <gate_type> 7 LEVEL_UPDATE_GATES_COLOR_JUICE_PURPLE
+        JUMP LEVEL_UPDATE_GATES_COLOR_JUICE_TRANS
+
+        >LEVEL_UPDATE_GATES_COLOR_JUICE_PURPLE
+            SETVAR _juice_color 1
+
+        >LEVEL_UPDATE_GATES_COLOR_JUICE_TRANS
+            JUMPEQ _all_on [[_was_open]] LEVEL_UPDATE_GATES_COLOR_BRANCH
+            JUMPEQ _all_on true LEVEL_UPDATE_GATES_COLOR_JUICE_OPEN
+            CALL "ON_GATE_CLOSE [[_juice_color]]"
+            JUMP LEVEL_UPDATE_GATES_COLOR_BRANCH
+
+            >LEVEL_UPDATE_GATES_COLOR_JUICE_OPEN
+                CALL "ON_GATE_OPEN [[_juice_color]]"
+
+        >LEVEL_UPDATE_GATES_COLOR_BRANCH
+            JUMPEQ _all_on true LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
+            JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_LOOP
 
     >LEVEL_UPDATE_GATES_COLOR_OPEN_LOOP
         JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_COLOR_END
@@ -55,7 +72,7 @@
         >LEVEL_UPDATE_GATES_COLOR_OPEN_VIS
             LISTGET <rids> [[_gi]] _rid
             JUMPLE _rid 0 LEVEL_UPDATE_GATES_COLOR_OPEN_NEXT
-            EDIT3D [[_rid]] "Disabled" true
+            CALL "ON_GATE_HIDE [[_rid]]"
 
         >LEVEL_UPDATE_GATES_COLOR_OPEN_NEXT
             ADD _gi 1
@@ -73,8 +90,8 @@
         JUMPNEQ _tile 2 LEVEL_UPDATE_GATES_COLOR_CLOSE_VIS
         LISTGET TILE_OBJ [[_cell]] _orid
         JUMPLE _orid 0 LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
-        # hide crushed box / inactive hero mesh
-        EDIT3D [[_orid]] "Disabled" true
+        $LIST_XY [[_cell]] [[LEVEL_W]] _sx _sy
+        CALL "ON_BOX_DEATH [[_orid]] [[_sx]] [[_sy]]"
         LISTSET TILE_OBJ [[_cell]] 0
         JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_SEAL
 
@@ -87,11 +104,11 @@
             # show barrier only when the cell is actually a closed gate
             LISTGET TILE_TYPES [[_cell]] _tile
             JUMPNEQ _tile <gate_type> LEVEL_UPDATE_GATES_COLOR_CLOSE_HIDE
-            EDIT3D [[_rid]] "Disabled" false
+            CALL "ON_GATE_SHOW [[_rid]]"
             JUMP LEVEL_UPDATE_GATES_COLOR_CLOSE_NEXT
 
         >LEVEL_UPDATE_GATES_COLOR_CLOSE_HIDE
-            EDIT3D [[_rid]] "Disabled" true
+            CALL "ON_GATE_HIDE [[_rid]]"
 
         >LEVEL_UPDATE_GATES_COLOR_CLOSE_NEXT
             ADD _gi 1

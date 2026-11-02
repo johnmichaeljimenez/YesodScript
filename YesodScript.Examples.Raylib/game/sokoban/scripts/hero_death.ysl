@@ -51,7 +51,7 @@
         BREAK
 
 @HERO_DIE
-    PRINT "Crushed by a gate!"
+    CALL "ON_HERO_DEATH"
     SETVAR PLAYER_MOVING false
     WAIT 0.4
     $LEVEL_INIT [[LEVEL_NAME]]

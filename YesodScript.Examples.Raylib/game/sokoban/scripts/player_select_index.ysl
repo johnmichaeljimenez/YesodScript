@@ -10,9 +10,9 @@
 
     $HERO_PLACE_INACTIVE [[HERO_ACTIVE]]
     $HERO_LIFT_INACTIVE <index>
-    $HERO_ACTIVATE <index> true
-    CALL "HERO_SELECTED [[HERO_TYPE]]"
-    $LEVEL_UPDATE_GATES
+    CALL "HERO_ACTIVATE <index> true"
+    CALL "ON_HERO_SELECT [[HERO_TYPE]] <index>"
+    CALL "LEVEL_UPDATE_GATES"
 
     DEFVAR _dead false bool
     $HERO_CHECK_GATE_DEATH _dead
@@ -21,7 +21,7 @@
     DEFVAR _all_exit false bool
     $HERO_CHECK_ALL_ON_EXIT _all_exit
     JUMPEQ _all_exit false PLAYER_SELECT_INDEX_END
-    PRINT "All heroes on exits!"
+    CALL "ON_EXIT"
     $LEVEL_NEXT
     JUMP PLAYER_SELECT_INDEX_END
 

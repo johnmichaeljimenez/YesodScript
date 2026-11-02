@@ -275,28 +275,23 @@
             RENDER3D [[UNDO_X]] [[UNDO_Y]] 0 "cube" UNDO_RID "level_floor"
             EDIT3D [[UNDO_RID]] "Scale" [[CUBE_SCALE]]
             LISTSET TILE_FLOOR [[UNDO_I]] [[UNDO_RID]]
+            CALL "ON_TILE_FLOOR [[UNDO_RID]] [[UNDO_X]] [[UNDO_Y]]"
 
             LISTFIND SWITCH_YELLOW_CELLS [[UNDO_I]] UNDO_SWITCH_I
             JUMPLT UNDO_SWITCH_I 0 UNDO_BUILD_SWITCH_PURPLE
-            EDIT3D [[UNDO_RID]] "Tint.R" 240
-            EDIT3D [[UNDO_RID]] "Tint.G" 200
-            EDIT3D [[UNDO_RID]] "Tint.B" 40
+            CALL "ON_TILE_SWITCH [[UNDO_RID]] [[UNDO_X]] [[UNDO_Y]] 0"
             JUMP UNDO_BUILD_AFTER_FLOOR
 
             >UNDO_BUILD_SWITCH_PURPLE
                 LISTFIND SWITCH_PURPLE_CELLS [[UNDO_I]] UNDO_SWITCH_I
                 JUMPLT UNDO_SWITCH_I 0 UNDO_BUILD_EXIT
-                EDIT3D [[UNDO_RID]] "Tint.R" 170
-                EDIT3D [[UNDO_RID]] "Tint.G" 70
-                EDIT3D [[UNDO_RID]] "Tint.B" 230
+                CALL "ON_TILE_SWITCH [[UNDO_RID]] [[UNDO_X]] [[UNDO_Y]] 1"
                 JUMP UNDO_BUILD_AFTER_FLOOR
 
             >UNDO_BUILD_EXIT
                 LISTFIND EXIT_CELLS [[UNDO_I]] UNDO_EXIT_I
                 JUMPLT UNDO_EXIT_I 0 UNDO_BUILD_AFTER_FLOOR
-                EDIT3D [[UNDO_RID]] "Tint.R" 80
-                EDIT3D [[UNDO_RID]] "Tint.G" 220
-                EDIT3D [[UNDO_RID]] "Tint.B" 100
+                CALL "ON_TILE_EXIT [[UNDO_RID]] [[UNDO_X]] [[UNDO_Y]]"
 
             >UNDO_BUILD_AFTER_FLOOR
                 JUMPNEQ UNDO_TYPE 2 UNDO_BUILD_NEXT
@@ -320,10 +315,8 @@
                     JUMPEQ UNDO_HAS_HERO true UNDO_BUILD_NEXT
                     RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_obj"
                     EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
-                    EDIT3D [[UNDO_ORID]] "Tint.R" 255
-                    EDIT3D [[UNDO_ORID]] "Tint.G" 140
-                    EDIT3D [[UNDO_ORID]] "Tint.B" 40
                     LISTSET TILE_OBJ [[UNDO_I]] [[UNDO_ORID]]
+                    CALL "ON_TILE_BOX [[UNDO_ORID]] [[UNDO_X]] [[UNDO_Y]]"
 
             >UNDO_BUILD_NEXT
                 ADD UNDO_I 1
@@ -338,16 +331,13 @@
                 $LIST_XY [[UNDO_CELL]] [[LEVEL_W]] UNDO_X UNDO_Y
                 RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_gate"
                 EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
-                EDIT3D [[UNDO_ORID]] "Tint.R" 240
-                EDIT3D [[UNDO_ORID]] "Tint.G" 190
-                EDIT3D [[UNDO_ORID]] "Tint.B" 30
                 LISTSET GATE_YELLOW_RIDS [[UNDO_I]] [[UNDO_ORID]]
                 LISTGET TILE_TYPES [[UNDO_CELL]] UNDO_V
-                JUMPNEQ UNDO_V 5 UNDO_BUILD_GATES_Y_HIDE
-                EDIT3D [[UNDO_ORID]] "Disabled" false
+                JUMPNEQ UNDO_V 5 UNDO_BUILD_GATES_Y_OPEN
+                CALL "ON_TILE_GATE [[UNDO_ORID]] [[UNDO_X]] [[UNDO_Y]] 0 false"
                 JUMP UNDO_BUILD_GATES_Y_NEXT
-                >UNDO_BUILD_GATES_Y_HIDE
-                    EDIT3D [[UNDO_ORID]] "Disabled" true
+                >UNDO_BUILD_GATES_Y_OPEN
+                    CALL "ON_TILE_GATE [[UNDO_ORID]] [[UNDO_X]] [[UNDO_Y]] 0 true"
                 >UNDO_BUILD_GATES_Y_NEXT
                     ADD UNDO_I 1
                     JUMP UNDO_BUILD_GATES_Y_LOOP
@@ -361,16 +351,13 @@
                 $LIST_XY [[UNDO_CELL]] [[LEVEL_W]] UNDO_X UNDO_Y
                 RENDER3D [[UNDO_X]] [[UNDO_Y]] 1 "cube" UNDO_ORID "level_gate"
                 EDIT3D [[UNDO_ORID]] "Scale" [[CUBE_SCALE]]
-                EDIT3D [[UNDO_ORID]] "Tint.R" 180
-                EDIT3D [[UNDO_ORID]] "Tint.G" 50
-                EDIT3D [[UNDO_ORID]] "Tint.B" 220
                 LISTSET GATE_PURPLE_RIDS [[UNDO_I]] [[UNDO_ORID]]
                 LISTGET TILE_TYPES [[UNDO_CELL]] UNDO_V
-                JUMPNEQ UNDO_V 7 UNDO_BUILD_GATES_P_HIDE
-                EDIT3D [[UNDO_ORID]] "Disabled" false
+                JUMPNEQ UNDO_V 7 UNDO_BUILD_GATES_P_OPEN
+                CALL "ON_TILE_GATE [[UNDO_ORID]] [[UNDO_X]] [[UNDO_Y]] 1 false"
                 JUMP UNDO_BUILD_GATES_P_NEXT
-                >UNDO_BUILD_GATES_P_HIDE
-                    EDIT3D [[UNDO_ORID]] "Disabled" true
+                >UNDO_BUILD_GATES_P_OPEN
+                    CALL "ON_TILE_GATE [[UNDO_ORID]] [[UNDO_X]] [[UNDO_Y]] 1 true"
                 >UNDO_BUILD_GATES_P_NEXT
                     ADD UNDO_I 1
                     JUMP UNDO_BUILD_GATES_P_LOOP
@@ -387,7 +374,7 @@
                 RENDER3D [[UNDO_HX]] [[UNDO_HY]] 1 "kaykit" UNDO_RID "player"
                 ANIM3D UNDO_RID "Idle_A" true
                 EDIT3D [[UNDO_RID]] "Rotation" [[UNDO_TEMP]]
-                $HERO_APPLY_TINT [[UNDO_RID]] [[UNDO_V]] false
+                CALL "ON_HERO_SPAWN [[UNDO_RID]] [[UNDO_V]] [[UNDO_HX]] [[UNDO_HY]]"
                 LISTADD HERO_RIDS [[UNDO_RID]]
                 JUMPEQ UNDO_I [[HERO_ACTIVE]] UNDO_BUILD_HEROES_NEXT
                 $HERO_PLACE_INACTIVE [[UNDO_I]]
@@ -396,13 +383,13 @@
                     JUMP UNDO_BUILD_HEROES_LOOP
 
             >UNDO_BUILD_ACTIVATE
-                $HERO_ACTIVATE [[HERO_ACTIVE]] false
+                CALL "HERO_ACTIVATE [[HERO_ACTIVE]] false"
                 SETVAR GATES_LETHAL true
-                PRINT "Undo"
+                CALL "ON_UNDO"
                 BREAK
 
     >UNDO_POP_EMPTY
-        PRINT "Nothing to undo"
+        CALL "ON_UNDO_EMPTY"
         BREAK
 
     >UNDO_POP_BUSY

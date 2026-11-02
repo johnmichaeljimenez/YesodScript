@@ -41,7 +41,7 @@
 
     PRINT "LOADING LEVEL '<levelname>'"
     CALL "LEVELDATA:<levelname>" LEVEL_INIT_MISSING
-    $LEVEL_BUILD_VISUALS
+    CALL "LEVEL_BUILD_VISUALS"
 
     #aim camera at level center
     DEFVAR _cx [[LEVEL_W]] int
@@ -55,7 +55,7 @@
 
     CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
 
-    $HEROES_INIT
+    CALL "HEROES_INIT"
     JUMP LEVEL_INIT_END
 
     >LEVEL_INIT_MISSING

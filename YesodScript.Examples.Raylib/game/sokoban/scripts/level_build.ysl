@@ -126,29 +126,25 @@
         ADD _floors 1
 
         >LEVEL_BUILD_FLOOR_READY
+            CALL "ON_TILE_FLOOR [[_rid]] [[_x]] [[_y]]"
+
             # yellow switch plate
             LISTFIND SWITCH_YELLOW_CELLS [[_i]] _switch_i
             JUMPLT _switch_i 0 LEVEL_BUILD_SWITCH_PURPLE
-            EDIT3D [[_rid]] "Tint.R" 240
-            EDIT3D [[_rid]] "Tint.G" 200
-            EDIT3D [[_rid]] "Tint.B" 40
+            CALL "ON_TILE_SWITCH [[_rid]] [[_x]] [[_y]] 0"
             JUMP LEVEL_BUILD_AFTER_FLOOR
 
         >LEVEL_BUILD_SWITCH_PURPLE
             LISTFIND SWITCH_PURPLE_CELLS [[_i]] _switch_i
             JUMPLT _switch_i 0 LEVEL_BUILD_EXIT
-            EDIT3D [[_rid]] "Tint.R" 170
-            EDIT3D [[_rid]] "Tint.G" 70
-            EDIT3D [[_rid]] "Tint.B" 230
+            CALL "ON_TILE_SWITCH [[_rid]] [[_x]] [[_y]] 1"
             JUMP LEVEL_BUILD_AFTER_FLOOR
 
         >LEVEL_BUILD_EXIT
             # Keep the exit visible even when a box starts on it.
             LISTFIND EXIT_CELLS [[_i]] _exit_i
             JUMPLT _exit_i 0 LEVEL_BUILD_AFTER_FLOOR
-            EDIT3D [[_rid]] "Tint.R" 80
-            EDIT3D [[_rid]] "Tint.G" 220
-            EDIT3D [[_rid]] "Tint.B" 100
+            CALL "ON_TILE_EXIT [[_rid]] [[_x]] [[_y]]"
 
         >LEVEL_BUILD_AFTER_FLOOR
             # yellow closed gate barrier
@@ -162,17 +158,14 @@
             JUMPLT _gate_i 0 LEVEL_BUILD_NEXT
 
             LISTGET GATE_YELLOW_RIDS [[_gate_i]] _orid
-            JUMPGT _orid 0 LEVEL_BUILD_GATE_YELLOW_TINT
+            JUMPGT _orid 0 LEVEL_BUILD_GATE_YELLOW_JUICE
 
             RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_gate"
             EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
             LISTSET GATE_YELLOW_RIDS [[_gate_i]] [[_orid]]
 
-            >LEVEL_BUILD_GATE_YELLOW_TINT
-                EDIT3D [[_orid]] "Tint.R" 240
-                EDIT3D [[_orid]] "Tint.G" 190
-                EDIT3D [[_orid]] "Tint.B" 30
-                EDIT3D [[_orid]] "Disabled" false
+            >LEVEL_BUILD_GATE_YELLOW_JUICE
+                CALL "ON_TILE_GATE [[_orid]] [[_x]] [[_y]] 0 false"
                 JUMP LEVEL_BUILD_NEXT
 
         >LEVEL_BUILD_GATE_PURPLE
@@ -180,33 +173,28 @@
             JUMPLT _gate_i 0 LEVEL_BUILD_NEXT
 
             LISTGET GATE_PURPLE_RIDS [[_gate_i]] _orid
-            JUMPGT _orid 0 LEVEL_BUILD_GATE_PURPLE_TINT
+            JUMPGT _orid 0 LEVEL_BUILD_GATE_PURPLE_JUICE
 
             RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_gate"
             EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
             LISTSET GATE_PURPLE_RIDS [[_gate_i]] [[_orid]]
 
-            >LEVEL_BUILD_GATE_PURPLE_TINT
-                EDIT3D [[_orid]] "Tint.R" 180
-                EDIT3D [[_orid]] "Tint.G" 50
-                EDIT3D [[_orid]] "Tint.B" 220
-                EDIT3D [[_orid]] "Disabled" false
+            >LEVEL_BUILD_GATE_PURPLE_JUICE
+                CALL "ON_TILE_GATE [[_orid]] [[_x]] [[_y]] 1 false"
                 JUMP LEVEL_BUILD_NEXT
 
         >LEVEL_BUILD_BOX
             JUMPNEQ _type 2 LEVEL_BUILD_NEXT
 
             LISTGET TILE_OBJ [[_i]] _orid
-            JUMPGT _orid 0 LEVEL_BUILD_BOX_TINT
+            JUMPGT _orid 0 LEVEL_BUILD_BOX_JUICE
 
             RENDER3D [[_x]] [[_y]] 1 "cube" _orid "level_obj"
             EDIT3D [[_orid]] "Scale" [[CUBE_SCALE]]
             LISTSET TILE_OBJ [[_i]] [[_orid]]
 
-            >LEVEL_BUILD_BOX_TINT
-                EDIT3D [[_orid]] "Tint.R" 255
-                EDIT3D [[_orid]] "Tint.G" 140
-                EDIT3D [[_orid]] "Tint.B" 40
+            >LEVEL_BUILD_BOX_JUICE
+                CALL "ON_TILE_BOX [[_orid]] [[_x]] [[_y]]"
                 JUMP LEVEL_BUILD_NEXT
 
         >LEVEL_BUILD_NEXT
@@ -214,5 +202,5 @@
             JUMP LEVEL_BUILD_LOOP
 
     >LEVEL_BUILD_DONE
-        $LEVEL_UPDATE_GATES
+        CALL "LEVEL_UPDATE_GATES"
         BREAK

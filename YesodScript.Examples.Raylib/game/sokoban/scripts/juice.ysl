@@ -1,0 +1,172 @@
+@HERO_APPLY_TINT <rid> <type> <announce>
+    JUMPEQ <type> 0 HERO_TINT_WARRIOR
+    JUMPEQ <type> 1 HERO_TINT_THIEF
+    JUMPEQ <type> 2 HERO_TINT_WIZARD
+    JUMP HERO_TINT_DONE
+
+    >HERO_TINT_WARRIOR
+        EDIT3D <rid> "Tint.R" 255
+        EDIT3D <rid> "Tint.G" 80
+        EDIT3D <rid> "Tint.B" 80
+        JUMPEQ <announce> false HERO_TINT_DONE
+        PRINT "Hero: WARRIOR (multi-box push)"
+        JUMP HERO_TINT_DONE
+
+    >HERO_TINT_THIEF
+        EDIT3D <rid> "Tint.R" 80
+        EDIT3D <rid> "Tint.G" 220
+        EDIT3D <rid> "Tint.B" 80
+        JUMPEQ <announce> false HERO_TINT_DONE
+        PRINT "Hero: THIEF (pull)"
+        JUMP HERO_TINT_DONE
+
+    >HERO_TINT_WIZARD
+        EDIT3D <rid> "Tint.R" 80
+        EDIT3D <rid> "Tint.G" 10
+        EDIT3D <rid> "Tint.B" 255
+        JUMPEQ <announce> false HERO_TINT_DONE
+        PRINT "Hero: WIZARD (swap)"
+        JUMP HERO_TINT_DONE
+
+    >HERO_TINT_DONE
+        BREAK
+
+@ON_TILE_FLOOR <rid> <x> <y>
+    PRINT "ON_TILE_FLOOR <rid> @ <x>,<y>"
+    BREAK
+
+@ON_TILE_SWITCH <rid> <x> <y> <color>
+    JUMPEQ <color> 1 ON_TILE_SWITCH_PURPLE
+    EDIT3D <rid> "Tint.R" 240
+    EDIT3D <rid> "Tint.G" 200
+    EDIT3D <rid> "Tint.B" 40
+    PRINT "ON_TILE_SWITCH yellow <rid> @ <x>,<y>"
+    BREAK
+
+    >ON_TILE_SWITCH_PURPLE
+        EDIT3D <rid> "Tint.R" 170
+        EDIT3D <rid> "Tint.G" 70
+        EDIT3D <rid> "Tint.B" 230
+        PRINT "ON_TILE_SWITCH purple <rid> @ <x>,<y>"
+        BREAK
+
+@ON_TILE_EXIT <rid> <x> <y>
+    EDIT3D <rid> "Tint.R" 80
+    EDIT3D <rid> "Tint.G" 220
+    EDIT3D <rid> "Tint.B" 100
+    PRINT "ON_TILE_EXIT <rid> @ <x>,<y>"
+    BREAK
+
+@ON_TILE_GATE <rid> <x> <y> <color> <disabled>
+    JUMPEQ <color> 1 ON_TILE_GATE_PURPLE
+    EDIT3D <rid> "Tint.R" 240
+    EDIT3D <rid> "Tint.G" 190
+    EDIT3D <rid> "Tint.B" 30
+    JUMP ON_TILE_GATE_APPLY
+
+    >ON_TILE_GATE_PURPLE
+        EDIT3D <rid> "Tint.R" 180
+        EDIT3D <rid> "Tint.G" 50
+        EDIT3D <rid> "Tint.B" 220
+
+    >ON_TILE_GATE_APPLY
+        EDIT3D <rid> "Disabled" <disabled>
+        PRINT "ON_TILE_GATE color=<color> disabled=<disabled> <rid> @ <x>,<y>"
+        BREAK
+
+@ON_TILE_BOX <rid> <x> <y>
+    EDIT3D <rid> "Tint.R" 255
+    EDIT3D <rid> "Tint.G" 140
+    EDIT3D <rid> "Tint.B" 40
+    PRINT "ON_TILE_BOX <rid> @ <x>,<y>"
+    BREAK
+
+@ON_HERO_SPAWN <rid> <type> <x> <y>
+    JUMPEQ <type> 0 ON_HERO_SPAWN_WARRIOR
+    JUMPEQ <type> 1 ON_HERO_SPAWN_THIEF
+    JUMPEQ <type> 2 ON_HERO_SPAWN_WIZARD
+    JUMP ON_HERO_SPAWN_DONE
+
+    >ON_HERO_SPAWN_WARRIOR
+        EDIT3D <rid> "Tint.R" 255
+        EDIT3D <rid> "Tint.G" 80
+        EDIT3D <rid> "Tint.B" 80
+        JUMP ON_HERO_SPAWN_DONE
+
+    >ON_HERO_SPAWN_THIEF
+        EDIT3D <rid> "Tint.R" 80
+        EDIT3D <rid> "Tint.G" 220
+        EDIT3D <rid> "Tint.B" 80
+        JUMP ON_HERO_SPAWN_DONE
+
+    >ON_HERO_SPAWN_WIZARD
+        EDIT3D <rid> "Tint.R" 80
+        EDIT3D <rid> "Tint.G" 10
+        EDIT3D <rid> "Tint.B" 255
+
+    >ON_HERO_SPAWN_DONE
+        PRINT "ON_HERO_SPAWN type=<type> <rid> @ <x>,<y>"
+        BREAK
+
+@ON_RESTART
+    PRINT "ON_RESTART"
+    BREAK
+
+@ON_UNDO
+    PRINT "ON_UNDO"
+    BREAK
+
+@ON_UNDO_EMPTY
+    PRINT "ON_UNDO_EMPTY"
+    BREAK
+
+@ON_HERO_SELECT <type> <index>
+    PRINT "ON_HERO_SELECT type=<type> index=<index>"
+    BREAK
+
+@ON_HERO_DEATH
+    PRINT "ON_HERO_DEATH"
+    BREAK
+
+@ON_BOX_DEATH <rid> <x> <y>
+    EDIT3D <rid> "Disabled" true
+    PRINT "ON_BOX_DEATH <rid> @ <x>,<y>"
+    BREAK
+
+@ON_GATE_OPEN <color>
+    PRINT "ON_GATE_OPEN color=<color>"
+    BREAK
+
+@ON_GATE_CLOSE <color>
+    PRINT "ON_GATE_CLOSE color=<color>"
+    BREAK
+
+@ON_GATE_SHOW <rid>
+    EDIT3D <rid> "Disabled" false
+    PRINT "ON_GATE_SHOW <rid>"
+    BREAK
+
+@ON_GATE_HIDE <rid>
+    EDIT3D <rid> "Disabled" true
+    PRINT "ON_GATE_HIDE <rid>"
+    BREAK
+
+@ON_EXIT
+    PRINT "ON_EXIT"
+    BREAK
+
+@ON_VICTORY
+    PRINT "ON_VICTORY"
+    BREAK
+
+@ON_PUSH
+    PRINT "ON_PUSH"
+    BREAK
+
+@ON_PULL
+    PRINT "ON_PULL"
+    BREAK
+
+@ON_SWAP
+    PRINT "ON_SWAP"
+    BREAK

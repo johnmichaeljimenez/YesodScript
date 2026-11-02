@@ -7,5 +7,5 @@
     BREAK
 
 @PLAYER_APPLY_TINT
-    $HERO_APPLY_TINT [[character]] [[HERO_TYPE]] true
+    CALL "HERO_APPLY_TINT [[character]] [[HERO_TYPE]] true"
     BREAK

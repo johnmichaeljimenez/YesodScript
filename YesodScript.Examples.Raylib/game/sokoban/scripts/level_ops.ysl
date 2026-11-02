@@ -260,11 +260,10 @@
     JUMPGT LEVEL_INDEX LEVEL_COUNT LEVEL_NEXT_WIN
 
     $LEVEL_LOAD_CURRENT
-    PRINT "Next level!"
     JUMP LEVEL_NEXT_DONE
 
     >LEVEL_NEXT_WIN
-        PRINT "All levels complete! Victory!"
+        CALL "ON_VICTORY"
 
     >LEVEL_NEXT_DONE
         BREAK

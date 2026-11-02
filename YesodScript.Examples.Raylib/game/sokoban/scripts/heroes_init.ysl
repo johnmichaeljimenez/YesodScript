@@ -41,7 +41,7 @@
             RENDER3D [[_sx]] [[_sy]] 1 "kaykit" _rid "player"
             ANIM3D _rid "Idle_A" true
             EDIT3D [[_rid]] "Rotation" 0
-            $HERO_APPLY_TINT [[_rid]] [[_stype]] false
+            CALL "ON_HERO_SPAWN [[_rid]] [[_stype]] [[_sx]] [[_sy]]"
 
             LISTADD HERO_XS [[_sx]]
             LISTADD HERO_YS [[_sy]]
@@ -68,8 +68,8 @@
                     JUMP HEROES_INIT_PARK_LOOP
 
             >HEROES_INIT_ACTIVATE
-                $HERO_ACTIVATE [[HERO_ACTIVE]] true
-                $LEVEL_UPDATE_GATES
+                CALL "HERO_ACTIVATE [[HERO_ACTIVE]] true"
+                CALL "LEVEL_UPDATE_GATES"
                 
                 SETVAR GATES_LETHAL true
                 JUMPLE HERO_COUNT 1 HEROES_INIT_END

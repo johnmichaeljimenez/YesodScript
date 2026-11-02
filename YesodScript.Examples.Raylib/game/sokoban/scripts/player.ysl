@@ -51,6 +51,7 @@
             SETVAR _toY [[_swapY]]
             SETVAR PLAYER_BLOCKED false
             SETVAR PLAYER_TILE 2
+            CALL "ON_SWAP"
             JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_STEP
@@ -70,7 +71,12 @@
         SUB _by <y>
         DEFVAR _pull_ok false bool
         $LEVEL_PULL [[_bx]] [[_by]] [[px]] [[py]] _pull_ok
+        JUMPEQ _pull_ok true PLAYER_MOVE_THIEF_PULL_OK
         JUMP PLAYER_MOVE_GO
+
+        >PLAYER_MOVE_THIEF_PULL_OK
+            CALL "ON_PULL"
+            JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_BLOCKED_CASE
         JUMPEQ PLAYER_TILE 2 PLAYER_MOVE_ON_BOX
@@ -89,7 +95,7 @@
         JUMP END
 
         >PLAYER_MOVE_WARRIOR_OK
-            PRINT "PUSH"
+            CALL "ON_PUSH"
             JUMP PLAYER_MOVE_GO
 
     >PLAYER_MOVE_GO
@@ -112,7 +118,7 @@
         >PLAYER_MOVE_WAIT
             WAIT 0.12
             SETVAR PLAYER_MOVING false
-            $LEVEL_UPDATE_GATES
+            CALL "LEVEL_UPDATE_GATES"
             DEFVAR _dead false bool
             $HERO_CHECK_GATE_DEATH _dead
             JUMPEQ _dead true TO_DEATH
@@ -129,7 +135,7 @@
         BREAK
 
     >TO_EXIT
-        PRINT "All heroes on exits!"
+        CALL "ON_EXIT"
         WAITFRAME
         $LEVEL_NEXT
 

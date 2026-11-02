@@ -21,7 +21,7 @@
     >RESTART
         $UNDO_PUSH
         $LEVEL_INIT [[LEVEL_NAME]]
-        PRINT "Restarted level"
+        CALL "ON_RESTART"
         JUMP AFTER
 
     >UNDO
