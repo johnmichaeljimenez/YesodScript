@@ -70,6 +70,8 @@
             >HEROES_INIT_ACTIVATE
                 $HERO_ACTIVATE [[HERO_ACTIVE]] true
                 $LEVEL_UPDATE_GATES
+                
+                SETVAR GATES_LETHAL true
                 JUMPLE HERO_COUNT 1 HEROES_INIT_END
                 PRINT "Press X to switch heroes (inactive = pushable blocks)"
 

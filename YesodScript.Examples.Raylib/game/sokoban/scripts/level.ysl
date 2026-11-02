@@ -27,6 +27,7 @@
     DEFLIST GATE_CELLS int
     DEFLIST GATE_RIDS int
     DEFVAR GATES_OPEN false bool
+    DEFVAR GATES_LETHAL false bool
 
 @LEVEL_INIT <levelname>
     $LEVEL_CLEAR

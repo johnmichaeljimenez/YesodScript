@@ -1,6 +1,10 @@
-# All gates open only while every switch is held by a box or the player.
+﻿# All gates open only while every switch is held by a box or the player.
 # Opening clears closed-gate tiles (5 -> 0). Closing restores empty open cells (0 -> 5).
 # A box sitting on an open gate keeps type 2 until it leaves; then close can apply.
+# Inactive heroes are type 2. When gates transition open -> closed they get sealed over
+# and crushed; ordinary boxes still prop the gate open.
+# The active player does not occupy the tile grid — empty gate cells seal under them
+# (tile becomes 5). HERO_CHECK_GATE_DEATH treats that as a crush.
 @LEVEL_UPDATE_GATES
     DEFVAR _all_on true bool
     DEFVAR _si 0 int
@@ -12,6 +16,9 @@
     DEFVAR _gi 0 int
     DEFVAR _gn 0 int
     DEFVAR _rid 0 int
+    DEFVAR _orid 0 int
+    DEFVAR _hero_i -1 int
+    DEFVAR _was_open [[GATES_OPEN]] bool
 
     LISTCOUNT SWITCH_CELLS _sn
     JUMPEQ _sn 0 LEVEL_UPDATE_GATES_EVAL
@@ -66,9 +73,19 @@
         JUMPGE _gi [[_gn]] LEVEL_UPDATE_GATES_END
         LISTGET GATE_CELLS [[_gi]] _cell
         LISTGET TILE_TYPES [[_cell]] _tile
-        # only seal empty open cells, leave boxes (and anything else) alone
-        JUMPNEQ _tile 0 LEVEL_UPDATE_GATES_CLOSE_VIS
-        LISTSET TILE_TYPES [[_cell]] 5
+        # seal empty open cells under the active player (or vacant floor)
+        JUMPEQ _tile 0 LEVEL_UPDATE_GATES_CLOSE_SEAL
+        # inactive hero crush only when gates just transitioned open -> closed
+        JUMPEQ GATES_LETHAL false LEVEL_UPDATE_GATES_CLOSE_VIS
+        JUMPEQ _was_open false LEVEL_UPDATE_GATES_CLOSE_VIS
+        JUMPNEQ _tile 2 LEVEL_UPDATE_GATES_CLOSE_VIS
+        LISTGET TILE_OBJ [[_cell]] _orid
+        $HERO_RID_INDEX [[_orid]] _hero_i
+        JUMPLT _hero_i 0 LEVEL_UPDATE_GATES_CLOSE_VIS
+        LISTSET TILE_OBJ [[_cell]] 0
+
+        >LEVEL_UPDATE_GATES_CLOSE_SEAL
+            LISTSET TILE_TYPES [[_cell]] 5
 
         >LEVEL_UPDATE_GATES_CLOSE_VIS
             LISTGET GATE_RIDS [[_gi]] _rid

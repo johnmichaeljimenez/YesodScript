@@ -102,6 +102,9 @@
             SETVAR PLAYER_MOVING false
             # switches / gates react after the move settles
             $LEVEL_UPDATE_GATES
+            DEFVAR _dead false bool
+            $HERO_CHECK_GATE_DEATH _dead
+            JUMPEQ _dead true TO_DEATH
             # re-read tile in case a gate opened under / near the player
             $LEVEL_GET [[px]] [[py]] PLAYER_TILE
             # win only when every hero is on an exit
@@ -110,6 +113,10 @@
 
     >END
         JUMPEQ _exit true TO_EXIT
+        BREAK
+
+    >TO_DEATH
+        $HERO_DIE
         BREAK
 
     >TO_EXIT

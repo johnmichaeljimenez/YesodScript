@@ -468,7 +468,7 @@
 						},
 						{
 							"__identifier": "Player_Start",
-							"__grid": [2,2],
+							"__grid": [1,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 4, "x": 48, "y": 992, "w": 16, "h": 16 },
@@ -477,12 +477,12 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 2,
-							"px": [32,32],
+							"px": [16,32],
 							"fieldInstances": [{ "__identifier": "HeroType", "__type": "LocalEnum.HeroType", "__value": "Thief", "__tile": { "tilesetUid": 4, "x": 48, "y": 992, "w": 16, "h": 16 }, "defUid": 9, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Thief"]
 							}] }],
-							"__worldX": 32,
+							"__worldX": 16,
 							"__worldY": 32
 						},
 						{
@@ -503,6 +503,38 @@
 							}] }],
 							"__worldX": 16,
 							"__worldY": 48
+						},
+						{
+							"__identifier": "Gate",
+							"__grid": [4,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 4, "x": 272, "y": 128, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "fa7f9d80-bde0-11f1-8873-9d8e56cc0781",
+							"width": 16,
+							"height": 16,
+							"defUid": 12,
+							"px": [64,32],
+							"fieldInstances": [],
+							"__worldX": 64,
+							"__worldY": 32
+						},
+						{
+							"__identifier": "Switch",
+							"__grid": [2,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 4, "x": 400, "y": 16, "w": 16, "h": 16 },
+							"__smartColor": "#E4A672",
+							"iid": "002cdcc0-bde0-11f1-8873-fb75fd60e666",
+							"width": 16,
+							"height": 16,
+							"defUid": 11,
+							"px": [32,32],
+							"fieldInstances": [],
+							"__worldX": 32,
+							"__worldY": 32
 						}
 					]
 				},
@@ -524,7 +556,7 @@
 					"pxOffsetY": 0,
 					"visible": true,
 					"optionalRules": [],
-					"intGridCsv": [1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+					"intGridCsv": [1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1],
 					"autoLayerTiles": [],
 					"seed": 2365846,
 					"overrideTilesetUid": null,

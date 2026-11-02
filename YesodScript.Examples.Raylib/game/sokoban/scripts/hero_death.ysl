@@ -1,0 +1,54 @@
+# Hero dies if they share a tile with a closed gate (type 5).
+@HERO_RID_INDEX <rid> <index>
+    SETVAR <index> -1
+    DEFVAR _i 0 int
+    DEFVAR _hrid 0 int
+
+    >HERO_RID_INDEX_LOOP
+        JUMPGE _i [[HERO_COUNT]] HERO_RID_INDEX_END
+        LISTGET HERO_RIDS [[_i]] _hrid
+        JUMPNEQ _hrid <rid> HERO_RID_INDEX_NEXT
+        SETVAR <index> [[_i]]
+        JUMP HERO_RID_INDEX_END
+
+        >HERO_RID_INDEX_NEXT
+            ADD _i 1
+            JUMP HERO_RID_INDEX_LOOP
+
+    >HERO_RID_INDEX_END
+        BREAK
+
+@HERO_CHECK_GATE_DEATH <dead>
+    SETVAR <dead> false
+    JUMPEQ HERO_COUNT 0 HERO_CHECK_GATE_DEATH_END
+
+    DEFVAR _i 0 int
+    DEFVAR _hx 0 int
+    DEFVAR _hy 0 int
+    DEFVAR _cell 0 int
+    DEFVAR _tile 0 int
+
+    >HERO_CHECK_GATE_DEATH_LOOP
+        JUMPGE _i [[HERO_COUNT]] HERO_CHECK_GATE_DEATH_END
+        LISTGET HERO_XS [[_i]] _hx
+        LISTGET HERO_YS [[_i]] _hy
+        $LIST_1D [[_hx]] [[_hy]] [[LEVEL_W]] [[LEVEL_H]] _cell
+        LISTGET TILE_TYPES [[_cell]] _tile
+        JUMPNEQ _tile 5 HERO_CHECK_GATE_DEATH_NEXT
+        SETVAR <dead> true
+        JUMP HERO_CHECK_GATE_DEATH_END
+
+        >HERO_CHECK_GATE_DEATH_NEXT
+            ADD _i 1
+            JUMP HERO_CHECK_GATE_DEATH_LOOP
+
+    >HERO_CHECK_GATE_DEATH_END
+        SETVAR LEVEL_TEMP -1
+        BREAK
+
+@HERO_DIE
+    PRINT "Crushed by a gate!"
+    SETVAR PLAYER_MOVING false
+    WAIT 0.4
+    $LEVEL_INIT [[LEVEL_NAME]]
+    BREAK

@@ -17,12 +17,20 @@
         $HERO_LIFT_INACTIVE [[_next]]
         $HERO_ACTIVATE [[_next]] true
         $LEVEL_UPDATE_GATES
-        
+
+        DEFVAR _dead false bool
+        $HERO_CHECK_GATE_DEATH _dead
+        JUMPEQ _dead true PLAYER_SWITCH_DEATH
+
         DEFVAR _all_exit false bool
         $HERO_CHECK_ALL_ON_EXIT _all_exit
         JUMPEQ _all_exit false PLAYER_SWITCH_END
         PRINT "All heroes on exits!"
         $LEVEL_NEXT
+        JUMP PLAYER_SWITCH_END
+
+    >PLAYER_SWITCH_DEATH
+        $HERO_DIE
 
     >PLAYER_SWITCH_END
         BREAK
