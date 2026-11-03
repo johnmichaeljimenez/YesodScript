@@ -1,10 +1,22 @@
 @ON_TILE_FLOOR_LOAD <rid> <x> <y>
-    DEFVAR _x <x> float
-    ADD _x <y>
-    DIV _x 20
+    DEFVAR _center_x [[LEVEL_W]] float
+    SUB _center_x 1
+    DIV _center_x 2
+    DEFVAR _center_y [[LEVEL_H]] float
+    SUB _center_y 1
+    DIV _center_y 2
 
-    TWEEN3D <rid> "Z" 0 0.1 true 0.2 "BELL" * * [[_x]]
-    EDIT3D <rid> "ShaderID" "shaders/floor"
+    DEFVAR _dx <x> float
+    SUB _dx [[_center_x]]
+    MUL _dx [[_dx]]
+    DEFVAR _dy <y> float
+    SUB _dy [[_center_y]]
+    MUL _dy [[_dy]]
+    ADD _dx [[_dy]]
+    SQRT _dx
+    DIV _dx 20
+
+    TWEEN3D <rid> "Z" 0 0.1 true 0.2 "BELL" * * [[_dx]]
     BREAK
 
 @ON_TILE_SWITCH <rid> <x> <y> <color>

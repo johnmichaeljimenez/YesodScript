@@ -279,6 +279,7 @@
 
             $LIST_XY [[UNDO_I]] [[LEVEL_W]] UNDO_X UNDO_Y
             RENDER3D [[UNDO_X]] [[UNDO_Y]] 0 "cube" UNDO_RID "level_floor"
+            EDIT3D [[UNDO_RID]] "ShaderID" "shaders/floor"
             EDIT3D [[UNDO_RID]] "Scale" [[CUBE_SCALE]]
             LISTSET TILE_FLOOR [[UNDO_I]] [[UNDO_RID]]
             CALL "ON_TILE_FLOOR [[UNDO_RID]] [[UNDO_X]] [[UNDO_Y]]"

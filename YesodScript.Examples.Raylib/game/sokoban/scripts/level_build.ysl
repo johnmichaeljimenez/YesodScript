@@ -122,6 +122,8 @@
 
         RENDER3D [[_x]] [[_y]] 0 "cube" _rid "level_floor"
         EDIT3D [[_rid]] "Scale" [[CUBE_SCALE]]
+        EDIT3D [[_rid]] "ShaderID" "shaders/floor"
+
         LISTSET TILE_FLOOR [[_i]] [[_rid]]
         ADD _floors 1
 
