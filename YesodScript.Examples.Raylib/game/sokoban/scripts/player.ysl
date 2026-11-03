@@ -101,6 +101,7 @@
     >PLAYER_MOVE_GO
         $HERO_SYNC_INACTIVE
 
+        ADD LEVEL_CURRENT_MOVES 1
         SETVAR PLAYER_MOVING true
 
         TWEEN3D [[character]] "X" [[px]] [[_toX]] false 0.12 "QUAD" "char_x" true

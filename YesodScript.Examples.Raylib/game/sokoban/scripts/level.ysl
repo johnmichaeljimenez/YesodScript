@@ -7,6 +7,8 @@
     DEFVAR LEVEL_INDEX 1 int
     DEFLIST LEVEL_NAMES string
 
+    DEFVAR LEVEL_CURRENT_MOVES 0 int
+
     DEFVAR LEVEL_HAS_SPAWN false bool
     DEFVAR LEVEL_SPAWN_X 0 int
     DEFVAR LEVEL_SPAWN_Y 0 int
@@ -37,6 +39,7 @@
 
 @LEVEL_INIT <levelname>
     $LEVEL_CLEAR
+    SETVAR LEVEL_CURRENT_MOVES 0
     SETVAR LEVEL_NAME <levelname>
 
     PRINT "LOADING LEVEL '<levelname>'"
