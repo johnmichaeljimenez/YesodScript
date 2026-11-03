@@ -127,6 +127,27 @@ public class Clear : GameCommand
 	}
 }
 
+public class BgColor : GameCommand
+{
+	[CommandParameter]
+	private int red;
+
+	[CommandParameter]
+	private int green;
+
+	[CommandParameter]
+	private int blue;
+
+	public override void OnEnter()
+	{
+		Renderer.Instance.BackgroundColor = new Color(
+			(byte)Math.Clamp(red, 0, 255),
+			(byte)Math.Clamp(green, 0, 255),
+			(byte)Math.Clamp(blue, 0, 255),
+			(byte)255);
+	}
+}
+
 public class Show : GameCommand
 {
 	[CommandParameter]

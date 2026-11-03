@@ -1,5 +1,5 @@
 @ON_TILE_FLOOR <rid> <x> <y>
-    PRINT "ON_TILE_FLOOR <rid> @ <x>,<y>"
+    EDIT3D <rid> "ShaderID" "shaders/floor"
     BREAK
 
 @ON_TILE_SWITCH <rid> <x> <y> <color>
@@ -56,21 +56,18 @@
 
     >ON_HERO_SPAWN_WARRIOR
         EDIT3D <rid> "ModelID" "fuwawa"
-        EDIT3D <rid> "ShaderID" "shaders/character"
-        EDIT3D <rid> "Tint.R" 150
-        EDIT3D <rid> "Tint.G" 150
-        EDIT3D <rid> "Tint.B" 150
-        JUMP ON_HERO_SPAWN_DONE
+        JUMP ON_HERO_VALID
 
     >ON_HERO_SPAWN_THIEF
         EDIT3D <rid> "ModelID" "mococo"
-        EDIT3D <rid> "Tint.R" 150
-        EDIT3D <rid> "Tint.G" 150
-        EDIT3D <rid> "Tint.B" 150
-        JUMP ON_HERO_SPAWN_DONE
+        JUMP ON_HERO_VALID
 
     >ON_HERO_SPAWN_WIZARD
         EDIT3D <rid> "ModelID" "bijou"
+        JUMP ON_HERO_VALID
+
+    >ON_HERO_VALID
+        EDIT3D <rid> "ShaderID" "shaders/character"
         EDIT3D <rid> "Tint.R" 150
         EDIT3D <rid> "Tint.G" 150
         EDIT3D <rid> "Tint.B" 150
