@@ -456,7 +456,7 @@ public class Renderer : IDisposable
 		var sourceRect = new Rectangle(0, 0, VirtualWidth, -VirtualHeight);
 		Raylib.BeginTextureMode(rt);
 		{
-			Raylib.ClearBackground(GameContent.Transparent? Color.Blank : Color.Black);
+			Raylib.ClearBackground(GameContent.Transparent ? Color.Blank : Color.Black);
 
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();
@@ -497,7 +497,7 @@ public class Renderer : IDisposable
 
 		Raylib.BeginDrawing();
 		{
-			Raylib.ClearBackground(GameContent.Transparent? Color.Blank : Color.Black);
+			Raylib.ClearBackground(GameContent.Transparent ? Color.Blank : Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 		}
 		Raylib.EndDrawing();
@@ -585,10 +585,30 @@ public class Renderer : IDisposable
 		var tint = new Color(i.Tint.R, i.Tint.G, i.Tint.B, (byte)Math.Clamp(i.Tint.A * i.Opacity, 0f, 255f));
 		var scaleVec = new Vector3(i.Scale, i.Scale, i.Scale);
 
-		if (Math.Abs(i.Rotation) > 0.001f)
-			Raylib.DrawModelEx(i.Model, pos, new Vector3(0f, 1f, 0f), i.Rotation, scaleVec, tint);
-		else
-			Raylib.DrawModel(i.Model, pos, i.Scale, tint);
+		Shader? prev = null;
+		bool overrideShader = i.Shader.Id != 0;
+
+		unsafe
+		{
+			if (overrideShader)
+			{
+				for (int m = 0; m < i.Model.MaterialCount; m++)
+					i.Model.Materials[m].Shader = i.Shader;
+			}
+
+
+			if (Math.Abs(i.Rotation) > 0.001f)
+				Raylib.DrawModelEx(i.Model, pos, new Vector3(0f, 1f, 0f), i.Rotation, scaleVec, tint);
+			else
+				Raylib.DrawModel(i.Model, pos, i.Scale, tint);
+
+			if (overrideShader)
+			{
+				var def = Raylib.LoadMaterialDefault().Shader;
+				for (int m = 0; m < i.Model.MaterialCount; m++)
+					i.Model.Materials[m].Shader = def;
+			}
+		}
 	}
 }
 
@@ -629,7 +649,7 @@ public class RenderData : IDisposable
 
 	public string SpriteID;
 	public Texture2D Sprite { get; private set; }
-	
+
 	public int TileIndex = -1;
 	public int FontSize = 14;
 	public string FontName = "";
@@ -701,8 +721,16 @@ public class RenderData3D : IDisposable
 	public string AnimName { get; private set; } = "";
 	private ModelAnimation currentAnim;
 
+	public string ShaderID;
+	public Shader Shader { get; private set; }
+
 	public void Sync()
 	{
+		if (string.IsNullOrEmpty(ShaderID))
+			Shader = default;
+		else
+			Shader = Assets.Instance.GetShader(ShaderID);
+
 		if (string.IsNullOrEmpty(ModelID))
 		{
 			Model = default;
@@ -713,8 +741,8 @@ public class RenderData3D : IDisposable
 		Model = Assets.Instance.GetModel(ModelID);
 
 		if (!string.IsNullOrEmpty(AnimName) &&
-		    Assets.Instance.TryGetModelAnimation(ModelID, AnimName, out var anim) &&
-		    (Model.MeshCount == 0 || Raylib.IsModelAnimationValid(Model, anim)))
+			Assets.Instance.TryGetModelAnimation(ModelID, AnimName, out var anim) &&
+			(Model.MeshCount == 0 || Raylib.IsModelAnimationValid(Model, anim)))
 		{
 			currentAnim = anim;
 			if (AnimPlaying || AnimFrame > 0f)

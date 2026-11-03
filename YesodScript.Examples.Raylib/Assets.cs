@@ -15,6 +15,7 @@ public class Assets : IDisposable
 	private readonly Dictionary<string, ModelAnimation[]> modelAnimations = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, IntPtr> modelAnimationPtrs = new(StringComparer.InvariantCultureIgnoreCase);
 	private readonly Dictionary<string, int> modelAnimationCounts = new(StringComparer.InvariantCultureIgnoreCase);
+	private readonly Dictionary<string, Shader> shaders = new(StringComparer.InvariantCultureIgnoreCase);
 
 	public Assets()
 	{
@@ -203,8 +204,26 @@ public class Assets : IDisposable
 		modelAnimations.Clear();
 	}
 
+	public void LoadShader(string id, string vsPath, string fsPath)
+	{
+		if (!File.Exists(vsPath) || !File.Exists(fsPath))
+			throw new FileNotFoundException($"Shader files missing for '{id}'");
+
+		shaders[id] = Raylib.LoadShader(vsPath, fsPath);
+	}
+
+	public Shader GetShader(string id)
+	{
+		return shaders[id];
+	}
+
 	public void Dispose()
 	{
+		foreach (var i in shaders)
+		{
+			Raylib.UnloadShader(i.Value);
+		}
+
 		foreach (var i in sprites.Values)
 		{
 			Raylib.UnloadTexture(i);
@@ -219,7 +238,7 @@ public class Assets : IDisposable
 
 		sounds.Clear();
 
-		fonts.Remove("");	//no need to unload this as it's either default font, or the existing keyed one
+		fonts.Remove("");   //no need to unload this as it's either default font, or the existing keyed one
 		foreach (var i in fonts.Values)
 		{
 			Raylib.UnloadFont(i);
@@ -251,6 +270,8 @@ public class LoadAssets : GameCommand
 	private List<string> fontKeys;
 	private Dictionary<string, string> modelPaths;
 	private List<string> modelKeys;
+	private Dictionary<string, (string vs, string fs)> shaderPairs;
+	private List<string> shaderKeys;
 
 	public override void OnEnter()
 	{
@@ -265,6 +286,17 @@ public class LoadAssets : GameCommand
 
 		modelPaths = DirectoryExtractor.GetPaths(relativePath, "glb");
 		modelKeys = modelPaths.Keys.ToList();
+
+		var vsPaths = DirectoryExtractor.GetPaths(relativePath, "vs");
+		var fsPaths = DirectoryExtractor.GetPaths(relativePath, "fs");
+
+		shaderPairs = new Dictionary<string, (string vs, string fs)>(StringComparer.InvariantCultureIgnoreCase);
+		foreach (var (key, vsPath) in vsPaths)
+		{
+			if (fsPaths.TryGetValue(key, out var fsPath))
+				shaderPairs[key] = (vsPath, fsPath);
+		}
+		shaderKeys = shaderPairs.Keys.ToList();
 	}
 
 	public override bool OnTick(float deltaTime)
@@ -302,6 +334,15 @@ public class LoadAssets : GameCommand
 			Assets.Instance.LoadModel(key, modelPaths[key]);
 			modelKeys.RemoveAt(0);
 
+			return false;
+		}
+		
+		if (shaderKeys.Count > 0)
+		{
+			var key = shaderKeys[0];
+			var pair = shaderPairs[key];
+			Assets.Instance.LoadShader(key, pair.vs, pair.fs);
+			shaderKeys.RemoveAt(0);
 			return false;
 		}
 
