@@ -6,16 +6,16 @@
     >LOOP
         JUMPKEYPRESS "Escape" END
         JUMPKEYPRESS "R" RESTART
-        JUMPKEYPRESS "Z" UNDO
-        JUMPKEYPRESS "U" UNDO
+        JUMPKEY "Z" UNDO
+        JUMPKEY "U" UNDO
         JUMPKEYPRESS "X" SWITCH_HERO
         JUMPKEYPRESS "One" SELECT_WARRIOR
         JUMPKEYPRESS "Two" SELECT_THIEF
         JUMPKEYPRESS "Three" SELECT_WIZARD
-        JUMPKEYPRESS "W" FACE_N
-        JUMPKEYPRESS "S" FACE_S
-        JUMPKEYPRESS "A" FACE_W
-        JUMPKEYPRESS "D" FACE_E
+        JUMPKEY "W" FACE_N
+        JUMPKEY "S" FACE_S
+        JUMPKEY "A" FACE_W
+        JUMPKEY "D" FACE_E
 
         JUMP AFTER
 
@@ -27,7 +27,7 @@
 
     >UNDO
         $UNDO_POP
-        JUMP AFTER
+        WAIT 0.15
 
     >SWITCH_HERO
         $PLAYER_SWITCH
@@ -47,18 +47,22 @@
 
     >FACE_N
         $PLAYER_MOVE -180 0 -1
-        JUMP AFTER
+        JUMP MOVEAFTER
 
     >FACE_E
         $PLAYER_MOVE 90 1 0
-        JUMP AFTER
+        JUMP MOVEAFTER
 
     >FACE_S
         $PLAYER_MOVE 0 0 1
-        JUMP AFTER
+        JUMP MOVEAFTER
 
     >FACE_W
         $PLAYER_MOVE -90 -1 0
+        JUMP MOVEAFTER
+
+    >MOVEAFTER
+        WAIT 0.05
         JUMP AFTER
 
     >AFTER
