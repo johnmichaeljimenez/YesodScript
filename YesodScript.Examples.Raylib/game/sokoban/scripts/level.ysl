@@ -49,9 +49,26 @@
     DIV _cx 2
     DIV _cy 2
 
-    DEFVAR _fromY [[_cy]] int
+    DEFVAR _inc 0 float
+    DEFVAR _minDim [[LEVEL_W]] int
+    JUMPLT LEVEL_H _minDim LEVEL_CAMERA_USE_HEIGHT
+    JUMP LEVEL_CAMERA_ZOOM
+
+    >LEVEL_CAMERA_USE_HEIGHT
+        SETVAR _minDim [[LEVEL_H]]
+
+    >LEVEL_CAMERA_ZOOM
+        JUMPLE _minDim 10 LEVEL_CAMERA_ZOOM_END
+        SETVAR _inc [[_minDim]]
+        SUB _inc 10
+
+    >LEVEL_CAMERA_ZOOM_END
+
+    DEFVAR _fromY [[_cy]] float
     ADD _fromY 4
-    DEFVAR _fromZ 14 int
+    ADD _fromY [[_inc]]
+    DEFVAR _fromZ 10 float
+    ADD _fromZ [[_inc]]
 
     CAM3D [[_cx]] [[_fromY]] [[_fromZ]]  [[_cx]] [[_cy]] 0  45 false
 
