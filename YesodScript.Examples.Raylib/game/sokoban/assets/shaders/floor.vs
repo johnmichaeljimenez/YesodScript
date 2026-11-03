@@ -10,13 +10,13 @@ uniform mat4 matModel;
 out vec2 fragTexCoord;
 out vec3 fragNormal;
 out vec4 fragColor;
-out float fragLocalHeight;
+out float fragWorldHeight;
 
 void main()
 {
     fragTexCoord = vertexTexCoord;
     fragNormal = normalize(vec3(matModel * vec4(vertexNormal, 0.0)));
     fragColor = vertexColor;
-    fragLocalHeight = vertexPosition.y;
+    fragWorldHeight = (matModel * vec4(vertexPosition, 1.0)).y;
     gl_Position = mvp * vec4(vertexPosition, 1.0);
 }

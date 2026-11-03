@@ -1,4 +1,9 @@
-@ON_TILE_FLOOR <rid> <x> <y>
+@ON_TILE_FLOOR_LOAD <rid> <x> <y>
+    DEFVAR _x <x> float
+    ADD _x <y>
+    DIV _x 20
+
+    TWEEN3D <rid> "Z" 0 0.1 true 0.2 "BELL" * * [[_x]]
     EDIT3D <rid> "ShaderID" "shaders/floor"
     BREAK
 

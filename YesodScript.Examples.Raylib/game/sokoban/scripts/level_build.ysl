@@ -126,7 +126,7 @@
         ADD _floors 1
 
         >LEVEL_BUILD_FLOOR_READY
-            CALL "ON_TILE_FLOOR [[_rid]] [[_x]] [[_y]]"
+            CALL "ON_TILE_FLOOR_LOAD [[_rid]] [[_x]] [[_y]]"
 
             # yellow switch plate
             LISTFIND SWITCH_YELLOW_CELLS [[_i]] _switch_i

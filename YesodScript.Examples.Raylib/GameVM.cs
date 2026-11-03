@@ -268,6 +268,8 @@ public class Tween : GameCommand
 	[CommandParameter] private string easing = "Linear";
 	[CommandParameter] private string tweenId = "";
 	[CommandParameter] private bool angleWrap = false;
+	[CommandParameter] private float delay = 0f;
+	[CommandParameter] private bool loop = false;
 
 	public override void OnEnter()
 	{
@@ -286,7 +288,11 @@ public class Tween : GameCommand
 		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
 					SetFrom(_from).
 					SetEasing(TweenUtil.ResolveEasing(easing)).
-					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId).
+					SetDelay(delay);
+
+		if (loop)
+			tween.SetLoops(-1);
 
 		data.activeTweens.Add(tween);
 		TweenManager.Add(tween);
@@ -355,6 +361,8 @@ public class Tween3D : GameCommand
 	[CommandParameter] private string easing = "Linear";
 	[CommandParameter] private string tweenId = "";
 	[CommandParameter] private bool angleWrap = false;
+	[CommandParameter] private float delay = 0f;
+	[CommandParameter] private bool loop = false;
 
 	public override void OnEnter()
 	{
@@ -373,7 +381,11 @@ public class Tween3D : GameCommand
 		var tween = TweenLib.Tween.To(getter, setter, _to, duration).
 					SetFrom(_from).
 					SetEasing(TweenUtil.ResolveEasing(easing)).
-					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId);
+					SetId(string.IsNullOrEmpty(tweenId) ? null : tweenId).
+					SetDelay(delay);
+
+		if (loop)
+			tween.SetLoops(-1);
 
 		data.activeTweens.Add(tween);
 		TweenManager.Add(tween);
