@@ -11,7 +11,7 @@
 	"iid": "a6c95e60-bde0-11f1-b567-658985f3f6d9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 41,
+	"nextUid": 42,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -425,7 +425,45 @@
 		{ "id": "Warrior", "tileRect": { "tilesetUid": 4, "x": 48, "y": 976, "w": 16, "h": 16 }, "color": 12470831 },
 		{ "id": "Thief", "tileRect": { "tilesetUid": 4, "x": 48, "y": 992, "w": 16, "h": 16 }, "color": 14120515 },
 		{ "id": "Wizard", "tileRect": { "tilesetUid": 4, "x": 112, "y": 976, "w": 16, "h": 16 }, "color": 15389866 }
-	], "iconTilesetUid": 4, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
+	], "iconTilesetUid": 4, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
+		{
+			"identifier": "Message",
+			"doc": null,
+			"__type": "String",
+			"uid": 41,
+			"type": "F_String",
+			"isArray": false,
+			"canBeNull": false,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "NameAndValue",
+			"editorDisplayScale": 1,
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorDisplayColor": null,
+			"editorAlwaysShow": true,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"exportToToc": false,
+			"searchable": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": null,
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefsEntityUid": null,
+			"allowedRefTags": [],
+			"tilesetUid": null
+		}
+	] },
 	"levels": [
 		{
 			"identifier": "Level_1",
@@ -446,7 +484,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "Fuwawa can push objects.", "__tile": null, "defUid": 41, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Fuwawa can push objects."]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -598,7 +639,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [{ "levelIid": "8dd4018c-4c69-411b-b86c-273a4e9ba765", "dir": "e" }]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_2",
@@ -619,7 +660,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -883,7 +924,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "f6296188-a736-48f1-b89d-742b7b7e919b", "dir": "w" }, { "levelIid": "93578368-e429-41c3-b1b4-81c11cea6245", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_3",
@@ -904,7 +945,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1104,7 +1145,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "8dd4018c-4c69-411b-b86c-273a4e9ba765", "dir": "w" }, { "levelIid": "fe472520-aac4-4bd2-9072-ac4aa482a03d", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_4",
@@ -1125,7 +1166,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1417,7 +1458,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "Mococo can pull objects.", "__tile": null, "defUid": 41, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Mococo can pull objects."]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1652,7 +1696,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "fe472520-aac4-4bd2-9072-ac4aa482a03d", "dir": "w" }, { "levelIid": "a2dbd461-6ea4-4f91-b116-d0dfd5ad1fbb", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_6",
@@ -1673,7 +1717,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1968,7 +2012,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2169,7 +2213,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "a2dbd461-6ea4-4f91-b116-d0dfd5ad1fbb", "dir": "w" }, { "levelIid": "67306afb-e181-460b-b764-b6f49d157f8d", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_8",
@@ -2190,7 +2234,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "Biboo can teleport swap through objects.", "__tile": null, "defUid": 41, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Biboo can teleport swap through objects."]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2425,7 +2472,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "a16e7101-12ef-4273-8f71-934b5180d958", "dir": "w" }, { "levelIid": "0f24f227-ec05-4f4f-86ff-378bfe6d1c4d", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_9",
@@ -2446,7 +2493,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2741,7 +2788,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2910,7 +2957,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "0f24f227-ec05-4f4f-86ff-378bfe6d1c4d", "dir": "w" }, { "levelIid": "f401f6be-4c4e-467f-9bb9-fb0944b860c6", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_11",
@@ -2931,7 +2978,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3121,7 +3168,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "9a9c64d0-4199-4eea-ad45-def2802e72d7", "dir": "w" }, { "levelIid": "50a7b687-715f-4b1a-865e-182f75e1e5a8", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_12",
@@ -3142,7 +3189,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3381,7 +3428,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "f401f6be-4c4e-467f-9bb9-fb0944b860c6", "dir": "w" }, { "levelIid": "44104d7b-0559-4990-9e22-99eda60af437", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_13",
@@ -3402,7 +3449,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3729,7 +3776,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "50a7b687-715f-4b1a-865e-182f75e1e5a8", "dir": "w" }, { "levelIid": "3e369643-440d-40fb-bf5e-13695bed8c51", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_14",
@@ -3750,7 +3797,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3959,7 +4006,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "44104d7b-0559-4990-9e22-99eda60af437", "dir": "w" }, { "levelIid": "1aee9f32-2b42-4704-83bb-d7cc2d9014a4", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_15",
@@ -3980,7 +4027,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -4231,7 +4278,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "3e369643-440d-40fb-bf5e-13695bed8c51", "dir": "w" }, { "levelIid": "5ac8cb7e-9c18-49dd-96ec-76ca8127e5c4", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_16",
@@ -4252,7 +4299,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -4539,7 +4586,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "1aee9f32-2b42-4704-83bb-d7cc2d9014a4", "dir": "w" }, { "levelIid": "512ef085-814c-42fb-9eb3-d04f083c48fb", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_17",
@@ -4560,7 +4607,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -4768,7 +4815,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "5ac8cb7e-9c18-49dd-96ec-76ca8127e5c4", "dir": "w" }, { "levelIid": "941f6f05-3bb9-4ce3-b146-ebd10ce42f36", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_18",
@@ -4789,7 +4836,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -5046,7 +5093,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "512ef085-814c-42fb-9eb3-d04f083c48fb", "dir": "w" }, { "levelIid": "e5778126-43ed-4ed3-b7fa-089c42583604", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_19",
@@ -5067,7 +5114,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -5527,7 +5574,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "941f6f05-3bb9-4ce3-b146-ebd10ce42f36", "dir": "w" }, { "levelIid": "7f14a90a-ff87-4a62-b39c-5a9687bed05e", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_20",
@@ -5548,7 +5595,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -5873,7 +5920,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "e5778126-43ed-4ed3-b7fa-089c42583604", "dir": "w" }, { "levelIid": "1f1c93df-40e8-4d51-aa61-1b7368bc31a6", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_21",
@@ -5894,7 +5941,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -6152,7 +6199,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "7f14a90a-ff87-4a62-b39c-5a9687bed05e", "dir": "w" }, { "levelIid": "86e7e231-b828-4bc8-93bf-2e314e961783", "dir": "e" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_22",
@@ -6173,7 +6220,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -6333,7 +6380,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [{ "levelIid": "1f1c93df-40e8-4d51-aa61-1b7368bc31a6", "dir": "w" }]
+			"__neighbours": []
 		}
 	],
 	"worlds": [],

@@ -92,6 +92,30 @@ def find_player_start(level: dict[str, Any]) -> tuple[int, int, int] | None:
     return starts[0] if starts else None
 
 
+def find_level_message(level: dict[str, Any]) -> str:
+    field = next(
+        (
+            field
+            for field in level.get("fieldInstances") or []
+            if field.get("__identifier") == "Message"
+        ),
+        None,
+    )
+    message = field.get("__value") if field is not None else None
+    if message is None:
+        return ""
+    if not isinstance(message, str):
+        raise ValueError(
+            f"Message on level '{level['identifier']}' must be a string"
+        )
+    if '"' in message or "\n" in message or "\r" in message:
+        raise ValueError(
+            f"Message on level '{level['identifier']}' contains characters "
+            "that cannot be represented in a YSL string"
+        )
+    return message
+
+
 def is_gameplay_intgrid_layer(layer: dict[str, Any]) -> bool:
     return (
         layer.get("__type") == "IntGrid"
@@ -147,9 +171,12 @@ def apply_entities(
 def generate_leveldata(level: dict[str, Any]) -> str:
     name = str(level["identifier"]).lower()
     gw, gh = grid_size(level)
+    message = find_level_message(level)
+    message_arg = f'"{message}"' if message else "*"
     lines = [
         f"@LEVELDATA:{name}",
         f"\t$LEVEL_FILL {gw} {gh}",
+        f"\tSETVAR LEVEL_MESSAGE {message_arg}",
     ]
 
     starts = find_player_starts(level)
