@@ -30,6 +30,7 @@
         $UNDO_POP
         CALL "ON_MOVES_UPDATE [[LEVEL_CURRENT_MOVES]]"
         WAIT 0.15
+        JUMP AFTER
 
     >SWITCH_HERO
         $PLAYER_SWITCH
