@@ -484,10 +484,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "Fuwawa can push objects.", "__tile": null, "defUid": 41, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Fuwawa can push objects."]
-			}] }],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [null] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -660,7 +657,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "", "__tile": null, "defUid": 41, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "Message", "__type": "String", "__value": "Fuwawa can push objects.", "__tile": null, "defUid": 41, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Fuwawa can push objects."]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",

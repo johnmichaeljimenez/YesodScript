@@ -1,6 +1,8 @@
 @_INIT
     DEFVAR HUD_LEVEL 0 int
     DEFVAR HUD_MOVES 0 int
+    DEFVAR HUD_HINT_UNDO 0 int
+    DEFVAR HUD_HINT_RESTART 0 int
     DEFVAR HUD_MESSAGE 0 int
     DEFVAR HUD_HINT_FUWAWA 0 int
     DEFVAR HUD_HINT_MOCOCO 0 int
@@ -22,12 +24,30 @@
 
     RENDER 20 52 HUD_MOVES 100 "HUD_MOVES"
     EDIT [[HUD_MOVES]] "Text" "Moves: 0"
-    EDIT [[HUD_MOVES]] "FontSize" 26
+    EDIT [[HUD_MOVES]] "FontSize" 20
     EDIT [[HUD_MOVES]] "TextHAlign" -1
     EDIT [[HUD_MOVES]] "TextVAlign" -1
     EDIT [[HUD_MOVES]] "Tint.R" 25
     EDIT [[HUD_MOVES]] "Tint.G" 40
     EDIT [[HUD_MOVES]] "Tint.B" 55
+
+    RENDER 20 78 HUD_HINT_UNDO 100 "HUD_ALWAYS"
+    EDIT [[HUD_HINT_UNDO]] "Text" "[Z] Undo"
+    EDIT [[HUD_HINT_UNDO]] "FontSize" 16
+    EDIT [[HUD_HINT_UNDO]] "TextHAlign" -1
+    EDIT [[HUD_HINT_UNDO]] "TextVAlign" -1
+    EDIT [[HUD_HINT_UNDO]] "Tint.R" 25
+    EDIT [[HUD_HINT_UNDO]] "Tint.G" 40
+    EDIT [[HUD_HINT_UNDO]] "Tint.B" 55
+
+    RENDER 20 100 HUD_HINT_RESTART 100 "HUD_ALWAYS"
+    EDIT [[HUD_HINT_RESTART]] "Text" "[R] Restart"
+    EDIT [[HUD_HINT_RESTART]] "FontSize" 16
+    EDIT [[HUD_HINT_RESTART]] "TextHAlign" -1
+    EDIT [[HUD_HINT_RESTART]] "TextVAlign" -1
+    EDIT [[HUD_HINT_RESTART]] "Tint.R" 25
+    EDIT [[HUD_HINT_RESTART]] "Tint.G" 40
+    EDIT [[HUD_HINT_RESTART]] "Tint.B" 55
 
     RENDER 20 520 HUD_MESSAGE 100 "HUD_MESSAGE"
     EDIT [[HUD_MESSAGE]] "FontSize" 20
