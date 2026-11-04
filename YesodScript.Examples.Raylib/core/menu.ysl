@@ -1,18 +1,134 @@
+#Example:
+#   $MENU:FONT "my-font" 24
+#   $MENU:POSITION 640 320
+#   $MENU:SPACING 40
+#   $MENU:ALIGN 0 0
+#   $MENU:COLORS 180 180 180 255 220 64
+#   $MENU:SELECTOR ">" -100
+#   $MENU:SELECTOR_COLOR 255 255 255
+#	$MENU:RESET
+
+
+#Events:
+#@MENU:MOVE <index> <x> <y> <text>
+#@MENU:SELECTED <index> <x> <y> <text>
+#@MENU:CANCEL <index> <x> <y> <text>
+
+@_BOOT
+	DEFVAR MENU_FONT * string
+	DEFVAR MENU_FONT_SIZE 18 int
+	DEFVAR MENU_X 0 int
+	DEFVAR MENU_Y 0 int
+	DEFVAR MENU_POSITION_SET false bool
+	DEFVAR MENU_SPACING 28 int
+	DEFVAR MENU_H_ALIGN 0 int
+	DEFVAR MENU_V_ALIGN 0 int
+	DEFVAR MENU_NORMAL_R 140 int
+	DEFVAR MENU_NORMAL_G 140 int
+	DEFVAR MENU_NORMAL_B 140 int
+	DEFVAR MENU_SELECTED_R 255 int
+	DEFVAR MENU_SELECTED_G 220 int
+	DEFVAR MENU_SELECTED_B 64 int
+	DEFVAR MENU_SELECTOR * string
+	DEFVAR MENU_SELECTOR_OFFSET -100 int
+	DEFVAR MENU_SELECTOR_R 255 int
+	DEFVAR MENU_SELECTOR_G 220 int
+	DEFVAR MENU_SELECTOR_B 64 int
+	DEFVAR MENU_SELECTOR_COLOR_SET false bool
+	BREAK
+
+@MENU:RESET
+	SETVAR MENU_FONT *
+	SETVAR MENU_FONT_SIZE 18
+	SETVAR MENU_X 0
+	SETVAR MENU_Y 0
+	SETVAR MENU_POSITION_SET false
+	SETVAR MENU_SPACING 28
+	SETVAR MENU_H_ALIGN 0
+	SETVAR MENU_V_ALIGN 0
+	SETVAR MENU_NORMAL_R 140
+	SETVAR MENU_NORMAL_G 140
+	SETVAR MENU_NORMAL_B 140
+	SETVAR MENU_SELECTED_R 255
+	SETVAR MENU_SELECTED_G 220
+	SETVAR MENU_SELECTED_B 64
+	SETVAR MENU_SELECTOR *
+	SETVAR MENU_SELECTOR_OFFSET -100
+	SETVAR MENU_SELECTOR_R 255
+	SETVAR MENU_SELECTOR_G 220
+	SETVAR MENU_SELECTOR_B 64
+	SETVAR MENU_SELECTOR_COLOR_SET false
+	BREAK
+
+@MENU:FONT <name> <size>
+	SETVAR MENU_FONT <name>
+	SETVAR MENU_FONT_SIZE <size>
+	BREAK
+
+@MENU:POSITION <x> <y>
+	SETVAR MENU_X <x>
+	SETVAR MENU_Y <y>
+	SETVAR MENU_POSITION_SET true
+	BREAK
+
+@MENU:SPACING <spacing>
+	SETVAR MENU_SPACING <spacing>
+	BREAK
+
+@MENU:ALIGN <horizontal> <vertical>
+	SETVAR MENU_H_ALIGN <horizontal>
+	SETVAR MENU_V_ALIGN <vertical>
+	BREAK
+
+@MENU:COLORS <normalR> <normalG> <normalB> <selectedR> <selectedG> <selectedB>
+	SETVAR MENU_NORMAL_R <normalR>
+	SETVAR MENU_NORMAL_G <normalG>
+	SETVAR MENU_NORMAL_B <normalB>
+	SETVAR MENU_SELECTED_R <selectedR>
+	SETVAR MENU_SELECTED_G <selectedG>
+	SETVAR MENU_SELECTED_B <selectedB>
+	BREAK
+
+@MENU:SELECTOR <text> <xOffset>
+	SETVAR MENU_SELECTOR <text>
+	SETVAR MENU_SELECTOR_OFFSET <xOffset>
+	BREAK
+
+@MENU:SELECTOR_COLOR <red> <green> <blue>
+	SETVAR MENU_SELECTOR_R <red>
+	SETVAR MENU_SELECTOR_G <green>
+	SETVAR MENU_SELECTOR_B <blue>
+	SETVAR MENU_SELECTOR_COLOR_SET true
+	BREAK
+
 @MENU <list> <result>
 	DEFVAR _sel 0 int
 	DEFVAR _count 0 int
 	DEFVAR _i 0 int
 	DEFVAR _id 0 int
+	DEFVAR _selectorId 0 int
+	DEFVAR _x 0 int
 	DEFVAR _y 0 int
+	DEFVAR _selectedY 0 int
 	DEFVAR _startY 0 int
-	DEFVAR _line 28 int
+	DEFVAR _line 0 int
 	DEFVAR _label * string
 	DEFLIST _ids int
 
 	LISTCOUNT <list> _count
 	JUMPLE _count 0 MENU_LIST_ABORT
 
+	SETVAR _x [[MENU_X]]
+	JUMPEQ MENU_POSITION_SET true MENU_LIST_POSITION_SET
+	SETVAR _x [[SYS:SCREEN_WIDTH_HALF]]
+
+	>MENU_LIST_POSITION_SET
+	SETVAR _line [[MENU_SPACING]]
+	SETVAR _startY [[MENU_Y]]
+	JUMPEQ MENU_POSITION_SET true MENU_LIST_START_Y_SET
 	SETVAR _startY [[SYS:SCREEN_HEIGHT_HALF]]
+
+	>MENU_LIST_START_Y_SET
 	SETVAR _i [[_count]]
 	MUL _i [[_line]]
 	DIV _i 2
@@ -24,18 +140,46 @@
 		JUMPGE _i [[_count]] MENU_LIST_BUILT
 
 		LISTGET <list> [[_i]] _label
-		RENDER [[SYS:SCREEN_WIDTH_HALF]] [[_y]] _id 1000 "MENU"
+		RENDER [[_x]] [[_y]] _id 1000 "MENU"
 		EDIT [[_id]] "Text" [[_label]]
-		EDIT [[_id]] "FontSize" 18
-		EDIT [[_id]] "TextHAlign" 0
-		EDIT [[_id]] "TextVAlign" 0
+		JUMPEQ MENU_FONT * MENU_LIST_DEFAULT_FONT
+		EDIT [[_id]] "FontName" [[MENU_FONT]]
+
+		>MENU_LIST_DEFAULT_FONT
+		EDIT [[_id]] "FontSize" [[MENU_FONT_SIZE]]
+		EDIT [[_id]] "TextHAlign" [[MENU_H_ALIGN]]
+		EDIT [[_id]] "TextVAlign" [[MENU_V_ALIGN]]
 		LISTADD _ids [[_id]]
 		ADD _y [[_line]]
 		ADD _i 1
 		JUMP MENU_LIST_BUILD
 
 	>MENU_LIST_BUILT
+		JUMPEQ MENU_SELECTOR * MENU_LIST_REFRESH
+		SETVAR _selectedY [[_startY]]
+		RENDER [[_x]] [[_selectedY]] _selectorId 1000 "MENU"
+		EDIT [[_selectorId]] "Text" [[MENU_SELECTOR]]
+		JUMPEQ MENU_FONT * MENU_LIST_SELECTOR_DEFAULT_FONT
+		EDIT [[_selectorId]] "FontName" [[MENU_FONT]]
+
+		>MENU_LIST_SELECTOR_DEFAULT_FONT
+		EDIT [[_selectorId]] "FontSize" [[MENU_FONT_SIZE]]
+		EDIT [[_selectorId]] "TextHAlign" -1
+		EDIT [[_selectorId]] "TextVAlign" 0
+		ADD _x [[MENU_SELECTOR_OFFSET]]
+		EDIT [[_selectorId]] "X" [[_x]]
+		JUMPEQ MENU_SELECTOR_COLOR_SET true MENU_LIST_SELECTOR_COLOR_SET
+		EDIT [[_selectorId]] "Tint.R" [[MENU_SELECTED_R]]
+		EDIT [[_selectorId]] "Tint.G" [[MENU_SELECTED_G]]
+		EDIT [[_selectorId]] "Tint.B" [[MENU_SELECTED_B]]
+		SUB _x [[MENU_SELECTOR_OFFSET]]
 		JUMP MENU_LIST_REFRESH
+
+	>MENU_LIST_SELECTOR_COLOR_SET
+		EDIT [[_selectorId]] "Tint.R" [[MENU_SELECTOR_R]]
+		EDIT [[_selectorId]] "Tint.G" [[MENU_SELECTOR_G]]
+		EDIT [[_selectorId]] "Tint.B" [[MENU_SELECTOR_B]]
+		SUB _x [[MENU_SELECTOR_OFFSET]]
 
 	>MENU_LIST_REFRESH
 		SETVAR _i 0
@@ -45,15 +189,20 @@
 		LISTGET _ids [[_i]] _id
 		JUMPEQ _i [[_sel]] MENU_LIST_COLOR_SEL
 
-		EDIT [[_id]] "Tint.R" 140
-		EDIT [[_id]] "Tint.G" 140
-		EDIT [[_id]] "Tint.B" 140
+		EDIT [[_id]] "Tint.R" [[MENU_NORMAL_R]]
+		EDIT [[_id]] "Tint.G" [[MENU_NORMAL_G]]
+		EDIT [[_id]] "Tint.B" [[MENU_NORMAL_B]]
 		JUMP MENU_LIST_COLOR_NEXT
 
 	>MENU_LIST_COLOR_SEL
-		EDIT [[_id]] "Tint.R" 255
-		EDIT [[_id]] "Tint.G" 220
-		EDIT [[_id]] "Tint.B" 64
+		EDIT [[_id]] "Tint.R" [[MENU_SELECTED_R]]
+		EDIT [[_id]] "Tint.G" [[MENU_SELECTED_G]]
+		EDIT [[_id]] "Tint.B" [[MENU_SELECTED_B]]
+		JUMPEQ _selectorId 0 MENU_LIST_COLOR_NEXT
+		SETVAR _selectedY [[_startY]]
+		MUL _selectedY [[_sel]]
+		ADD _selectedY [[_line]]
+		EDIT [[_selectorId]] "Y" [[_selectedY]]
 
 	>MENU_LIST_COLOR_NEXT
 		ADD _i 1
@@ -63,25 +212,48 @@
 		JUMPKEYPRESS "W" MENU_LIST_UP
 		JUMPKEYPRESS "S" MENU_LIST_DOWN
 		JUMPKEYPRESS "Space" MENU_LIST_CHOOSE
+		JUMPKEYPRESS "Escape" MENU_LIST_CANCEL
 
 		WAITFRAME
 		JUMP MENU_LIST_INPUT
 
 	>MENU_LIST_UP
 		SUB _sel 1
-		JUMPGE _sel 0 MENU_LIST_REFRESH
+		JUMPGE _sel 0 MENU_LIST_CHANGED
 		SETVAR _sel [[_count]]
 		SUB _sel 1
-		JUMP MENU_LIST_REFRESH
+		JUMP MENU_LIST_CHANGED
 
 	>MENU_LIST_DOWN
 		ADD _sel 1
-		JUMPLT _sel [[_count]] MENU_LIST_REFRESH
+		JUMPLT _sel [[_count]] MENU_LIST_CHANGED
 		SETVAR _sel 0
+		JUMP MENU_LIST_CHANGED
+
+	>MENU_LIST_CHANGED
+		SETVAR _selectedY [[_startY]]
+		MUL _selectedY [[_sel]]
+		ADD _selectedY [[_line]]
+		LISTGET <list> [[_sel]] _label
+		$MENU:MOVE [[_sel]] [[_x]] [[_selectedY]] "[[_label]]"
 		JUMP MENU_LIST_REFRESH
 
 	>MENU_LIST_CHOOSE
 		SETVAR <result> [[_sel]]
+		SETVAR _selectedY [[_startY]]
+		MUL _selectedY [[_sel]]
+		ADD _selectedY [[_line]]
+		LISTGET <list> [[_sel]] _label
+		$MENU:SELECTED [[_sel]] [[_x]] [[_selectedY]] "[[_label]]"
+		JUMP MENU_LIST_CLEANUP
+
+	>MENU_LIST_CANCEL
+		SETVAR <result> -1
+		SETVAR _selectedY [[_startY]]
+		MUL _selectedY [[_sel]]
+		ADD _selectedY [[_line]]
+		LISTGET <list> [[_sel]] _label
+		$MENU:CANCEL [[_sel]] [[_x]] [[_selectedY]] "[[_label]]"
 		JUMP MENU_LIST_CLEANUP
 
 	>MENU_LIST_CLEANUP
@@ -95,6 +267,10 @@
 		JUMP MENU_LIST_CLEAN_LOOP
 
 	>MENU_LIST_DONE
+		JUMPEQ _selectorId 0 MENU_LIST_DONE_BREAK
+		REMOVERENDER [[_selectorId]]
+
+	>MENU_LIST_DONE_BREAK
 		BREAK
 
 	>MENU_LIST_ABORT
