@@ -19,37 +19,37 @@
     EDIT [[HUD_MOVES]] "Tint.G" 40
     EDIT [[HUD_MOVES]] "Tint.B" 55
 
-    RENDER 20 690 HUD_MESSAGE 100 "HUD_MESSAGE"
+    RENDER 20 520 HUD_MESSAGE 100 "HUD_MESSAGE"
     EDIT [[HUD_MESSAGE]] "FontSize" 20
     EDIT [[HUD_MESSAGE]] "TextHAlign" -1
-    EDIT [[HUD_MESSAGE]] "TextVAlign" 1
+    EDIT [[HUD_MESSAGE]] "TextVAlign" -1
     EDIT [[HUD_MESSAGE]] "Tint.R" 25
     EDIT [[HUD_MESSAGE]] "Tint.G" 40
     EDIT [[HUD_MESSAGE]] "Tint.B" 55
     SHOW false "HUD_MESSAGE"
 
-    RENDER 1260 620 HUD_HINT_FUWAWA 100 "HUD_HINT_FUWAWA"
+    RENDER 20 600 HUD_HINT_FUWAWA 100 "HUD_HINT_FUWAWA"
     EDIT [[HUD_HINT_FUWAWA]] "Text" "[1] Fuwawa"
     EDIT [[HUD_HINT_FUWAWA]] "FontSize" 16
     EDIT [[HUD_HINT_FUWAWA]] "TextHAlign" -1
     EDIT [[HUD_HINT_FUWAWA]] "TextVAlign" -1
 
-    RENDER 1260 642 HUD_HINT_MOCOCO 100 "HUD_HINT_MOCOCO"
+    RENDER 20 622 HUD_HINT_MOCOCO 100 "HUD_HINT_MOCOCO"
     EDIT [[HUD_HINT_MOCOCO]] "Text" "[2] Mococo"
     EDIT [[HUD_HINT_MOCOCO]] "FontSize" 16
-    EDIT [[HUD_HINT_MOCOCO]] "TextHAlign" 1
+    EDIT [[HUD_HINT_MOCOCO]] "TextHAlign" -1
     EDIT [[HUD_HINT_MOCOCO]] "TextVAlign" -1
 
-    RENDER 1260 664 HUD_HINT_BIBOO 100 "HUD_HINT_BIBOO"
+    RENDER 20 644 HUD_HINT_BIBOO 100 "HUD_HINT_BIBOO"
     EDIT [[HUD_HINT_BIBOO]] "Text" "[3] Biboo"
     EDIT [[HUD_HINT_BIBOO]] "FontSize" 16
-    EDIT [[HUD_HINT_BIBOO]] "TextHAlign" 1
+    EDIT [[HUD_HINT_BIBOO]] "TextHAlign" -1
     EDIT [[HUD_HINT_BIBOO]] "TextVAlign" -1
 
-    RENDER 1260 690 HUD_HINT_SWITCH 100 "HUD_HINT_SWITCH"
+    RENDER 20 666 HUD_HINT_SWITCH 100 "HUD_HINT_SWITCH"
     EDIT [[HUD_HINT_SWITCH]] "Text" "[X] Switch characters"
     EDIT [[HUD_HINT_SWITCH]] "FontSize" 16
-    EDIT [[HUD_HINT_SWITCH]] "TextHAlign" 1
+    EDIT [[HUD_HINT_SWITCH]] "TextHAlign" -1
     EDIT [[HUD_HINT_SWITCH]] "TextVAlign" -1
     SHOW false "HUD_HINT*"
     BREAK
@@ -106,10 +106,28 @@
             JUMP HUD_LEVEL_START_DONE
 
         >HUD_LEVEL_START_SHOW_CONTROLS
-            SHOW [[HUD_HAS_FUWAWA]] "HUD_HINT_FUWAWA"
-            SHOW [[HUD_HAS_MOCOCO]] "HUD_HINT_MOCOCO"
-            SHOW [[HUD_HAS_BIBOO]] "HUD_HINT_BIBOO"
-            SHOW true "HUD_HINT_SWITCH"
+            SHOW false "HUD_HINT*"
+            DEFVAR _hud_y 600 int
+            JUMPEQ HUD_HAS_FUWAWA false HUD_LEVEL_START_CHECK_MOCOCO
+            EDIT [[HUD_HINT_FUWAWA]] "Y" [[_hud_y]]
+            SHOW true "HUD_HINT_FUWAWA"
+            ADD _hud_y 22
+
+            >HUD_LEVEL_START_CHECK_MOCOCO
+                JUMPEQ HUD_HAS_MOCOCO false HUD_LEVEL_START_CHECK_BIBOO
+                EDIT [[HUD_HINT_MOCOCO]] "Y" [[_hud_y]]
+                SHOW true "HUD_HINT_MOCOCO"
+                ADD _hud_y 22
+
+            >HUD_LEVEL_START_CHECK_BIBOO
+                JUMPEQ HUD_HAS_BIBOO false HUD_LEVEL_START_SHOW_SWITCH
+                EDIT [[HUD_HINT_BIBOO]] "Y" [[_hud_y]]
+                SHOW true "HUD_HINT_BIBOO"
+                ADD _hud_y 22
+
+            >HUD_LEVEL_START_SHOW_SWITCH
+                EDIT [[HUD_HINT_SWITCH]] "Y" [[_hud_y]]
+                SHOW true "HUD_HINT_SWITCH"
 
         >HUD_LEVEL_START_DONE
             BREAK
