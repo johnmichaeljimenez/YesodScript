@@ -1,0 +1,115 @@
+@_INIT
+    DEFVAR HUD_MOVES 0 int
+    DEFVAR HUD_MESSAGE 0 int
+    DEFVAR HUD_HINT_FUWAWA 0 int
+    DEFVAR HUD_HINT_MOCOCO 0 int
+    DEFVAR HUD_HINT_BIBOO 0 int
+    DEFVAR HUD_HINT_SWITCH 0 int
+    DEFVAR HUD_HAS_FUWAWA false bool
+    DEFVAR HUD_HAS_MOCOCO false bool
+    DEFVAR HUD_HAS_BIBOO false bool
+
+@HUD_INIT
+    RENDER 20 20 HUD_MOVES 100 "HUD_MOVES"
+    EDIT [[HUD_MOVES]] "Text" "Moves: 0"
+    EDIT [[HUD_MOVES]] "FontSize" 26
+    EDIT [[HUD_MOVES]] "TextHAlign" -1
+    EDIT [[HUD_MOVES]] "TextVAlign" -1
+    EDIT [[HUD_MOVES]] "Tint.R" 25
+    EDIT [[HUD_MOVES]] "Tint.G" 40
+    EDIT [[HUD_MOVES]] "Tint.B" 55
+
+    RENDER 20 690 HUD_MESSAGE 100 "HUD_MESSAGE"
+    EDIT [[HUD_MESSAGE]] "FontSize" 20
+    EDIT [[HUD_MESSAGE]] "TextHAlign" -1
+    EDIT [[HUD_MESSAGE]] "TextVAlign" 1
+    EDIT [[HUD_MESSAGE]] "Tint.R" 25
+    EDIT [[HUD_MESSAGE]] "Tint.G" 40
+    EDIT [[HUD_MESSAGE]] "Tint.B" 55
+    SHOW false "HUD_MESSAGE"
+
+    RENDER 1260 620 HUD_HINT_FUWAWA 100 "HUD_HINT_FUWAWA"
+    EDIT [[HUD_HINT_FUWAWA]] "Text" "[1] Fuwawa"
+    EDIT [[HUD_HINT_FUWAWA]] "FontSize" 16
+    EDIT [[HUD_HINT_FUWAWA]] "TextHAlign" -1
+    EDIT [[HUD_HINT_FUWAWA]] "TextVAlign" -1
+
+    RENDER 1260 642 HUD_HINT_MOCOCO 100 "HUD_HINT_MOCOCO"
+    EDIT [[HUD_HINT_MOCOCO]] "Text" "[2] Mococo"
+    EDIT [[HUD_HINT_MOCOCO]] "FontSize" 16
+    EDIT [[HUD_HINT_MOCOCO]] "TextHAlign" 1
+    EDIT [[HUD_HINT_MOCOCO]] "TextVAlign" -1
+
+    RENDER 1260 664 HUD_HINT_BIBOO 100 "HUD_HINT_BIBOO"
+    EDIT [[HUD_HINT_BIBOO]] "Text" "[3] Biboo"
+    EDIT [[HUD_HINT_BIBOO]] "FontSize" 16
+    EDIT [[HUD_HINT_BIBOO]] "TextHAlign" 1
+    EDIT [[HUD_HINT_BIBOO]] "TextVAlign" -1
+
+    RENDER 1260 690 HUD_HINT_SWITCH 100 "HUD_HINT_SWITCH"
+    EDIT [[HUD_HINT_SWITCH]] "Text" "[X] Switch characters"
+    EDIT [[HUD_HINT_SWITCH]] "FontSize" 16
+    EDIT [[HUD_HINT_SWITCH]] "TextHAlign" 1
+    EDIT [[HUD_HINT_SWITCH]] "TextVAlign" -1
+    SHOW false "HUD_HINT*"
+    BREAK
+
+@ON_MOVES_UPDATE <amt>
+    EDIT [[HUD_MOVES]] "Text" "Moves: <amt>"
+    BREAK
+
+@LEVEL_START
+    EDIT [[HUD_MOVES]] "Text" "Moves: [[LEVEL_CURRENT_MOVES]]"
+
+    JUMPEQ LEVEL_MESSAGE * HUD_LEVEL_START_NO_MESSAGE
+    EDIT [[HUD_MESSAGE]] "Text" "[[LEVEL_MESSAGE]]"
+    SHOW true "HUD_MESSAGE"
+    JUMP HUD_LEVEL_START_MESSAGE_DONE
+
+    >HUD_LEVEL_START_NO_MESSAGE
+        EDIT [[HUD_MESSAGE]] "Text" ""
+        SHOW false "HUD_MESSAGE"
+
+    >HUD_LEVEL_START_MESSAGE_DONE
+        SETVAR HUD_HAS_FUWAWA false
+        SETVAR HUD_HAS_MOCOCO false
+        SETVAR HUD_HAS_BIBOO false
+        DEFVAR _hud_i 0 int
+        DEFVAR _hud_type 0 int
+
+        >HUD_LEVEL_START_SCAN
+            JUMPGE _hud_i [[HERO_COUNT]] HUD_LEVEL_START_SCAN_DONE
+            LISTGET HERO_TYPES [[_hud_i]] _hud_type
+            JUMPEQ _hud_type 0 HUD_LEVEL_START_FUWAWA
+            JUMPEQ _hud_type 1 HUD_LEVEL_START_MOCOCO
+            JUMPEQ _hud_type 2 HUD_LEVEL_START_BIBOO
+            JUMP HUD_LEVEL_START_SCAN_NEXT
+
+            >HUD_LEVEL_START_FUWAWA
+                SETVAR HUD_HAS_FUWAWA true
+                JUMP HUD_LEVEL_START_SCAN_NEXT
+
+            >HUD_LEVEL_START_MOCOCO
+                SETVAR HUD_HAS_MOCOCO true
+                JUMP HUD_LEVEL_START_SCAN_NEXT
+
+            >HUD_LEVEL_START_BIBOO
+                SETVAR HUD_HAS_BIBOO true
+
+            >HUD_LEVEL_START_SCAN_NEXT
+                ADD _hud_i 1
+                JUMP HUD_LEVEL_START_SCAN
+
+        >HUD_LEVEL_START_SCAN_DONE
+            JUMPGT HERO_COUNT 1 HUD_LEVEL_START_SHOW_CONTROLS
+            SHOW false "HUD_HINT*"
+            JUMP HUD_LEVEL_START_DONE
+
+        >HUD_LEVEL_START_SHOW_CONTROLS
+            SHOW [[HUD_HAS_FUWAWA]] "HUD_HINT_FUWAWA"
+            SHOW [[HUD_HAS_MOCOCO]] "HUD_HINT_MOCOCO"
+            SHOW [[HUD_HAS_BIBOO]] "HUD_HINT_BIBOO"
+            SHOW true "HUD_HINT_SWITCH"
+
+        >HUD_LEVEL_START_DONE
+            BREAK
