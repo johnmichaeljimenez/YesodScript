@@ -1,4 +1,5 @@
 @_INIT
+    DEFVAR HUD_LEVEL 0 int
     DEFVAR HUD_MOVES 0 int
     DEFVAR HUD_MESSAGE 0 int
     DEFVAR HUD_HINT_FUWAWA 0 int
@@ -10,7 +11,16 @@
     DEFVAR HUD_HAS_BIBOO false bool
 
 @HUD_INIT
-    RENDER 20 20 HUD_MOVES 100 "HUD_MOVES"
+    RENDER 20 20 HUD_LEVEL 100 "HUD_LEVEL"
+    EDIT [[HUD_LEVEL]] "Text" "Level: 1"
+    EDIT [[HUD_LEVEL]] "FontSize" 26
+    EDIT [[HUD_LEVEL]] "TextHAlign" -1
+    EDIT [[HUD_LEVEL]] "TextVAlign" -1
+    EDIT [[HUD_LEVEL]] "Tint.R" 25
+    EDIT [[HUD_LEVEL]] "Tint.G" 40
+    EDIT [[HUD_LEVEL]] "Tint.B" 55
+
+    RENDER 20 52 HUD_MOVES 100 "HUD_MOVES"
     EDIT [[HUD_MOVES]] "Text" "Moves: 0"
     EDIT [[HUD_MOVES]] "FontSize" 26
     EDIT [[HUD_MOVES]] "TextHAlign" -1
@@ -59,6 +69,7 @@
     BREAK
 
 @LEVEL_START
+    EDIT [[HUD_LEVEL]] "Text" "Level [[LEVEL_INDEX]]"
     EDIT [[HUD_MOVES]] "Text" "Moves: [[LEVEL_CURRENT_MOVES]]"
 
     JUMPEQ LEVEL_MESSAGE * HUD_LEVEL_START_NO_MESSAGE
