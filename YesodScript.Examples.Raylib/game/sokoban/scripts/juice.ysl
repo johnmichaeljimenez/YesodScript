@@ -98,6 +98,7 @@
     BREAK
 
 @ON_UNDO
+    PLAYSOUND "sfx/undo"
     PRINT "ON_UNDO"
     BREAK
 
@@ -106,6 +107,7 @@
     BREAK
 
 @ON_HERO_SELECT <type> <index> <rid>
+    PLAYSOUND "sfx/character-select"
     TWEEN3D <rid> "Z" 1 1.1 false 0.2 "SHAKE" "hero_select"
     PRINT "ON_HERO_SELECT type=<type> index=<index> rid=<rid>"
     BREAK
