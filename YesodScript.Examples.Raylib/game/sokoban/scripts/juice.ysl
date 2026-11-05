@@ -171,7 +171,7 @@
     BREAK
 
 @ON_STEP
-    $SFX:PLAY "sfx/footstep05"
+    PLAYSOUND "sfx/footstep05" 0.2
     PRINT "ON_STEP"
     BREAK
 
@@ -184,5 +184,11 @@
     BREAK
 
 @ON_SWAP
-    $SFX:PLAY "sfx/whoosh_1"
+    PLAYSOUND "sfx/whoosh_1"
     BREAK
+
+@MENU:MOVE <index> <x> <y> <text>
+    PLAYSOUND "sfx/ui-select"
+
+@MENU:SELECTED <index> <x> <y> <text>
+    PLAYSOUND "sfx/ui-confirm"
