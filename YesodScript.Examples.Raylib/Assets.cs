@@ -64,7 +64,7 @@ public class Assets : IDisposable
 		if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
 			throw new FileNotFoundException($"Font file not found for id '{id}': '{path}'", path);
 
-		var f = Raylib.LoadFontEx(path, 20, null, 0);
+		var f = Raylib.LoadFontEx(path, 64, null, 0);
 		if (id.Equals(GameContent.DefaultFontName, StringComparison.InvariantCultureIgnoreCase))
 		{
 			fonts[""] = f;
