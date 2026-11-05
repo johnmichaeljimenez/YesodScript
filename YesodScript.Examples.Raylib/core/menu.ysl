@@ -1,5 +1,6 @@
 #Example:
-#   $MENU:FONT "my-font" 24
+#   $MENU:FONT "my-font"
+#   $MENU:FONT_SIZE 24
 #   $MENU:POSITION 640 320
 #   $MENU:SPACING 40
 #   $MENU:ALIGN 0 0
@@ -60,8 +61,11 @@
 	SETVAR MENU_SELECTOR_COLOR_SET false
 	BREAK
 
-@MENU:FONT <name> <size>
+@MENU:FONT <name>
 	SETVAR MENU_FONT <name>
+	BREAK
+
+@MENU:FONT_SIZE <size>
 	SETVAR MENU_FONT_SIZE <size>
 	BREAK
 
