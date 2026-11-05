@@ -1,0 +1,2 @@
+@SFX:PLAY <sfxname>
+    PLAYSOUND <sfxname>

@@ -170,6 +170,11 @@
     PRINT "ON_VICTORY"
     BREAK
 
+@ON_STEP
+    $SFX:PLAY "sfx/footstep05"
+    PRINT "ON_STEP"
+    BREAK
+
 @ON_PUSH
     PRINT "ON_PUSH"
     BREAK
@@ -179,5 +184,5 @@
     BREAK
 
 @ON_SWAP
-    PRINT "ON_SWAP"
+    $SFX:PLAY "sfx/whoosh_1"
     BREAK
