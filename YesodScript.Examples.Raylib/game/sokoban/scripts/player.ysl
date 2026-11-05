@@ -60,6 +60,7 @@
     >PLAYER_MOVE_READY
         JUMPEQ PLAYER_BLOCKED true PLAYER_MOVE_BLOCKED_CASE
         # free walk (thief may also pull)
+        $ON_STEP
         $UNDO_PUSH
         JUMPEQ HERO_TYPE 1 PLAYER_MOVE_THIEF_PULL
         JUMP PLAYER_MOVE_GO
