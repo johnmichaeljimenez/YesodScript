@@ -243,8 +243,10 @@
     LISTSET TILE_OBJ [[LEVEL_TEMP]] [[_rid]]
 
     JUMPLE _rid 0 LEVEL_SWAP_OK
-    TWEEN3D [[_rid]] "X" <bx> <px> false 0.12 "QUAD" "box_swap_x" false
-    TWEEN3D [[_rid]] "Y" <by> <py> false 0.12 "QUAD" "box_swap_y" false
+    EDIT3D [[_rid]] "X" <px>
+    EDIT3D [[_rid]] "Y" <py>
+    # TWEEN3D [[_rid]] "X" <bx> <px> false 0.12 "QUAD" "box_swap_x" false
+    # TWEEN3D [[_rid]] "Y" <by> <py> false 0.12 "QUAD" "box_swap_y" false
 
     >LEVEL_SWAP_OK
         SETVAR <ok> true
