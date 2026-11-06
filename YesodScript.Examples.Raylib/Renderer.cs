@@ -498,7 +498,7 @@ public class Renderer : IDisposable
 
 		Raylib.BeginDrawing();
 		{
-			Raylib.ClearBackground(GameContent.Transparent ? Color.Blank : BackgroundColor);
+			Raylib.ClearBackground(GameContent.Transparent ? Color.Blank : Color.Black);
 			Raylib.DrawTexturePro(rt.Texture, sourceRect, destRect, Vector2.Zero, 0.0f, Color.White);
 		}
 		Raylib.EndDrawing();
