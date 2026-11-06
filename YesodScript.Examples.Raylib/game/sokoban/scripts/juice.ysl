@@ -94,6 +94,8 @@
         BREAK
 
 @ON_LEVEL_START
+    TWEENCAM3D "FromY" 1 0 true 2 "QUAD" "CamY"
+    TWEENCAM3D "FromZ" 1 0 true 2 "QUAD" "CamZ"
     PLAYSOUND "sfx/level-start"
     BREAK
 
@@ -170,6 +172,7 @@
     BREAK
 
 @ON_EXIT
+    WAIT 0.5
     PLAYSOUND "sfx/level-complete"
     WAIT 0.5
     PRINT "ON_EXIT"
