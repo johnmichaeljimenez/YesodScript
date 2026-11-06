@@ -94,8 +94,12 @@
         BREAK
 
 @ON_LEVEL_START
+    #dolly zoom (-ish)
+    $FADE_OUT
     TWEENCAM3D "FromY" 1 0 true 2 "QUAD" "CamY"
     TWEENCAM3D "FromZ" 1 0 true 2 "QUAD" "CamZ"
+    TWEENCAM3D "Fovy" -10 0 true 2 "QUAD" "CamF"
+    
     PLAYSOUND "sfx/level-start"
     BREAK
 
