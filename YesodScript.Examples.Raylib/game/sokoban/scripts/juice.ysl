@@ -93,7 +93,12 @@
         PRINT "ON_HERO_SPAWN type=<type> <rid> @ <x>,<y>"
         BREAK
 
+@ON_LEVEL_START
+    PLAYSOUND "sfx/level-start"
+    BREAK
+
 @ON_RESTART
+    PLAYSOUND "sfx/undo"
     PRINT "ON_RESTART"
     BREAK
 
@@ -165,6 +170,8 @@
     BREAK
 
 @ON_EXIT
+    PLAYSOUND "sfx/level-complete"
+    WAIT 0.5
     PRINT "ON_EXIT"
     BREAK
 
