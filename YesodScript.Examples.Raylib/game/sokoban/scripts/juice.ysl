@@ -95,12 +95,12 @@
 
 @ON_LEVEL_START
     #dolly zoom (-ish)
-    $FADE_OUT
     TWEENCAM3D "FromY" 1 0 true 2 "QUAD" "CamY"
     TWEENCAM3D "FromZ" 1 0 true 2 "QUAD" "CamZ"
     TWEENCAM3D "Fovy" -10 0 true 2 "QUAD" "CamF"
     
     PLAYSOUND "sfx/level-start"
+    $FADE_OUT
     BREAK
 
 @ON_RESTART
@@ -176,13 +176,16 @@
     BREAK
 
 @ON_EXIT
-    WAIT 0.5
+    TWEENCAM3D "Fovy" 0 -5 true 1.5 "QUAD" "CamF"
     PLAYSOUND "sfx/level-complete"
-    WAIT 0.5
+    WAIT 1
+    $FADE_IN
     PRINT "ON_EXIT"
     BREAK
 
 @ON_VICTORY
+    SETVAR GAME_COMPLETED true
+    SHOW true "HUD_VICTORY"
     PRINT "ON_VICTORY"
     BREAK
 
