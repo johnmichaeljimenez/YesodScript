@@ -292,15 +292,37 @@ public class Renderer : IDisposable
 		return -1;
 	}
 
-	private Vector2 ScreenToWorld(Vector2 screen)
+	public Vector2 ScreenToWorld(Vector2 screen)
 	{
-		var zoom = Camera.Zoom == 0f ? 1f : Camera.Zoom;
-		var offsetX = VirtualWidth * 0.5f;
-		var offsetY = VirtualHeight * 0.5f;
-		return new Vector2(
-			(screen.X - offsetX) / zoom + Camera.X,
-			(screen.Y - offsetY) / zoom + Camera.Y
-		);
+		var cam2d = Camera.ToCamera2D(VirtualWidth * 0.5f, VirtualHeight * 0.5f);
+		return Raylib.GetScreenToWorld2D(screen, cam2d);
+	}
+
+	public Vector2 WorldToScreen(Vector2 world)
+	{
+		var cam2d = Camera.ToCamera2D(VirtualWidth * 0.5f, VirtualHeight * 0.5f);
+		return Raylib.GetWorldToScreen2D(world, cam2d);
+	}
+
+	public Vector3 ScreenToWorld3D(Vector2 screen, float planeZ = 0f)
+	{
+		var cam3d = Camera3D.ToCamera3D();
+		var ray = Raylib.GetScreenToWorldRayEx(screen, cam3d, VirtualWidth, VirtualHeight);
+
+		const float epsilon = 1e-6f;
+		if (MathF.Abs(ray.Direction.Y) < epsilon)
+			return new Vector3(ray.Position.X, ray.Position.Z, planeZ);
+
+		var t = (planeZ - ray.Position.Y) / ray.Direction.Y;
+		var hit = ray.Position + ray.Direction * t;
+		return new Vector3(hit.X, hit.Z, planeZ);
+	}
+
+	public Vector2 WorldToScreen3D(Vector3 world)
+	{
+		var cam3d = Camera3D.ToCamera3D();
+		var rlPos = new Vector3(world.X, world.Z, world.Y);
+		return Raylib.GetWorldToScreenEx(rlPos, cam3d, VirtualWidth, VirtualHeight);
 	}
 
 	private static bool HitTest(RenderData item, Vector2 point)

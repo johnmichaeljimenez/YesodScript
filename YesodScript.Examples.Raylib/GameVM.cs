@@ -523,6 +523,90 @@ public class TweenCam3D : GameCommand
 	}
 }
 
+public class ScreenToWorld : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private string storeX;
+	[CommandParameter] private string storeY;
+
+	public override void OnEnter()
+	{
+		var world = Renderer.Instance.ScreenToWorld(new Vector2(x, y));
+		CoordUtil.StoreNumber(GameVM, Instruction, storeX, world.X);
+		CoordUtil.StoreNumber(GameVM, Instruction, storeY, world.Y);
+	}
+}
+
+public class WorldToScreen : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private string storeX;
+	[CommandParameter] private string storeY;
+
+	public override void OnEnter()
+	{
+		var screen = Renderer.Instance.WorldToScreen(new Vector2(x, y));
+		CoordUtil.StoreNumber(GameVM, Instruction, storeX, screen.X);
+		CoordUtil.StoreNumber(GameVM, Instruction, storeY, screen.Y);
+	}
+}
+
+public class ScreenToWorld3D : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private string storeX;
+	[CommandParameter] private string storeY;
+	[CommandParameter] private string storeZ;
+	[CommandParameter] private float planeZ = 0f;
+
+	public override void OnEnter()
+	{
+		var world = Renderer.Instance.ScreenToWorld3D(new Vector2(x, y), planeZ);
+		CoordUtil.StoreNumber(GameVM, Instruction, storeX, world.X);
+		CoordUtil.StoreNumber(GameVM, Instruction, storeY, world.Y);
+		if (!string.IsNullOrEmpty(storeZ))
+			CoordUtil.StoreNumber(GameVM, Instruction, storeZ, world.Z);
+	}
+}
+
+public class WorldToScreen3D : GameCommand
+{
+	[CommandParameter] private float x;
+	[CommandParameter] private float y;
+	[CommandParameter] private float z;
+	[CommandParameter] private string storeX;
+	[CommandParameter] private string storeY;
+
+	public override void OnEnter()
+	{
+		var screen = Renderer.Instance.WorldToScreen3D(new Vector3(x, y, z));
+		CoordUtil.StoreNumber(GameVM, Instruction, storeX, screen.X);
+		CoordUtil.StoreNumber(GameVM, Instruction, storeY, screen.Y);
+	}
+}
+
+internal static class CoordUtil
+{
+	public static void StoreNumber(VirtualMachine vm, Instruction instruction, string varName, float value)
+	{
+		if (string.IsNullOrEmpty(varName))
+			throw new InvalidOperationException("Store var name is required.");
+
+		var v = vm.GetVar(varName, instruction)
+			?? throw new InvalidOperationException($"Var '{varName}' was not found.");
+
+		if (v.Type == typeof(int))
+			v.Value = (int)float.Truncate(value);
+		else if (v.Type == typeof(float))
+			v.Value = value;
+		else
+			throw new NotSupportedException($"Var '{varName}' is of type '{v.Type.Name}'; coordinate store requires int or float.");
+	}
+}
+
 public class RegSaveVar : GameCommand
 {
 	[CommandParameter]
