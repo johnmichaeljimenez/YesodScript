@@ -54,5 +54,7 @@
     CALL "ON_HERO_DEATH"
     SETVAR PLAYER_MOVING false
     WAIT 0.4
+    $FADE_IN
     $LEVEL_INIT [[LEVEL_NAME]]
+    $FADE_OUT
     BREAK
