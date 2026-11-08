@@ -149,7 +149,10 @@
         BREAK
 
 @ON_HERO_DEATH
-    PRINT "ON_HERO_DEATH"
+    PLAYSOUND "sfx/game-over"
+    TWEENCAM3D "FromX" -0.05 0.05 true 0.2 "SHAKE"
+    TWEENCAM3D "FromY" -0.05 0.05 true 0.2 "SHAKE"
+    WAIT 1
     BREAK
 
 @ON_BOX_DEATH <rid> <x> <y>
