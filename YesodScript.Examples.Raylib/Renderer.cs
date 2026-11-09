@@ -391,7 +391,7 @@ public class Renderer : IDisposable
 
 	private static string[] SplitLines(string text)
 	{
-		return text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+		return text.Replace("\\n", "\n").Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 	}
 
 	private static Vector2 MeasureMultilineText(Font font, string text, float fontSize, float spacing)
