@@ -1,5 +1,5 @@
 @_INIT
-    DEFVAR CRED_MSG "SFX by Chequered Ink and Atelier Magicae\nFuwawa, Mococo and Bijou 3D models by pyrox3ne\n\nFull game design and all levels are based off\nJonah Ostroff's Heroes of Sokoban\n" string
+    DEFVAR CRED_MSG "SFX by Chequered Ink and Atelier Magicae\n\nFuwawa, Mococo and Bijou 3D models by pyrox3ne\n\nFull game design and all levels are based off\nJonah Ostroff's Heroes of Sokoban\n" string
     DEFVAR CRED_ID 0 int
     DEFVAR CRED_PRESS_ID 0 int
     
@@ -15,9 +15,9 @@
     BREAK
 
 @CREDITS:SHOW
-    @MENU:SELECTED
+    PLAYSOUND "sfx/ui-confirm"
     SHOW true "CREDITS"
     $WAITPRESS "Space"
-    @MENU:SELECTED
+    PLAYSOUND "sfx/ui-confirm"
     SHOW false "CREDITS"
     BREAK
