@@ -1,15 +1,33 @@
 @_INIT
-    DEFVAR CRED_MSG "SFX by Chequered Ink and Atelier Magicae\n\nFuwawa, Mococo and Bijou 3D models by pyrox3ne\n\nFull game design and all levels are based off\nJonah Ostroff's Heroes of Sokoban\n" string
-    DEFVAR CRED_ID 0 int
+    DEFVAR CRED_TITLE_ID 0 int
+    RENDER 640 120 CRED_TITLE_ID 100 "CREDITS"
+    EDIT [[CRED_TITLE_ID]] "Text" "SOKOBAN HEROES"
+    EDIT [[CRED_TITLE_ID]] "FontSize" 48
+
+    DEFVAR CRED_AUTHOR_ID 0 int
+    RENDER 640 180 CRED_AUTHOR_ID 100 "CREDITS"
+    EDIT [[CRED_AUTHOR_ID]] "Text" "A YesodScript sokoban demo by rateater93"
+    EDIT [[CRED_AUTHOR_ID]] "FontSize" 24
+
+    DEFVAR CRED_DESIGN_ID 0 int
+    RENDER 640 260 CRED_DESIGN_ID 100 "CREDITS"
+    EDIT [[CRED_DESIGN_ID]] "Text" "GAME DESIGN & LEVELS\nBased on Heroes of Sokoban by Jonah Ostroff\n(PuzzleScript, 2013)"
+    EDIT [[CRED_DESIGN_ID]] "FontSize" 26
+
+    DEFVAR CRED_MODELS_ID 0 int
+    RENDER 640 380 CRED_MODELS_ID 100 "CREDITS"
+    EDIT [[CRED_MODELS_ID]] "Text" "3D CHARACTER MODELS\nFuwawa, Mococo & Bijou models by pyrox3ne\n\nUnofficial fan models of hololive characters.\nNot affiliated with Cover Corp or hololive production."
+    EDIT [[CRED_MODELS_ID]] "FontSize" 24
+
+    DEFVAR CRED_SFX_ID 0 int
+    RENDER 640 520 CRED_SFX_ID 100 "CREDITS"
+    EDIT [[CRED_SFX_ID]] "Text" "SOUND EFFECTS\nChequered Ink\nAtelier Magicae"
+    EDIT [[CRED_SFX_ID]] "FontSize" 26
+
     DEFVAR CRED_PRESS_ID 0 int
-    
-    RENDER 640 360 CRED_ID 100 "CREDITS"
-    EDIT [[CRED_ID]] "Text" [[CRED_MSG]]
-    EDIT [[CRED_ID]] "FontSize" 30    
-    
-    RENDER 640 480 CRED_PRESS_ID 100 "CREDITS"
-    EDIT [[CRED_PRESS_ID]] "Text" "[Space] back"
-    EDIT [[CRED_PRESS_ID]] "FontSize" 20
+    RENDER 640 640 CRED_PRESS_ID 100 "CREDITS"
+    EDIT [[CRED_PRESS_ID]] "Text" "[Space] Back"
+    EDIT [[CRED_PRESS_ID]] "FontSize" 22
 
     SHOW false "CREDITS"
     BREAK
