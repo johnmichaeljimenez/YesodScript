@@ -44,8 +44,9 @@ DEFLIST MENU string
 	JUMP MENU_START
 
 >CREDITS
-    #stub for now
+    $CREDITS:SHOW
     JUMP MENU_START
+    BREAK
 
 >END
     WAIT 0.2

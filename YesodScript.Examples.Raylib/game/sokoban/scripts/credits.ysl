@@ -1,0 +1,23 @@
+@_INIT
+    DEFVAR CRED_MSG "SFX by Chequered Ink and Atelier Magicae\nFuwawa, Mococo and Bijou 3D models by pyrox3ne\n\nFull game design and all levels are based off\nJonah Ostroff's Heroes of Sokoban\n" string
+    DEFVAR CRED_ID 0 int
+    DEFVAR CRED_PRESS_ID 0 int
+    
+    RENDER 640 360 CRED_ID 100 "CREDITS"
+    EDIT [[CRED_ID]] "Text" [[CRED_MSG]]
+    EDIT [[CRED_ID]] "FontSize" 30    
+    
+    RENDER 640 480 CRED_PRESS_ID 100 "CREDITS"
+    EDIT [[CRED_PRESS_ID]] "Text" "[Space] back"
+    EDIT [[CRED_PRESS_ID]] "FontSize" 20
+
+    SHOW false "CREDITS"
+    BREAK
+
+@CREDITS:SHOW
+    @MENU:SELECTED
+    SHOW true "CREDITS"
+    $WAITPRESS "Space"
+    @MENU:SELECTED
+    SHOW false "CREDITS"
+    BREAK
