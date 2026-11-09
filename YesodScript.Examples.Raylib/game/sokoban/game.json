@@ -4,5 +4,6 @@
   "virtualwidth": 1280,
   "virtualheight": 720,
   "pixelart": false,
+  "itch": "rateater93/sokoban:windows",
   "defaultfontname": "font-default"
 }
