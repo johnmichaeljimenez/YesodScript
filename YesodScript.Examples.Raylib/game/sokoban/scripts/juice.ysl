@@ -214,3 +214,10 @@
 
 @MENU:SELECTED <index> <x> <y> <text>
     PLAYSOUND "sfx/ui-confirm"
+
+@MAINMENULOGO:SHOW
+    SHOW true "MENU*"
+    TWEEN [[MENU_LOGO]] "Opacity" 0 1 false 0.4 "QUAD" "MENU_A"
+    
+@MAINMENULOGO:HIDE
+    SHOW false "MENU*"
