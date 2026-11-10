@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 
-namespace YesodScript.Examples;
+namespace YesodScript.Runtime;
 
 public static class GameContent
 {
@@ -97,11 +97,19 @@ public static class GameContent
 	private static string? FindProjectGameRoot(string gameId)
 	{
 		var dir = new DirectoryInfo(AppContext.BaseDirectory);
-		for (var i = 0; i < 6 && dir != null; i++, dir = dir.Parent)
+		for (var i = 0; i < 8 && dir != null; i++, dir = dir.Parent)
 		{
-			var candidate = Path.Combine(dir.FullName, "game", gameId);
-			if (IsContentRoot(candidate))
-				return Path.GetFullPath(candidate);
+			var candidates = new[]
+			{
+				Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "game", gameId),
+				Path.Combine(dir.FullName, "game", gameId),
+			};
+
+			foreach (var candidate in candidates)
+			{
+				if (IsContentRoot(candidate))
+					return Path.GetFullPath(candidate);
+			}
 		}
 
 		return null;
@@ -131,21 +139,22 @@ public static class GameContent
 		for (var i = 0; i < 8 && dir != null; i++, dir = dir.Parent)
 		{
 			var stdlibCore = Path.Combine(dir.FullName, "stdlib", "core");
-			var hostCore = Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "core");
+			var hostCore = Path.Combine(dir.FullName, "YesodScript.Runtime.Raylib", "core");
 			var legacyCore = Path.Combine(dir.FullName, "core");
-			var games = Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "game");
-			if (!Directory.Exists(games))
-				games = Path.Combine(dir.FullName, "game");
+
+			var exampleGames = Path.Combine(dir.FullName, "YesodScript.Examples.Raylib", "game");
+			var rootGames = Path.Combine(dir.FullName, "game");
+			var hasGamesLayout = Directory.Exists(exampleGames) || Directory.Exists(rootGames);
 
 			var paths = new List<string>();
 			if (Directory.Exists(stdlibCore))
 				paths.Add(Path.GetFullPath(stdlibCore));
 			if (Directory.Exists(hostCore))
 				paths.Add(Path.GetFullPath(hostCore));
-			else if (Directory.Exists(legacyCore) && Directory.Exists(games))
+			else if (Directory.Exists(legacyCore) && hasGamesLayout)
 				paths.Add(Path.GetFullPath(legacyCore));
 
-			if (paths.Count > 0 && Directory.Exists(games))
+			if (paths.Count > 0 && (Directory.Exists(hostCore) || hasGamesLayout))
 				return paths;
 		}
 

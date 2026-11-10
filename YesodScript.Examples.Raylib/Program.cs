@@ -1,3 +1,5 @@
+using YesodScript.Runtime;
+
 namespace YesodScript.Examples;
 
 public static class Program
@@ -26,7 +28,6 @@ public static class Program
 			}
 			catch
 			{
-
 			}
 		}
 	}

@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.Json;
 using YesodScript.Engine.Core;
 
-namespace YesodScript.Examples;
+namespace YesodScript.Runtime;
 
 public class SaveManager
 {

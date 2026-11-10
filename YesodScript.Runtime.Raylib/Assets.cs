@@ -3,7 +3,7 @@ using Raylib_cs;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
 
-namespace YesodScript.Examples;
+namespace YesodScript.Runtime;
 
 public class Assets : IDisposable
 {

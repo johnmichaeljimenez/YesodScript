@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace YesodScript.Examples;
+namespace YesodScript.Runtime;
 
 public static class ErrorReport
 {

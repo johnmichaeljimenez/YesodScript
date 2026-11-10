@@ -5,7 +5,8 @@ Usage:
   python package.py pong --upload push zip to itch.io via butler
 
 Content lives under game/<id>/ (assets, scripts, game.json).
-Official stdlib is repo stdlib/core/ (plus host core/ helpers) and is shipped as core/ beside scripts/assets.
+Runtime + host core live in YesodScript.Runtime.Raylib (stdlib/core + runtime core/)
+and are shipped as core/ beside scripts/assets.
 """
 
 from __future__ import annotations

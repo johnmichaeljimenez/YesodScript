@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>true</IsPackable>
+    <PackageId>YesodScript.Runtime.Raylib</PackageId>
+    <Authors>John Jimenez</Authors>
+    <Description>Raylib host runtime for YesodScript games (VM bindings, content manager, renderer, assets).</Description>
+    <RepositoryUrl>https://github.com/johnmichaeljimenez/YesodScript</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
+    <ProjectReference Include="..\..\Tween\src\Tween\Tween.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="8.1.0" />
+    <PackageReference Include="MinVer" Version="5.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Official engine stdlib (core/) shipped beside host helpers for a complete runtime content tree. -->
+  <ItemGroup>
+    <None Include="..\stdlib\core\**\*">
+      <Link>core\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Pack>true</Pack>
+      <PackagePath>contentFiles/any/any/core/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </None>
+    <None Include="core/**/*">
+      <Link>core/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Pack>true</Pack>
+      <PackagePath>contentFiles/any/any/core/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateRuntimeCore" BeforeTargets="Build">
+    <Error
+      Condition="!Exists('..\stdlib\core')"
+      Text="Official stdlib folder is missing. Expected ../stdlib/core with .ysl helpers." />
+    <Error
+      Condition="!Exists('core')"
+      Text="Host core helpers folder 'core/' is missing. Expected YesodScript.Runtime.Raylib/core with .ysl helpers." />
+  </Target>
+
+</Project>

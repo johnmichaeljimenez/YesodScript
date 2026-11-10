@@ -5,9 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-    <!-- select game content pack. override with -p:GameId=pong -->
+    <!-- select game content pack. override with GameId msbuild property -->
     <GameId Condition="'$(GameId)' == ''">pong</GameId>
     <GameTitle Condition="'$(GameTitle)' == ''">Pong</GameTitle>
     <GameIcon Condition="'$(GameIcon)' == ''">game/$(GameId)/$(GameTitle).ico</GameIcon>
@@ -30,27 +29,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Tween\src\Tween\Tween.csproj" />
-    <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
+    <ProjectReference Include="..\YesodScript.Runtime.Raylib\YesodScript.Runtime.Raylib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\stdlib\core\**\*">
-      <Link>core\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
-    <None Include="core/**/*">
-      <Link>core/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-
+  <!-- Debug: ship all sample games under game/ for multi-game switching. -->
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <None Include="game/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Release: flatten one game pack next to the exe (runtime assumes one game). -->
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <None Include="game/$(GameId)/assets/**/*">
       <Link>assets/%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -66,17 +53,7 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Raylib-cs" Version="8.1.0" />
-  </ItemGroup>
-
   <Target Name="ValidateGameContent" BeforeTargets="Build">
-    <Error
-      Condition="!Exists('..\stdlib\core')"
-      Text="Official stdlib folder is missing. Expected ../stdlib/core with .ysl helpers." />
-    <Error
-      Condition="!Exists('core')"
-      Text="Host core helpers folder 'core/' is missing. Expected YesodScript.Examples.Raylib/core with .ysl helpers." />
     <Error
       Condition="!Exists('game/$(GameId)/scripts') and !Exists('game/$(GameId)/assets')"
       Text="Game content not found for GameId=$(GameId). Expected game/$(GameId)/scripts and/or assets." />

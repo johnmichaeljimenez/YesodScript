@@ -1,5 +1,6 @@
-<Solution>
+﻿<Solution>
   <Project Path="YesodScript.Engine.Tests/YesodScript.Engine.Tests.csproj" />
   <Project Path="YesodScript.Engine/YesodScript.Engine.csproj" />
+  <Project Path="YesodScript.Runtime.Raylib/YesodScript.Runtime.Raylib.csproj" />
   <Project Path="YesodScript.Examples.Raylib/YesodScript.Examples.Raylib.csproj" />
 </Solution>

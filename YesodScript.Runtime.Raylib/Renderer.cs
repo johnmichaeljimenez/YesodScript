@@ -4,7 +4,7 @@ using TweenLib;
 using YesodScript.Engine.Core;
 using YesodScript.Engine.Tools;
 
-namespace YesodScript.Examples;
+namespace YesodScript.Runtime;
 
 public class Camera
 {
