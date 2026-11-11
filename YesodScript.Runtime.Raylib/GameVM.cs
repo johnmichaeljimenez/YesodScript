@@ -9,6 +9,7 @@ namespace YesodScript.Runtime;
 
 public class GameVM : VirtualMachine
 {
+	public bool mouseHold;
 	public bool mouseClicked;
 	private Var screenWidth, screenHeight, screenWidthHalf, screenHeightHalf;
 	private Var mouseX, mouseY;
@@ -78,9 +79,10 @@ public class GameVM : VirtualMachine
 		AddGlobalList("SYS:DRAWLIST", typeof(int));
 	}
 
-	public void UpdateInputVars(int mx, int my, bool mouse)
+	public void UpdateInputVars(int mx, int my, bool mouse, bool mouseHeld = false)
 	{
 		mouseClicked = mouse;
+		mouseHold = mouseHeld;
 		mouseX.Value = mx;
 		mouseY.Value = my;
 
@@ -162,7 +164,7 @@ public class Show : GameCommand
 	}
 }
 
-public class JumpClick : GameCommand
+public class JumpMouseClick : GameCommand
 {
 	[CommandParameter]
 	private string labelName;
@@ -170,6 +172,18 @@ public class JumpClick : GameCommand
 	public override void OnEnter()
 	{
 		if (GameVM.mouseClicked)
+			Instruction.Jump(labelName);
+	}
+}
+
+public class JumpMouseHold : GameCommand
+{
+	[CommandParameter]
+	private string labelName;
+
+	public override void OnEnter()
+	{
+		if (GameVM.mouseHold)
 			Instruction.Jump(labelName);
 	}
 }

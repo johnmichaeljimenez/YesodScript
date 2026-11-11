@@ -91,25 +91,25 @@ public class RaylibHost
 
 		while (!Raylib.WindowShouldClose() && UpdateFrame())
 		{
-			
+
 		}
 	}
 
-	public bool UpdateFrame() =>
-		UpdateFrame(
-			Raylib.GetFrameTime(),
-			renderer.GetVirtualPointerPosition(),
-			GetPointerPressed());
-
-	private bool GetPointerPressed()
+	public bool UpdateFrame()
 	{
 		var pointerDown = Raylib.IsMouseButtonDown(MouseButton.Left) || Raylib.GetTouchPointCount() > 0;
 		var pointerPressed = Raylib.IsMouseButtonPressed(MouseButton.Left) || (pointerDown && !pointerWasDown);
 		pointerWasDown = pointerDown;
-		return pointerPressed;
+
+		return UpdateFrame(Raylib.GetFrameTime(), renderer.GetVirtualPointerPosition(), pointerPressed, pointerDown);
 	}
 
 	public bool UpdateFrame(float frameTime, Vector2 mousePosition, bool mousePressed)
+	{
+		return UpdateFrame(frameTime, mousePosition, mousePressed, false);
+	}
+
+	public bool UpdateFrame(float frameTime, Vector2 mousePosition, bool mousePressed, bool mouseHeld)
 	{
 		if (cleanedUp)
 			return false;
@@ -137,7 +137,7 @@ public class RaylibHost
 			while (accumulator >= hz)
 			{
 				renderer.SnapshotPosition();
-				vm.UpdateInputVars((int)mousePosition.X, (int)mousePosition.Y, latchedClick);
+				vm.UpdateInputVars((int)mousePosition.X, (int)mousePosition.Y, latchedClick, mouseHeld);
 				vm.Tick(hz);
 				accumulator -= hz;
 				vmTickedThisFrame = true;
