@@ -294,15 +294,16 @@ public class VirtualMachine : IDisposable
 					}
 
 					var parameters = trigger.Parameters.Keys.ToList();
+					var triggerParameters = parameters.ToDictionary(parameter => parameter, _ => "");
 					for (int j = 0; j < parts.Count; j++)
 					{
 						if (j < parameters.Count)
-							trigger.Parameters[parameters[j]] = parts[j];
+							triggerParameters[parameters[j]] = parts[j];
 					}
 
 					i.TriggerKey = trigger.Key;
 					i.TriggerParameters.Clear();
-					foreach (var kvp in trigger.Parameters)
+					foreach (var kvp in triggerParameters)
 					{
 						i.TriggerParameters[kvp.Key] = kvp.Value;
 					}

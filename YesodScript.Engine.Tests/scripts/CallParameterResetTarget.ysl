@@ -1,0 +1,3 @@
+@PARAMETER_RESET <a> <b> <c> <d> <e>
+
+PRINT "<a>|<b>|<c>|<d>|<e>"

@@ -121,6 +121,13 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_ParamsRetain()
+    {
+        var vm = Utils.Test(out var output, "CallParameterReset.ysl", "CallParameterResetTarget.ysl");
+        output.Should().Be("1|2|3|4|5\n6|7|8||");
+    }
+
+    [Fact]
     public void Test_ExecOrder()
     {
         var vm = Utils.Test(out var output, "ExecutionOrder.ysl", "CallShorthand2.ysl", "Params3.ysl");
