@@ -20,7 +20,11 @@ public class RaylibHost
 	private readonly HashSet<KeyboardKey> pressedKeys = new();
 	private static readonly KeyboardKey[] allKeys = Enum.GetValues<KeyboardKey>();
 
-	public RaylibHost(GameVM vm)
+	public RaylibHost(GameVM vm) : this(vm, null)
+	{
+	}
+
+	public RaylibHost(GameVM vm, Action<Assets>? configureAssets)
 	{
 		Instance = this;
 
@@ -52,6 +56,7 @@ public class RaylibHost
 		this.vm = vm;
 		try
 		{
+			configureAssets?.Invoke(assets);
 			vm.Initialize();
 		}
 		catch (Exception ex)
