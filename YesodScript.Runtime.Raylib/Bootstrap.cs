@@ -1,7 +1,17 @@
+using Raylib_cs;
+
 namespace YesodScript.Runtime;
 
 public class Bootstrap
 {
+    public static RaylibHost CreateBrowserHost(string[]? args = null, Action<Assets>? configureAssets = null)
+    {
+        GameContent.Initialize(args);
+        var host = new RaylibHost(GameVM.Create(), configureAssets);
+        Raylib.SetTargetFPS(30);
+        return host;
+    }
+
     public void Run(string[] args)
     {
         Run(args, null);

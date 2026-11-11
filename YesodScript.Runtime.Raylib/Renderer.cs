@@ -257,19 +257,42 @@ public class Renderer : IDisposable
 
 	public Vector2 GetVirtualMousePosition()
 	{
+		return ScreenToVirtual(Raylib.GetMousePosition());
+	}
+
+	public Vector2 GetVirtualTouchPosition(int index) =>
+		ScreenToVirtual(Raylib.GetTouchPosition(index));
+
+	public Vector2 GetVirtualPointerPosition() =>
+		Raylib.GetTouchPointCount() > 0
+			? GetVirtualTouchPosition(0)
+			: GetVirtualMousePosition();
+
+	public bool IsInsideVirtualScreen(Vector2 virtualPosition) =>
+		virtualPosition.X >= 0 &&
+		virtualPosition.Y >= 0 &&
+		virtualPosition.X < VirtualWidth &&
+		virtualPosition.Y < VirtualHeight;
+
+	private Vector2 ScreenToVirtual(Vector2 screenPosition)
+	{
+		GetRenderScaleAndOffset(out var offsetX, out var offsetY, out var scale);
+		if (screenPosition.X < 0 || screenPosition.Y < 0 || scale <= 0)
+			return screenPosition;
+
+		return new Vector2(
+			(screenPosition.X - offsetX) / scale,
+			(screenPosition.Y - offsetY) / scale);
+	}
+
+	private void GetRenderScaleAndOffset(out float offsetX, out float offsetY, out float scale)
+	{
 		var windowWidth = Raylib.GetScreenWidth();
 		var windowHeight = Raylib.GetScreenHeight();
 
-		var currentScale = MathF.Min((float)windowWidth / VirtualWidth, (float)windowHeight / VirtualHeight);
-		var offsetX = (windowWidth - (VirtualWidth * currentScale)) * 0.5f;
-		var offsetY = (windowHeight - (VirtualHeight * currentScale)) * 0.5f;
-
-		var mouseScreenPos = Raylib.GetMousePosition();
-
-		var virtualMouseX = (mouseScreenPos.X - offsetX) / currentScale;
-		var virtualMouseY = (mouseScreenPos.Y - offsetY) / currentScale;
-
-		return new Vector2(virtualMouseX, virtualMouseY);
+		scale = MathF.Min((float)windowWidth / VirtualWidth, (float)windowHeight / VirtualHeight);
+		offsetX = (windowWidth - (VirtualWidth * scale)) * 0.5f;
+		offsetY = (windowHeight - (VirtualHeight * scale)) * 0.5f;
 	}
 
 	public int GetHoveredRenderId(Vector2 virtualMouse)
@@ -464,14 +487,11 @@ public class Renderer : IDisposable
 
 	public void Draw()
 	{
-		var windowWidth = Raylib.GetScreenWidth();
-		var windowHeight = Raylib.GetScreenHeight();
-
-		var scale = MathF.Min((float)windowWidth / VirtualWidth, (float)windowHeight / VirtualHeight);
+		GetRenderScaleAndOffset(out var offsetX, out var offsetY, out var scale);
 
 		var destRect = new Rectangle(
-			(windowWidth - (VirtualWidth * scale)) * 0.5f,
-			(windowHeight - (VirtualHeight * scale)) * 0.5f,
+			offsetX,
+			offsetY,
 			VirtualWidth * scale,
 			VirtualHeight * scale
 		);

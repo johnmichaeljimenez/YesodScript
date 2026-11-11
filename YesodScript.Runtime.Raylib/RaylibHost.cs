@@ -18,6 +18,7 @@ public class RaylibHost
 	private bool ownsWindow;
 	private bool audioReady;
 	private bool latchedClick;
+	private bool pointerWasDown;
 	private bool cleanedUp;
 
 	private readonly HashSet<KeyboardKey> holdKeys = new();
@@ -97,8 +98,16 @@ public class RaylibHost
 	public bool UpdateFrame() =>
 		UpdateFrame(
 			Raylib.GetFrameTime(),
-			renderer.GetVirtualMousePosition(),
-			Raylib.IsMouseButtonPressed(MouseButton.Left));
+			renderer.GetVirtualPointerPosition(),
+			GetPointerPressed());
+
+	private bool GetPointerPressed()
+	{
+		var pointerDown = Raylib.IsMouseButtonDown(MouseButton.Left) || Raylib.GetTouchPointCount() > 0;
+		var pointerPressed = Raylib.IsMouseButtonPressed(MouseButton.Left) || (pointerDown && !pointerWasDown);
+		pointerWasDown = pointerDown;
+		return pointerPressed;
+	}
 
 	public bool UpdateFrame(float frameTime, Vector2 mousePosition, bool mousePressed)
 	{
