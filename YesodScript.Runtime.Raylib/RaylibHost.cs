@@ -1,3 +1,4 @@
+using System.Numerics;
 using Raylib_cs;
 using TweenLib;
 
@@ -14,40 +15,57 @@ public class RaylibHost
 	private Assets assets;
 	private string? fatalErrorText;
 	private bool windowReady;
+	private bool ownsWindow;
 	private bool audioReady;
+	private bool latchedClick;
+	private bool cleanedUp;
 
 	private readonly HashSet<KeyboardKey> holdKeys = new();
 	private readonly HashSet<KeyboardKey> pressedKeys = new();
 	private static readonly KeyboardKey[] allKeys = Enum.GetValues<KeyboardKey>();
+	public string? FatalErrorText => fatalErrorText;
 
 	public RaylibHost(GameVM vm) : this(vm, null)
 	{
+
 	}
 
-	public RaylibHost(GameVM vm, Action<Assets>? configureAssets)
+	public RaylibHost(GameVM vm, Action<Assets>? configureAssets) : this(vm, configureAssets, true, true)
+	{
+
+	}
+
+	public RaylibHost(GameVM vm, Action<Assets>? configureAssets, bool createWindow, bool initializeAudioDevice)
 	{
 		Instance = this;
 
-		var flags = ConfigFlags.VSyncHint;
-		if (GameContent.Resizable)
+		ownsWindow = createWindow;
+		if (createWindow)
 		{
-			flags |= ConfigFlags.ResizableWindow;
-		}
-		
-		if (GameContent.Transparent)
-		{
-			flags |= ConfigFlags.TransparentWindow;
-			flags |= ConfigFlags.UndecoratedWindow;
+			var flags = ConfigFlags.VSyncHint;
+			if (GameContent.Resizable)
+			{
+				flags |= ConfigFlags.ResizableWindow;
+			}
+
+			if (GameContent.Transparent)
+			{
+				flags |= ConfigFlags.TransparentWindow;
+				flags |= ConfigFlags.UndecoratedWindow;
+			}
+
+			Raylib.SetConfigFlags(flags);
+			Raylib.InitWindow(GameContent.WindowWidth, GameContent.WindowHeight, GameContent.Title);
+			if (GameContent.Maximized && GameContent.Resizable)
+				Raylib.MaximizeWindow();
 		}
 
-		Raylib.SetConfigFlags(flags);
-		Raylib.InitWindow(GameContent.WindowWidth, GameContent.WindowHeight, GameContent.Title);
 		windowReady = true;
-
-		if (GameContent.Maximized && GameContent.Resizable)
-			Raylib.MaximizeWindow();
-		Raylib.InitAudioDevice();
-		audioReady = true;
+		if (initializeAudioDevice)
+		{
+			Raylib.InitAudioDevice();
+			audioReady = true;
+		}
 		Raylib.SetExitKey(0);
 
 		renderer = new();
@@ -68,76 +86,96 @@ public class RaylibHost
 	public void Tick()
 	{
 		accumulator = 0;
-		var latchedClick = false;
+		latchedClick = false;
 
-		while (!Raylib.WindowShouldClose())
+		while (!Raylib.WindowShouldClose() && UpdateFrame())
 		{
-			if (fatalErrorText != null)
+			
+		}
+	}
+
+	public bool UpdateFrame() =>
+		UpdateFrame(
+			Raylib.GetFrameTime(),
+			renderer.GetVirtualMousePosition(),
+			Raylib.IsMouseButtonPressed(MouseButton.Left));
+
+	public bool UpdateFrame(float frameTime, Vector2 mousePosition, bool mousePressed)
+	{
+		if (cleanedUp)
+			return false;
+
+		if (fatalErrorText != null)
+		{
+			DrawFatalError();
+			return true;
+		}
+
+		frameTime = Math.Clamp(frameTime, 0f, 0.25f);
+		if (mousePressed)
+			latchedClick = true;
+
+		foreach (var key in allKeys)
+		{
+			if (Raylib.IsKeyPressed(key)) pressedKeys.Add(key);
+			if (Raylib.IsKeyDown(key)) holdKeys.Add(key);
+		}
+
+		accumulator += frameTime;
+		var vmTickedThisFrame = false;
+		try
+		{
+			while (accumulator >= hz)
 			{
-				DrawFatalError();
-				continue;
-			}
+				renderer.SnapshotPosition();
+				vm.UpdateInputVars((int)mousePosition.X, (int)mousePosition.Y, latchedClick);
+				vm.Tick(hz);
+				accumulator -= hz;
+				vmTickedThisFrame = true;
 
-			var frameTime = Raylib.GetFrameTime();
-			if (frameTime > 0.25f) frameTime = 0.25f;
-
-			if (Raylib.IsMouseButtonPressed(0)) latchedClick = true;
-
-			foreach (var key in allKeys)
-			{
-				if (Raylib.IsKeyPressed(key)) pressedKeys.Add(key);
-				if (Raylib.IsKeyDown(key)) holdKeys.Add(key);
-			}
-
-			var mousePos = renderer.GetVirtualMousePosition();
-			accumulator += frameTime;
-
-			bool vmTickedThisFrame = false;
-			try
-			{
-				while (accumulator >= hz)
-				{
-					renderer.SnapshotPosition();
-					vm.UpdateInputVars((int)mousePos.X, (int)mousePos.Y, latchedClick);
-					vm.Tick(hz);
-					accumulator -= hz;
-					vmTickedThisFrame = true;
-
-					if (!vm.IsRunning) break;
-				}
-			}
-			catch (Exception ex)
-			{
-				SetFatal(ex, "Runtime");
-				continue;
-			}
-
-			if (vmTickedThisFrame)
-			{
-				latchedClick = false;
-				holdKeys.Clear();
-				pressedKeys.Clear();
-			}
-
-			if (!vm.IsRunning) break;
-
-			try
-			{
-				TweenManager.Update(frameTime, frameTime);
-				renderer.Draw();
-			}
-			catch (Exception ex)
-			{
-				SetFatal(ex, "Render");
+				if (!vm.IsRunning) break;
 			}
 		}
+		catch (Exception ex)
+		{
+			SetFatal(ex, "Runtime");
+			DrawFatalError();
+			return true;
+		}
+
+		if (vmTickedThisFrame)
+		{
+			latchedClick = false;
+			holdKeys.Clear();
+			pressedKeys.Clear();
+		}
+
+		if (!vm.IsRunning)
+			return false;
+
+		try
+		{
+			TweenManager.Update(frameTime, frameTime);
+			renderer.Draw();
+		}
+		catch (Exception ex)
+		{
+			SetFatal(ex, "Render");
+			DrawFatalError();
+		}
+
+		return true;
 	}
 
 	public void Cleanup()
 	{
-		try { vm.Dispose(); } catch {  }
+		if (cleanedUp)
+			return;
+
+		cleanedUp = true;
+		try { vm.Dispose(); } catch { }
 		try { assets.Dispose(); } catch { }
-		try { renderer.Dispose(); } catch {  }
+		try { renderer.Dispose(); } catch { }
 
 		if (audioReady)
 		{
@@ -145,7 +183,7 @@ public class RaylibHost
 			audioReady = false;
 		}
 
-		if (windowReady)
+		if (windowReady && ownsWindow)
 		{
 			Raylib.CloseWindow();
 			windowReady = false;

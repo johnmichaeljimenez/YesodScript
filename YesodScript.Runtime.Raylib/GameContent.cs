@@ -1,17 +1,11 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace YesodScript.Runtime;
 
 public static class GameContent
 {
-	private static readonly JsonSerializerOptions JsonOptions = new()
-	{
-		PropertyNameCaseInsensitive = true,
-		ReadCommentHandling = JsonCommentHandling.Skip,
-		AllowTrailingCommas = true,
-	};
-
 	public static string GameId { get; private set; } = "pong";
 	public static string Title { get; private set; } = "YesodScript";
 	public static string Root { get; private set; } = AppContext.BaseDirectory;
@@ -187,7 +181,7 @@ public static class GameContent
 		try
 		{
 			var json = File.ReadAllText(manifestPath);
-			var manifest = JsonSerializer.Deserialize<GameManifest>(json, JsonOptions);
+			var manifest = JsonSerializer.Deserialize(json, GameContentJsonContext.Default.GameManifest);
 			if (manifest == null)
 				return;
 
@@ -227,7 +221,9 @@ public static class GameContent
 		}
 		catch (Exception ex)
 		{
-			throw new InvalidOperationException($"Failed to read game manifest '{manifestPath}'.", ex);
+			throw new InvalidOperationException(
+				$"Failed to read game manifest '{manifestPath}': {ex.Message}",
+				ex);
 		}
 	}
 
@@ -246,7 +242,7 @@ public static class GameContent
 		return char.ToUpperInvariant(id[0]) + id[1..];
 	}
 
-	private sealed class GameManifest
+	internal sealed class GameManifest
 	{
 		public string? Id { get; set; }
 		public string? Title { get; set; }
@@ -264,4 +260,14 @@ public static class GameContent
 		public bool? Resizable { get; set; }
 		public bool? Transparent { get; set; }
 	}
+}
+
+[JsonSourceGenerationOptions(
+	PropertyNameCaseInsensitive = true,
+	ReadCommentHandling = JsonCommentHandling.Skip,
+	AllowTrailingCommas = true)]
+[JsonSerializable(typeof(GameContent.GameManifest))]
+internal partial class GameContentJsonContext : JsonSerializerContext
+{
+	
 }
