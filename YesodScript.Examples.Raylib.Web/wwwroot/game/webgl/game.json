@@ -1,0 +1,10 @@
+{
+  "id": "webgl",
+  "title": "YesodScript WebGL",
+  "virtualWidth": 360,
+  "virtualHeight": 640,
+  "windowWidth": 360,
+  "windowHeight": 640,
+  "maximized": false,
+  "resizable": false
+}

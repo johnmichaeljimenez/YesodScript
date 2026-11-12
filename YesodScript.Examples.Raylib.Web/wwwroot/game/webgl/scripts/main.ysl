@@ -1,0 +1,43 @@
+@_INIT
+    BGCOLOR 18 60 80
+    DEFVAR C 0 int
+    REGSAVEVAR "game" C
+
+    LOADDATA "game" "save"
+
+    DEFVAR "TITLE" 0 int
+    DEFVAR "SUBTITLE" 0 int
+    DEFVAR "HELP" 0 int
+
+    # RENDER [[SYS:SCREEN_WIDTH_HALF]] [[SYS:SCREEN_HEIGHT_HALF]] "TITLE" 0
+    # EDIT [[TITLE]] "Text" "YesodScript + raylib"
+    # EDIT [[TITLE]] "FontSize" 28
+
+    # RENDER 225 390 "SUBTITLE" 1
+    # EDIT [[SUBTITLE]] "Text" "Running in the browser"
+    # EDIT [[SUBTITLE]] "FontSize" 18
+
+    RENDER [[SYS:SCREEN_WIDTH_HALF]] [[SYS:SCREEN_HEIGHT_HALF]] "HELP" 2
+    EDIT [[HELP]] "Text" [[C]]
+    EDIT [[HELP]] "FontSize" 25
+
+>LOOP
+    JUMPMOUSECLICK CLICK
+    JUMPKEYPRESS "Space" KEY
+    JUMP AFTER
+
+>KEY
+    ADD C 1
+    EDIT [[HELP]] "Text" [[C]]
+    SAVEDATA "game" "save"
+    JUMP AFTER
+
+>CLICK
+    ADD C 1
+    EDIT [[HELP]] "Text" [[C]]
+    SAVEDATA "game" "save"
+    JUMP AFTER
+
+>AFTER
+    WAITFRAME
+    JUMP LOOP
