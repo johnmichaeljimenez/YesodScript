@@ -139,6 +139,7 @@ public class RaylibHost
 				renderer.SnapshotPosition();
 				vm.UpdateInputVars((int)mousePosition.X, (int)mousePosition.Y, latchedClick, mouseHeld);
 				vm.Tick(hz);
+				latchedClick = false;
 				accumulator -= hz;
 				vmTickedThisFrame = true;
 
@@ -154,7 +155,6 @@ public class RaylibHost
 
 		if (vmTickedThisFrame)
 		{
-			latchedClick = false;
 			holdKeys.Clear();
 			pressedKeys.Clear();
 		}
