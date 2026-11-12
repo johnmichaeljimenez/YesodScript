@@ -1,0 +1,59 @@
+<Project>
+  <PropertyGroup>
+    <YesodScriptRaylibWebGameContentDir Condition="'$(YesodScriptRaylibWebGameContentDir)' == ''">$(MSBuildProjectDirectory)\wwwroot\game\webgl</YesodScriptRaylibWebGameContentDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <SelfContained>true</SelfContained>
+    <WasmMainJSPath>$(MSBuildThisFileDirectory)wwwroot\main.js</WasmMainJSPath>
+    <DefineConstants>$(DefineConstants);BROWSER</DefineConstants>
+    <WasmBuildNative>true</WasmBuildNative>
+    <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
+    <EmccFlags>$(EmccFlags) -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB</EmccFlags>
+    <EmccLinkOptimizationFlag Condition="'$(EmccLinkOptimizationFlag)' == ''">-O0</EmccLinkOptimizationFlag>
+    <EmccCompileOptimizationFlag Condition="'$(EmccCompileOptimizationFlag)' == ''">-O0</EmccCompileOptimizationFlag>
+    <WasmNativeStrip Condition="'$(WasmNativeStrip)' == ''">false</WasmNativeStrip>
+    <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <TrimmerRootAssembly Include="YesodScript.Runtime.Raylib.Web" />
+    <TrimmerRootAssembly Include="YesodScript.Runtime.Raylib" />
+    <TrimmerRootAssembly Include="YesodScript.Engine" />
+    <WasmExtraFilesToDeploy Include="$(MSBuildThisFileDirectory)wwwroot\index.html" TargetPath="index.html" />
+    <WasmExtraFilesToDeploy Include="$(MSBuildThisFileDirectory)wwwroot\main.js" TargetPath="main.js" />
+    <WasmExtraFilesToDeploy Include="$(YesodScriptRaylibWebGameContentDir)\game.json" TargetPath="game/webgl/game.json" />
+    <WasmFilesToIncludeInFileSystem Include="$(YesodScriptRaylibWebGameContentDir)\**\*">
+      <TargetPath>game\webgl\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </WasmFilesToIncludeInFileSystem>
+    <WasmFilesToIncludeInFileSystem Include="$(MSBuildThisFileDirectory)..\stdlib\core\**\*">
+      <TargetPath>core\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </WasmFilesToIncludeInFileSystem>
+    <WasmFilesToIncludeInFileSystem Include="$(MSBuildThisFileDirectory)..\YesodScript.Runtime.Raylib\core\**\*">
+      <TargetPath>core\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </WasmFilesToIncludeInFileSystem>
+  </ItemGroup>
+
+  <Target
+    Name="ValidateYesodScriptRaylibWebContent"
+    BeforeTargets="_WasmGenerateAppBundle"
+    Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <Error
+      Condition="!Exists('$(YesodScriptRaylibWebGameContentDir)\game.json')"
+      Text="Web game manifest not found. Expected '$(YesodScriptRaylibWebGameContentDir)\game.json'." />
+    <Error
+      Condition="!Exists('$(YesodScriptRaylibWebGameContentDir)\scripts')"
+      Text="Web game scripts folder not found. Expected '$(YesodScriptRaylibWebGameContentDir)\scripts'." />
+  </Target>
+
+  <Target
+    Name="RefreshYesodScriptRaylibWebBundleWhenGameFilesChange"
+    BeforeTargets="_WasmGenerateAppBundle"
+    Inputs="@(WasmFilesToIncludeInFileSystem)"
+    Outputs="$(IntermediateOutputPath)wasm-vfs-content.stamp"
+    Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <Delete Files="$(WasmAppDir)\.stamp" Condition="Exists('$(WasmAppDir)\.stamp')" />
+    <Touch Files="$(IntermediateOutputPath)wasm-vfs-content.stamp" AlwaysCreate="true" />
+  </Target>
+</Project>
