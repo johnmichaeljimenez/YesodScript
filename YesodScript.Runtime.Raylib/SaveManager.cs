@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using YesodScript.Engine.Core;
 
@@ -6,15 +7,16 @@ namespace YesodScript.Runtime;
 
 public class SaveManager
 {
-	private static readonly JsonSerializerOptions JsonOptions = new()
-	{
-		WriteIndented = true
-	};
-
 	private readonly Dictionary<string, List<Var>> saveData = new(StringComparer.OrdinalIgnoreCase);
+	private readonly ISaveStorage storage;
 
-	public SaveManager(GameVM gameVM)
+	public SaveManager(GameVM gameVM) : this(gameVM, null)
 	{
+	}
+
+	public SaveManager(GameVM gameVM, ISaveStorage? storage)
+	{
+		this.storage = storage ?? new FileSaveStorage();
 	}
 
 	public void RegisterVar(string group, Var variable)
@@ -43,10 +45,7 @@ public class SaveManager
 			throw new Exception($"No save data registered for group '{group}'");
 
 		var path = GetSavePath(filename);
-		if (!File.Exists(path))
-			return;
-
-		var json = File.ReadAllText(path);
+		var json = storage.Read(path);
 		if (string.IsNullOrWhiteSpace(json))
 			return;
 
@@ -69,13 +68,20 @@ public class SaveManager
 			throw new Exception($"No save data registered for group '{group}'");
 
 		var path = GetSavePath(filename);
-		var data = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+		using var stream = new MemoryStream();
+		using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+		{
+			writer.WriteStartObject();
+			foreach (var variable in vars)
+			{
+				writer.WritePropertyName(variable.Name);
+				WriteValue(writer, variable);
+			}
+			writer.WriteEndObject();
+		}
 
-		foreach (var variable in vars)
-			data[variable.Name] = SerializeValue(variable);
-
-		var json = JsonSerializer.Serialize(data, JsonOptions);
-		File.WriteAllText(path, json);
+		var json = Encoding.UTF8.GetString(stream.ToArray());
+		storage.Write(path, json);
 	}
 
 	public string GetSavePath(string filename)
@@ -86,37 +92,60 @@ public class SaveManager
 		return Path.Combine("saves", $"{filename}.json");
 	}
 
-	private static object? SerializeValue(Var variable)
+	private static void WriteValue(Utf8JsonWriter writer, Var variable)
 	{
 		if (variable.Type == typeof(OpList))
 		{
 			if (variable.Value is not OpList list)
-				return Array.Empty<object>();
+			{
+				writer.WriteStartArray();
+				writer.WriteEndArray();
+				return;
+			}
 
-			return list.Items.Select(item => SerializeScalar(item, list.ElementType)).ToArray();
+			writer.WriteStartArray();
+			foreach (var item in list.Items)
+				WriteScalar(writer, item, list.ElementType);
+			writer.WriteEndArray();
+			return;
 		}
 
-		return SerializeScalar(variable.Value, variable.Type);
+		WriteScalar(writer, variable.Value, variable.Type);
 	}
 
-	private static object? SerializeScalar(object? value, Type type)
+	private static void WriteScalar(Utf8JsonWriter writer, object? value, Type type)
 	{
 		if (value is null)
-			return null;
+		{
+			writer.WriteNullValue();
+			return;
+		}
 
 		if (type == typeof(bool) || value is bool)
-			return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
+		{
+			writer.WriteBooleanValue(Convert.ToBoolean(value, CultureInfo.InvariantCulture));
+			return;
+		}
 
 		if (type == typeof(int) || value is int)
-			return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+		{
+			writer.WriteNumberValue(Convert.ToInt32(value, CultureInfo.InvariantCulture));
+			return;
+		}
 
 		if (type == typeof(float) || value is float)
-			return Convert.ToSingle(value, CultureInfo.InvariantCulture);
+		{
+			writer.WriteNumberValue(Convert.ToSingle(value, CultureInfo.InvariantCulture));
+			return;
+		}
 
 		if (type == typeof(string) || value is string)
-			return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+		{
+			writer.WriteStringValue(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+			return;
+		}
 
-		return value;
+		throw new NotSupportedException($"Unsupported save type '{type.Name}'.");
 	}
 
 	private static object DeserializeValue(JsonElement element, Var variable)
@@ -149,8 +178,12 @@ public class SaveManager
 		{
 			if (type == typeof(string))
 				return string.Empty;
-			if (type.IsValueType)
-				return Activator.CreateInstance(type)!;
+			if (type == typeof(bool))
+				return false;
+			if (type == typeof(int))
+				return 0;
+			if (type == typeof(float))
+				return 0f;
 			throw new InvalidDataException($"Null is not valid for '{varName}' ({type.Name}).");
 		}
 

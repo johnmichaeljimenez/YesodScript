@@ -18,16 +18,22 @@ public class GameVM : VirtualMachine
 
 	public readonly SaveManager SaveManager;
 
-	public GameVM(int randomSeed = 0) : base(randomSeed)
+	public GameVM(int randomSeed = 0) : this(randomSeed, null)
 	{
-		SaveManager = new SaveManager(this);
+	}
+
+	public GameVM(int randomSeed, ISaveStorage? saveStorage) : base(randomSeed)
+	{
+		SaveManager = new SaveManager(this, saveStorage);
 	}
 
 	public static GameVM Instance { get; private set; }
 
-	public static GameVM Create()
+	public static GameVM Create() => Create(null);
+
+	public static GameVM Create(ISaveStorage? saveStorage)
 	{
-		var vm = new GameVM(Environment.TickCount);
+		var vm = new GameVM(Environment.TickCount, saveStorage);
 		vm.OnOutput += (msg) =>
 		{
 			var logs = vm.logString.Value.ToString();

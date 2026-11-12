@@ -6,8 +6,18 @@ public class Bootstrap
 {
     public static RaylibHost CreateBrowserHost(string[]? args = null, Action<Assets>? configureAssets = null)
     {
+        return CreateBrowserHost(args, configureAssets, null);
+    }
+
+    public static RaylibHost CreateBrowserHostWithStorage(ISaveStorage saveStorage, string[]? args = null, Action<Assets>? configureAssets = null)
+    {
+        return CreateBrowserHost(args, configureAssets, saveStorage);
+    }
+
+    private static RaylibHost CreateBrowserHost(string[]? args, Action<Assets>? configureAssets, ISaveStorage? saveStorage)
+    {
         GameContent.Initialize(args);
-        var host = new RaylibHost(GameVM.Create(), configureAssets);
+        var host = new RaylibHost(GameVM.Create(saveStorage), configureAssets);
         Raylib.SetTargetFPS(30);
         return host;
     }
