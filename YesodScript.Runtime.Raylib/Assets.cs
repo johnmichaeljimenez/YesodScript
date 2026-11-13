@@ -174,12 +174,6 @@ public class Assets : IDisposable
 		LoadModelAnimations(id, path);
 	}
 
-	/// <summary>
-	/// Sketchfab (and similar) GLBs often ship black baseColorFactor with the
-	/// actual unlit colors in the emissive map. Raylib's default model shader
-	/// multiplies albedo texture by albedo color and ignores emission, so those
-	/// models draw as black silhouettes. Promote emission → albedo when needed.
-	/// </summary>
 	private static unsafe void NormalizeModelMaterials(Model model)
 	{
 		if (model.MaterialCount <= 0 || model.Materials == null)
@@ -434,7 +428,7 @@ public class LoadAssets : GameCommand
 		fontPaths = DirectoryExtractor.GetPaths(relativePath, "ttf", "otf");
 		fontKeys = fontPaths.Keys.ToList();
 
-		modelPaths = DirectoryExtractor.GetPaths(relativePath, "glb");
+		modelPaths = DirectoryExtractor.GetPaths(relativePath, "glb", "obj");
 		modelKeys = modelPaths.Keys.ToList();
 
 		var vsPaths = DirectoryExtractor.GetPaths(relativePath, "vs");
