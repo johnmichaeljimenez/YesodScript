@@ -91,6 +91,8 @@ public class Renderer : IDisposable
 	public Camera Camera = new();
 	public Camera3D Camera3D = new();
 	public Color BackgroundColor { get; set; } = Color.Black;
+	private Camera previousCamera = new();
+	private Camera3D previousCamera3D = new();
 
 	public Renderer()
 	{
@@ -200,6 +202,14 @@ public class Renderer : IDisposable
 
 	public void SnapshotPosition()
 	{
+		previousCamera = new Camera(Camera.X, Camera.Y, Camera.Zoom);
+		previousCamera3D = new Camera3D(
+			Camera3D.FromX, Camera3D.FromY, Camera3D.FromZ,
+			Camera3D.ToX, Camera3D.ToY, Camera3D.ToZ, Camera3D.Fovy)
+		{
+			ShowGrid = Camera3D.ShowGrid
+		};
+
 		foreach (var i in sortedRenderList)
 		{
 			i.prevX = i.X;
@@ -213,6 +223,23 @@ public class Renderer : IDisposable
 			i.Value.prevZ = i.Value.Z;
 		}
 	}
+
+	private Camera GetInterpolatedCamera(float alpha) => new(
+		InterpolatePosition(previousCamera.X, Camera.X, alpha),
+		InterpolatePosition(previousCamera.Y, Camera.Y, alpha),
+		previousCamera.Zoom + (Camera.Zoom - previousCamera.Zoom) * alpha);
+
+	private Camera3D GetInterpolatedCamera3D(float alpha) => new(
+		InterpolatePosition(previousCamera3D.FromX, Camera3D.FromX, alpha),
+		InterpolatePosition(previousCamera3D.FromY, Camera3D.FromY, alpha),
+		InterpolatePosition(previousCamera3D.FromZ, Camera3D.FromZ, alpha),
+		InterpolatePosition(previousCamera3D.ToX, Camera3D.ToX, alpha),
+		InterpolatePosition(previousCamera3D.ToY, Camera3D.ToY, alpha),
+		InterpolatePosition(previousCamera3D.ToZ, Camera3D.ToZ, alpha),
+		previousCamera3D.Fovy + (Camera3D.Fovy - previousCamera3D.Fovy) * alpha);
+
+	private static float InterpolatePosition(float previous, float current, float alpha) =>
+		MathF.Abs(current - previous) > 100f ? current : previous + (current - previous) * alpha;
 
 	public RenderData3D CreateRenderData3D(float x, float y, float z = 0f)
 	{
@@ -504,7 +531,7 @@ public class Renderer : IDisposable
 			var alpha = Math.Clamp(RaylibHost.Instance.HzAlpha, 0f, 1f);
 			EnsureSorted();
 
-			var cam2d = Camera.ToCamera2D(VirtualWidth * 0.5f, VirtualHeight * 0.5f);
+			var cam2d = GetInterpolatedCamera(alpha).ToCamera2D(VirtualWidth * 0.5f, VirtualHeight * 0.5f);
 			Raylib.BeginMode2D(cam2d);
 			foreach (var item in sortedRenderList)
 			{
@@ -515,7 +542,7 @@ public class Renderer : IDisposable
 			}
 			Raylib.EndMode2D();
 
-			var cam3d = Camera3D.ToCamera3D();
+			var cam3d = GetInterpolatedCamera3D(alpha).ToCamera3D();
 			Raylib.BeginMode3D(cam3d);
 			if (Camera3D.ShowGrid)
 				Raylib.DrawGrid(10, 1f);

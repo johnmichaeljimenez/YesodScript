@@ -77,6 +77,7 @@ public class RaylibHost
 		{
 			configureAssets?.Invoke(assets);
 			vm.Initialize();
+			renderer.SnapshotPosition();
 		}
 		catch (Exception ex)
 		{
