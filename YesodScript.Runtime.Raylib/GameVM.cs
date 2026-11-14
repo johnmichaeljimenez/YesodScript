@@ -33,7 +33,15 @@ public class GameVM : VirtualMachine
 
 	public static GameVM Create(ISaveStorage? saveStorage)
 	{
-		var vm = new GameVM(Environment.TickCount, saveStorage);
+		return CreateWithFactory(storage => new GameVM(Environment.TickCount, storage), saveStorage);
+	}
+
+	public static GameVM CreateWithFactory(Func<ISaveStorage?, GameVM> vmFactory, ISaveStorage? saveStorage = null)
+	{
+		ArgumentNullException.ThrowIfNull(vmFactory);
+		var vm = vmFactory(saveStorage)
+			?? throw new InvalidOperationException("The GameVM factory returned null.");
+			
 		vm.OnOutput += (msg) =>
 		{
 			var logs = vm.logString.Value.ToString();
@@ -85,7 +93,7 @@ public class GameVM : VirtualMachine
 		AddGlobalList("SYS:DRAWLIST", typeof(int));
 	}
 
-	public void UpdateInputVars(int mx, int my, bool mouse, bool mouseHeld = false)
+	public virtual void UpdateInputVars(int mx, int my, bool mouse, bool mouseHeld = false)
 	{
 		mouseClicked = mouse;
 		mouseHold = mouseHeld;
